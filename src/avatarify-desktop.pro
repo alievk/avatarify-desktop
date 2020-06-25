@@ -20,8 +20,7 @@ SOURCES += \
 RESOURCES += qml.qrc
 
 OTHER_FILES = main.qml \
-    qtquickcontrols2.conf \
-    content/Config.qml
+    qtquickcontrols2.conf
 
 TRANSLATIONS += \
     avatarify-desktop_en_US.ts

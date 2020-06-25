@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>content/Config.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play">content/icons8/icons8-play-64.png</file>

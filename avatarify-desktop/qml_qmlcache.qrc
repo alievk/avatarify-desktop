@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/">
+        <file alias="main.qml">../src/main.qml</file>
+        <file alias="qtquickcontrols2.conf">../src/qtquickcontrols2.conf</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="play">../src/content/icons8/icons8-play-64.png</file>
+        <file alias="stop">../src/content/icons8/icons8-stop-64.png</file>
+        <file alias="save">../src/content/icons8/icons8-save-64.png</file>
+        <file alias="switch-off">../src/content/icons8/icons8-switch-off-64.png</file>
+        <file alias="toggle-on">../src/content/icons8/icons8-toggle-on-64.png</file>
+        <file alias="toggle-off">../src/content/icons8/icons8-toggle-off-64.png</file>
+    </qresource>
+</RCC>
