@@ -1,1 +1,1 @@
-# avatarify-desktop-cpp
+# Avatarify Desktop

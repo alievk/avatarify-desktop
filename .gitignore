@@ -35,5 +35,7 @@
 *.tar
 *.dat
 
-/build/*
+/build
 .DS_Store
+/cmake-build-debug
+/.idea

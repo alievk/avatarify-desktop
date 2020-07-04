@@ -7,23 +7,21 @@ import QtMultimedia 5.15
 import Qt.labs.settings 1.0
 import Qt.labs.folderlistmodel 2.15
 
-import io.qt.examples.backend 1.0
+import com.avatarify.desktop 1.0
 
 ApplicationWindow {
     id: window
     visible: true
     width: 760
     height: 530
-//    title: "Avatarify Desktop"
+    title: "Avatarify Desktop"
 
-//    Settings {
-//        property alias x: window.x
-//        property alias y: window.y
-//        property alias width: window.width
-//        property alias height: window.height
-    //    }
-
-
+    Settings {
+        property alias x: window.x
+        property alias y: window.y
+        property alias width: window.width
+        property alias height: window.height
+    }
 
     ColumnLayout {
         anchors.fill: parent
