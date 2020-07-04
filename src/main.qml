@@ -7,11 +7,13 @@ import QtMultimedia 5.15
 import Qt.labs.settings 1.0
 import Qt.labs.folderlistmodel 2.15
 
+import io.qt.examples.backend 1.0
+
 ApplicationWindow {
     id: window
     visible: true
     width: 760
-    height: 450
+    height: 530
 //    title: "Avatarify Desktop"
 
 //    Settings {
@@ -20,6 +22,8 @@ ApplicationWindow {
 //        property alias width: window.width
 //        property alias height: window.height
     //    }
+
+
 
     ColumnLayout {
         anchors.fill: parent
@@ -56,8 +60,6 @@ ApplicationWindow {
                     ColumnLayout {
                         anchors.fill: parent
                         visible: true
-                        anchors.bottom: parent.bottom
-                        anchors.top: parent.top
 
                         Label {
                             text: "Choose your camera:"
@@ -65,6 +67,10 @@ ApplicationWindow {
                         ComboBox {
                             id: cameraSelector
                             Layout.fillWidth: true
+                            width: 250
+                            Layout.maximumWidth: 250
+                            Layout.preferredWidth: 250
+                            Layout.minimumWidth: 250
 
                             model: QtMultimedia.availableCameras
                             textRole: 'displayName'
@@ -87,10 +93,29 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             text: qsTr("Virtual camera")
                         }
-//                        Label {
-//                            text: "You can use Avatarify as a \nvirtual camera for Skype/Zoom calls"
-//                            wrapMode: Text.WordWrap
-//                        }
+                        Label {
+                            width: 260
+                            Layout.maximumWidth: 260
+                            Layout.preferredWidth: 260
+                            Layout.minimumWidth: 260
+                            text: "You can use Avatarify as a virtual camera for Skype/Zoom calls"
+                            wrapMode: Text.WordWrap
+                        }
+
+                        BackEnd {
+                            id: backend
+                        }
+
+                        TextField {
+                            width: 260
+                            Layout.maximumWidth: 260
+                            Layout.preferredWidth: 260
+                            Layout.minimumWidth: 260
+                            text: backend.userName
+                            placeholderText: qsTr("User name")
+
+                            onTextChanged: backend.userName = text
+                        }
                     }
                 }
 
@@ -116,6 +141,10 @@ ApplicationWindow {
                             Layout.preferredHeight: 256
                             Layout.preferredWidth: 455
                             width: 455
+
+                            background: Rectangle {
+                                color: "black"
+                            }
                         }
                     }
                 }
@@ -125,28 +154,35 @@ ApplicationWindow {
         GroupBox {
             id: avatarGroup
             Layout.fillWidth: true
-            title: qsTr("Avatars")
+            title: qsTr("Choose your avatar:")
 
             Settings {
                 category: "Input"
-                property alias avatar: avatarSelector.currentValue
+//                property alias avatar: avatarSelector.currentValue
             }
 
             ColumnLayout {
                 anchors.fill: parent
 
-                Label {
-                    text: "Choose your avatar:"
-                }
-                ComboBox {
+                ListView {
                     id: avatarSelector
                     Layout.fillWidth: true
+                    height: 154
+                    orientation: ListView.Horizontal
+                    flickableDirection: Flickable.HorizontalFlick
+                    clip: true
 
                     model: FolderListModel {
                         folder: "file:///Users/vlivashkin/.avatarify/avatars"
                         nameFilters: ['*.jpg', '*.jpeg', '*.png']
                     }
-                    textRole: 'fileBaseName'
+                    delegate: Component {
+                        Image {
+                            height: 144
+                            width: 144
+                            source: "file:///Users/vlivashkin/.avatarify/avatars/" + fileName
+                        }
+                    }
                 }
             }
         }

@@ -34,3 +34,6 @@
 # Weights
 *.tar
 *.dat
+
+/build/*
+.DS_Store
