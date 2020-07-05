@@ -17,10 +17,33 @@ ApplicationWindow {
     title: "Avatarify Desktop"
 
     Settings {
+        id: window_settings
+        category: "Window"
         property alias x: window.x
         property alias y: window.y
         property alias width: window.width
         property alias height: window.height
+    }
+
+    Settings {
+        id: input_settings
+        category: "Input"
+        property alias cam_id: cameraSelector.currentValue
+        property alias mirror: cameraMirrorCheckbox.checked
+        property alias smartCrop: cameraSmartCropCheckbox.checked
+        property alias vcam: cameraVCamCheckbox.checked
+    }
+
+    AsyncCameraCapture {
+        id: cam
+        deviceId: QtMultimedia.defaultCamera.deviceId
+        mirror: input_settings.mirror
+        smartCrop: input_settings.smartCrop
+    }
+
+    InferenceManager {
+        id: manager
+        camera: cam
     }
 
     ColumnLayout {
@@ -45,22 +68,14 @@ ApplicationWindow {
                     Layout.minimumWidth: 270
                     Layout.fillHeight: false
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-                    title: qsTr("Settings")
-
-                    Settings {
-                        category: "Input"
-                        property alias cam_id: cameraSelector.currentValue
-                        property alias mirror: cameraMirrorCheckbox.checked
-                        property alias smartCrop: cameraSmartCropCheckbox.checked
-                        property alias vcam: cameraVCamCheckbox.checked
-                    }
+                    title: "Settings"
 
                     ColumnLayout {
                         anchors.fill: parent
                         visible: true
 
                         Label {
-                            text: "Choose your camera:"
+                            text: "Choose your cam:"
                         }
                         ComboBox {
                             id: cameraSelector
@@ -71,63 +86,55 @@ ApplicationWindow {
                             Layout.minimumWidth: 250
 
                             model: QtMultimedia.availableCameras
+                            valueRole: 'deviceId'
                             textRole: 'displayName'
+
+                            onActivated: cam.deviceId = currentValue
                         }
 
                         Switch {
                             id: cameraMirrorCheckbox
                             Layout.fillWidth: true
-                            text: qsTr("Flip video preview")
+                            text: "Flip video preview"
+
+                            onClicked: cam.mirror = checked
                         }
 
                         Switch {
                             id: cameraSmartCropCheckbox
                             Layout.fillWidth: true
-                            text: qsTr("Smart crop")
+                            text: "Smart crop"
+
+                            onClicked: cam.smartCrop = checked
                         }
 
                         Switch {
                             id: cameraVCamCheckbox
                             Layout.fillWidth: true
-                            text: qsTr("Virtual camera")
+                            text: "Virtual cam"
                         }
                         Label {
                             width: 260
                             Layout.maximumWidth: 260
                             Layout.preferredWidth: 260
                             Layout.minimumWidth: 260
-                            text: "You can use Avatarify as a virtual camera for Skype/Zoom calls"
+                            text: "You can use Avatarify as a virtual cam for Skype/Zoom calls"
                             wrapMode: Text.WordWrap
-                        }
-
-                        BackEnd {
-                            id: backend
-                        }
-
-                        TextField {
-                            width: 260
-                            Layout.maximumWidth: 260
-                            Layout.preferredWidth: 260
-                            Layout.minimumWidth: 260
-                            text: backend.userName
-                            placeholderText: qsTr("User name")
-
-                            onTextChanged: backend.userName = text
                         }
                     }
                 }
 
                 GroupBox {
                     id: previewGroup
-                    title: qsTr("Preview")
+                    title: "Preview"
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
                     ColumnLayout {
                         anchors.fill: parent
 
-                        Label {
-                            id: previewScene
+                        VideoOutput {
+                            source: cam
                             height: 256
                             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                             Layout.maximumHeight: 256
@@ -139,10 +146,6 @@ ApplicationWindow {
                             Layout.preferredHeight: 256
                             Layout.preferredWidth: 455
                             width: 455
-
-                            background: Rectangle {
-                                color: "black"
-                            }
                         }
                     }
                 }
@@ -152,7 +155,7 @@ ApplicationWindow {
         GroupBox {
             id: avatarGroup
             Layout.fillWidth: true
-            title: qsTr("Choose your avatar:")
+            title: "Choose your avatar:"
 
             Settings {
                 category: "Input"

@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "backend.h"
+#include "AsyncCameraCapture.h"
+#include "InferenceManager.h"
 
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -9,7 +10,8 @@ int main(int argc, char *argv[]) {
     app.setOrganizationDomain("avatarify.com");
     app.setApplicationName("Avatarify Desktop");
 
-    qmlRegisterType<BackEnd>("com.avatarify.desktop", 1, 0, "BackEnd");
+    qmlRegisterType<AsyncCameraCapture>("com.avatarify.desktop", 1, 0, "AsyncCameraCapture");
+    qmlRegisterType<InferenceManager>("com.avatarify.desktop", 1, 0, "InferenceManager");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
