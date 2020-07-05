@@ -1,7 +1,8 @@
 QT += quick \
-    quickcontrols2
+    quickcontrols2 \
+    multimedia
 
-CONFIG += c++11 \
+CONFIG += c++14 \
     qmltypes
 
 # The following define makes your compiler emit warnings if you use
@@ -16,19 +17,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 HEADERS += \
-    backend.h
+    src/AsyncCameraCapture.h \
+    src/PoorMansProbe.h \
+    src/predictors/Predictor.h \
+    src/predictors/IdentityPredictor.h \
+    src/InferenceManager.h \
+    src/InferenceWorker.h
 
 SOURCES += \
-     backend.cpp \
-     main.cpp
+    src/AsyncCameraCapture.cpp \
+    src/PoorMansProbe.cpp \
+    src/predictors/Predictor.cpp \
+    src/predictors/IdentityPredictor.cpp \
+    src/InferenceManager.cpp \
+    src/InferenceWorker.cpp \
+    src/main.cpp
 
-RESOURCES += qml.qrc
+RESOURCES += src/qml.qrc
 
-OTHER_FILES = main.qml \
-    qtquickcontrols2.conf
+OTHER_FILES = src/main.qml \
+    src/qtquickcontrols2.conf
 
 TRANSLATIONS += \
-    avatarify-desktop_en_US.ts
+    src/avatarify-desktop_en_US.ts
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

@@ -12,8 +12,10 @@ import com.avatarify.desktop 1.0
 ApplicationWindow {
     id: window
     visible: true
-    width: 760
-    height: 530
+    width: 706
+    height: 537
+    minimumWidth: 706
+    minimumHeight: 537
     title: "Avatarify Desktop"
 
     Settings {
@@ -49,6 +51,7 @@ ApplicationWindow {
     }
 
     ColumnLayout {
+        spacing: 0
         anchors.fill: parent
         anchors.rightMargin: 5
         anchors.topMargin: 0
@@ -68,7 +71,9 @@ ApplicationWindow {
                     Layout.maximumWidth: 270
                     Layout.preferredWidth: 270
                     Layout.minimumWidth: 270
+                    topPadding: 40
                     Layout.fillHeight: false
+                    Layout.fillWidth: false
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     title: "Settings"
 
@@ -122,26 +127,23 @@ ApplicationWindow {
 
                 GroupBox {
                     id: previewGroup
-                    title: "Preview"
+                    padding: 5
+                    topPadding: 35
+                    rightPadding: 5
+                    bottomPadding: 5
+                    leftPadding: 5
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+                    title: "Preview"
 
                     ColumnLayout {
+                        spacing: 0
                         anchors.fill: parent
 
                         VideoOutput {
                             source: manager
-                            height: 256
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-                            Layout.maximumHeight: 256
-                            Layout.maximumWidth: 455
-                            Layout.minimumHeight: 256
-                            Layout.minimumWidth: 455
-                            Layout.fillHeight: false
-                            Layout.fillWidth: false
-                            Layout.preferredHeight: 256
-                            Layout.preferredWidth: 455
-                            width: 455
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                         }
                     }
                 }
@@ -150,21 +152,32 @@ ApplicationWindow {
 
         GroupBox {
             id: avatarGroup
+            Layout.maximumHeight: 184
+            Layout.minimumHeight: 184
+            Layout.preferredHeight: 184
+            padding: 5
+            topPadding: 35
+            rightPadding: 5
+            bottomPadding: 5
+            leftPadding: 5
+            Layout.fillHeight: false
             Layout.fillWidth: true
             title: "Choose your avatar:"
 
             ColumnLayout {
+                spacing: 0
                 anchors.fill: parent
 
                 ListView {
                     id: avatarSelector
+                    spacing: 3
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.fillWidth: true
-                    height: 144
+                    Layout.fillHeight: true
                     orientation: ListView.Horizontal
                     flickableDirection: Flickable.HorizontalFlick
                     clip: true
-                    highlightFollowsCurrentItem: true
-                    focus: true
+                    highlightFollowsCurrentItem: false
 
                     model: FolderListModel {
                         folder: "file:///Users/vlivashkin/.avatarify/avatars"
@@ -172,27 +185,52 @@ ApplicationWindow {
                     }
                     delegate: Component {
                         Item {
+                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                             width: 144
                             height: 144
-                            Image {
-                                Layout.margins: 5
-                                height: 134
-                                width: 134
-                                fillMode: Image.PreserveAspectCrop
-                                source: "file:///Users/vlivashkin/.avatarify/avatars/" + fileName
+
+                            ColumnLayout {
+                                spacing: 0
+                                anchors.fill: parent
+
+                                Image {
+                                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                                    width: 138
+                                    height: 138
+                                    Layout.maximumWidth: 138
+                                    Layout.minimumWidth: 138
+                                    Layout.preferredWidth: 138
+                                    Layout.maximumHeight: 138
+                                    Layout.minimumHeight: 138
+                                    Layout.preferredHeight: 138
+                                    fillMode: Image.PreserveAspectCrop
+                                    source: "file:///Users/vlivashkin/.avatarify/avatars/" + fileName
+                                }
                             }
+
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: avatarSelector.currentIndex = index
+                                onClicked: {
+                                    console.log('select!');
+                                    avatarSelector.currentIndex = index;
+                                }
                             }
                         }
                     }
                     highlight: Rectangle {
-                        color: "lightsteelblue"
+                        border.color: "steelblue"
+                        border.width: 3
+                        color: "transparent"
                         radius: 5
+                        width: 144
+                        height: 144
+                        x: avatarSelector.currentItem.x
+                        z: Infinity
                     }
                 }
             }
         }
     }
 }
+
+

@@ -3,8 +3,8 @@
 
 #include <QThread>
 #include <QAbstractVideoSurface>
-#include <src/predictors/IdentityPredictor.h>
 #include "AsyncCameraCapture.h"
+#include "predictors/IdentityPredictor.h"
 
 class InferenceWorker : public QThread {
 Q_OBJECT
@@ -13,6 +13,7 @@ public:
     InferenceWorker(AsyncCameraCapture *camera, QAbstractVideoSurface *videoSurface, bool virtualCamera);
 
 public slots:
+
     void setMirror(bool mirror);
 
     void setVirtualCamera(bool virtualCamera);
