@@ -18,6 +18,8 @@ public slots:
 
     void setVirtualCamera(bool virtualCamera);
 
+    void setAvatarPath(QString avatarPath);
+
     void stop();
 
     void run() override;
@@ -32,6 +34,7 @@ private:
     IdentityPredictor predictor;
     bool m_mirror{};
     bool m_virtualCamera;
+    QString m_avatarPath;
     bool isAlive = true;
 };
 

@@ -1,6 +1,7 @@
 #include <QTime>
 #include <qtestsupport_core.h>
 #include <QVideoSurfaceFormat>
+#include <utility>
 #include "InferenceWorker.h"
 
 InferenceWorker::InferenceWorker(AsyncCameraCapture *camera, QAbstractVideoSurface *videoSurface, bool virtualCamera) {
@@ -16,6 +17,11 @@ void InferenceWorker::setMirror(bool mirror) {
 void InferenceWorker::setVirtualCamera(bool virtualCamera) {
     m_virtualCamera = virtualCamera;
 }
+
+void InferenceWorker::setAvatarPath(QString avatarPath) {
+    m_avatarPath = std::move(avatarPath);
+}
+
 
 void InferenceWorker::stop() {
     isAlive = false;
@@ -46,6 +52,3 @@ void InferenceWorker::inference() {
 
     // TODO: virtual camera
 }
-
-
-

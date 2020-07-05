@@ -33,7 +33,7 @@ bool InferenceManager::mirror() const {
 }
 
 void InferenceManager::setMirror(bool mirror) {
-    qDebug() << "InferenceManager::setMirror";
+    qDebug() << "InferenceManager::setMirror" << mirror;
 
     if (m_mirror == mirror)
         return;
@@ -49,7 +49,7 @@ bool InferenceManager::virtualCamera() const {
 }
 
 void InferenceManager::setVirtualCamera(bool virtualCamera) {
-    qDebug() << "InferenceManager::setVirtualCamera";
+    qDebug() << "InferenceManager::setVirtualCamera" << virtualCamera;
 
     if (m_virtualCamera == virtualCamera)
         return;
@@ -57,6 +57,22 @@ void InferenceManager::setVirtualCamera(bool virtualCamera) {
     m_virtualCamera = virtualCamera;
     if (worker != nullptr) {
         worker->setVirtualCamera(m_virtualCamera);
+    }
+}
+
+QString InferenceManager::avatarPath() const {
+    return m_avatarPath;
+}
+
+void InferenceManager::setAvatarPath(QString avatarPath) {
+    qDebug() << "InferenceManager::setAvatarPath " << avatarPath;
+
+    if (m_avatarPath == avatarPath)
+        return;
+
+    m_avatarPath = avatarPath;
+    if (worker != nullptr) {
+        worker->setAvatarPath(m_avatarPath);
     }
 }
 
@@ -74,3 +90,4 @@ void InferenceManager::startWorkerIfReady() {
         qDebug() << "Refuse to start worker, not all params are filled.";
     }
 }
+

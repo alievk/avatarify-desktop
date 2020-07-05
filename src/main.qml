@@ -34,7 +34,6 @@ ApplicationWindow {
         property alias mirror: cameraMirrorCheckbox.checked
         property alias smartCrop: cameraSmartCropCheckbox.checked
         property alias vcam: cameraVCamCheckbox.checked
-        property alias avatar: avatarSelector.currentIndex
     }
 
     AsyncCameraCapture {
@@ -180,6 +179,7 @@ ApplicationWindow {
                     highlightFollowsCurrentItem: false
 
                     model: FolderListModel {
+                        id: avatarModel
                         folder: "file:///Users/vlivashkin/.avatarify/avatars"
                         nameFilters: ['*.jpg', '*.jpeg', '*.png']
                     }
@@ -204,15 +204,15 @@ ApplicationWindow {
                                     Layout.minimumHeight: 138
                                     Layout.preferredHeight: 138
                                     fillMode: Image.PreserveAspectCrop
-                                    source: "file:///Users/vlivashkin/.avatarify/avatars/" + fileName
+                                    source: avatarModel.folder + "/" + model.fileName
                                 }
                             }
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    console.log('select!');
                                     avatarSelector.currentIndex = index;
+                                    manager.avatarPath = avatarModel.folder + "/" + model.fileName
                                 }
                             }
                         }
