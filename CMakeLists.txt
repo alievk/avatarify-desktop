@@ -25,6 +25,7 @@ set(HEADERS ${HEADERS}
         src/predictors/Predictor.h
         src/predictors/IdentityPredictor.h
         src/InferenceManager.h
+        src/InferenceWorker.h
         )
 set(SOURCES ${SOURCES}
         src/AsyncCameraCapture.cpp
@@ -32,6 +33,7 @@ set(SOURCES ${SOURCES}
         src/predictors/Predictor.cpp
         src/predictors/IdentityPredictor.cpp
         src/InferenceManager.cpp
+        src/InferenceWorker.cpp
         src/main.cpp
         )
 add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})

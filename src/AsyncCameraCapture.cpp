@@ -51,21 +51,18 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
 
     QVideoFrame cloneFrame(frame);
     cloneFrame.map(QAbstractVideoBuffer::ReadOnly);
-    const QImage image(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(),
-                       QVideoFrame::imageFormatFromPixelFormat(cloneFrame.pixelFormat()));
+    QImage::Format format = QVideoFrame::imageFormatFromPixelFormat(cloneFrame.pixelFormat());
+    if (format == QImage::Format_Invalid) {
+        qDebug() << "FUCK";
+    }
+    QImage image(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), format);
+    if (format != QImage::Format_ARGB32) {
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
 
-    // preprocessing (mirror, crop/smartCrop) will be here
+    // TODO: crop/smartCrop
 
     m_frame = image;
-}
-
-bool AsyncCameraCapture::mirror() const {
-    return m_mirror;
-}
-
-void AsyncCameraCapture::setMirror(const bool mirror) {
-    qDebug() << "AsyncCameraCapture::setMirror " << QString::number(mirror);
-    m_mirror = mirror;
 }
 
 bool AsyncCameraCapture::smartCrop() const {

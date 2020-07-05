@@ -12,7 +12,6 @@
 class AsyncCameraCapture : public QObject {
 Q_OBJECT
     Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId)
-    Q_PROPERTY(bool mirror READ mirror WRITE setMirror)
     Q_PROPERTY(bool smartCrop READ smartCrop WRITE setSmartCrop)
 
 public:
@@ -21,10 +20,6 @@ public:
     QString deviceId();
 
     void setDeviceId(const QString &deviceId);
-
-    bool mirror() const;
-
-    void setMirror(bool mirror);
 
     bool smartCrop() const;
 
@@ -44,8 +39,7 @@ private:
     QScopedPointer<QCameraViewfinderSettings> m_vfsettings;
 
     QCameraInfo m_cameraInfo;
-    bool m_mirror;
-    bool m_smartCrop;
+    bool m_smartCrop = false;
     QImage m_frame;
 };
 

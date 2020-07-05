@@ -32,18 +32,20 @@ ApplicationWindow {
         property alias mirror: cameraMirrorCheckbox.checked
         property alias smartCrop: cameraSmartCropCheckbox.checked
         property alias vcam: cameraVCamCheckbox.checked
+        property alias avatar: avatarSelector.currentIndex
     }
 
     AsyncCameraCapture {
         id: cam
-        deviceId: QtMultimedia.defaultCamera.deviceId
-        mirror: input_settings.mirror
+        deviceId: input_settings.cam_id
         smartCrop: input_settings.smartCrop
     }
 
     InferenceManager {
         id: manager
         camera: cam
+        mirror: input_settings.mirror
+        virtualCamera: input_settings.vcam
     }
 
     ColumnLayout {
@@ -88,24 +90,18 @@ ApplicationWindow {
                             model: QtMultimedia.availableCameras
                             valueRole: 'deviceId'
                             textRole: 'displayName'
-
-                            onActivated: cam.deviceId = currentValue
                         }
 
                         Switch {
                             id: cameraMirrorCheckbox
                             Layout.fillWidth: true
                             text: "Flip video preview"
-
-                            onClicked: cam.mirror = checked
                         }
 
                         Switch {
                             id: cameraSmartCropCheckbox
                             Layout.fillWidth: true
                             text: "Smart crop"
-
-                            onClicked: cam.smartCrop = checked
                         }
 
                         Switch {
@@ -134,7 +130,7 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         VideoOutput {
-                            source: cam
+                            source: manager
                             height: 256
                             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                             Layout.maximumHeight: 256
@@ -157,32 +153,43 @@ ApplicationWindow {
             Layout.fillWidth: true
             title: "Choose your avatar:"
 
-            Settings {
-                category: "Input"
-//                property alias avatar: avatarSelector.currentValue
-            }
-
             ColumnLayout {
                 anchors.fill: parent
 
                 ListView {
                     id: avatarSelector
                     Layout.fillWidth: true
-                    height: 154
+                    height: 144
                     orientation: ListView.Horizontal
                     flickableDirection: Flickable.HorizontalFlick
                     clip: true
+                    highlightFollowsCurrentItem: true
+                    focus: true
 
                     model: FolderListModel {
                         folder: "file:///Users/vlivashkin/.avatarify/avatars"
                         nameFilters: ['*.jpg', '*.jpeg', '*.png']
                     }
                     delegate: Component {
-                        Image {
-                            height: 144
+                        Item {
                             width: 144
-                            source: "file:///Users/vlivashkin/.avatarify/avatars/" + fileName
+                            height: 144
+                            Image {
+                                Layout.margins: 5
+                                height: 134
+                                width: 134
+                                fillMode: Image.PreserveAspectCrop
+                                source: "file:///Users/vlivashkin/.avatarify/avatars/" + fileName
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: avatarSelector.currentIndex = index
+                            }
                         }
+                    }
+                    highlight: Rectangle {
+                        color: "lightsteelblue"
+                        radius: 5
                     }
                 }
             }
