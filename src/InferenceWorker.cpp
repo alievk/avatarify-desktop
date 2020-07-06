@@ -43,16 +43,17 @@ void InferenceWorker::run() {
 }
 
 void InferenceWorker::inference() {
-    QImage srcImage = m_camera->frame();
-    QImage resultImage;
+    QImage drivingFrame = m_camera->frame();
+    QImage generatedFrame;
     if (m_avatarPath != "none") {
-        resultImage = libtorchPredictor.predict(srcImage);
+        generatedFrame = libtorchPredictor.predict(drivingFrame);
     } else {
-        resultImage = identityPredictor.predict(srcImage);
+        generatedFrame = identityPredictor.predict(drivingFrame);
     }
 
     // preview
-    QVideoFrame previewFrame(m_mirror ? resultImage.mirrored(true, false) : resultImage);
+    QImage generatedFrameRGBA = generatedFrame.convertToFormat(QImage::Format_ARGB32);
+    QVideoFrame previewFrame(m_mirror ? generatedFrameRGBA.mirrored(true, false) : generatedFrameRGBA);
     m_videoSurface->present(previewFrame);
 
     // TODO: virtual camera

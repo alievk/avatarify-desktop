@@ -13,11 +13,11 @@ public:
     QImage predict(QImage &drivingFrame) override;
 
 private:
-    static QImage tensorToQImage(const torch::Tensor &tensor);
+    static QImage tensorToQImage(torch::Tensor &tensor);
 
-    static torch::Tensor qimageToTensor(const QImage &image);
+    static torch::Tensor qimageToTensor(QImage &image);
 
-    torch::Tensor FOMMEncoder(const torch::Tensor &sourceImage);
+    torch::Tensor FOMMEncoder(const torch::Tensor &image);
 
     std::pair<torch::Tensor, torch::Tensor> KPDetector(const torch::Tensor &image);
 

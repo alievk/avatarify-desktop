@@ -56,8 +56,8 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
         qDebug() << "FUCK";
     }
     QImage image(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), format);
-    if (format != QImage::Format_ARGB32) {
-        image = image.convertToFormat(QImage::Format_ARGB32);
+    if (format != QImage::Format_RGB888) {
+        image = image.convertToFormat(QImage::Format_RGB888);
     }
 
     // TODO: crop/smartCrop

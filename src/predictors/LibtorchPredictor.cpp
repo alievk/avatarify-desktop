@@ -1,8 +1,9 @@
 #include <torch/script.h>
-#include <QFile>
 #include <QFileInfo>
 #include <QDebug>
 #include "LibtorchPredictor.h"
+
+using namespace torch::indexing;
 
 LibtorchPredictor::LibtorchPredictor() {
     if (not QFileInfo::exists(FOMMEncoderPath)) {
@@ -15,6 +16,7 @@ LibtorchPredictor::LibtorchPredictor() {
         qWarning() << "FOMMNoEncoderNoKPDetectorPath doesn't exist";
     }
 
+    torch::init_num_threads();
     FOMMEncoderModule = torch::jit::load(FOMMEncoderPath.toStdString());
     KPDetectorModule = torch::jit::load(KPDetectorPath.toStdString());
     FOMMNoEncoderNoKPDetectorModule = torch::jit::load(FOMMNoEncoderNoKPDetectorPath.toStdString());
@@ -25,6 +27,7 @@ void LibtorchPredictor::setSourceImage(QString &avatarPath) {
 
     QImage avatar;
     avatar.load(avatarPath);
+    avatar = avatar.convertToFormat(QImage::Format_RGB888);
     sourceImage = torch::upsample_bilinear2d(qimageToTensor(avatar), {256, 256}, false);
     sourceEncoded = FOMMEncoder(sourceImage);
     auto kpAndJacobian = KPDetector(sourceImage);
@@ -53,6 +56,7 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
         kpInitial = kpDriving;
         kpInitialJacobian = kpDrivingJacobian;
         isCalibrated = true;
+        return drivingFrame;
     }
 
     torch::Tensor generatedImage = FOMMNoEncoderNoKPDetector(kpDriving, kpDrivingJacobian);
@@ -60,8 +64,7 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
     return tensorToQImage(generatedImage);
 }
 
-QImage LibtorchPredictor::tensorToQImage(const torch::Tensor &tensor) {
-    QImage image;
+QImage LibtorchPredictor::tensorToQImage(torch::Tensor &tensor) {
     int dim = tensor.dim();
     if (dim != 4) {
         qFatal("dim must be 4.");
@@ -69,40 +72,18 @@ QImage LibtorchPredictor::tensorToQImage(const torch::Tensor &tensor) {
     int width = tensor.size(3);
     int height = tensor.size(2);
 
-    // fill QImage
-    image = QImage(width, height, QImage::Format_ARGB32);
-    for (int w = 0; w < width; ++w) {
-        for (int h = 0; h < height; ++h) {
-            int r = floor(tensor[0][0][h][w].item<float>() * 255.0);
-            int g = floor(tensor[0][1][h][w].item<float>() * 255.0);
-            int b = floor(tensor[0][2][h][w].item<float>() * 255.0);
-            image.setPixel(w, h, qRgba(r, g, b, 0));
-        }
-    }
-    return image;
+    tensor = (tensor * 255.0f).permute({0, 2, 3, 1}).to(torch::kUInt8).flatten();
+    return QImage((uchar *)tensor.data_ptr(), width, height, QImage::Format_RGB888).copy();
 }
 
-torch::Tensor LibtorchPredictor::qimageToTensor(const QImage &image) {
+torch::Tensor LibtorchPredictor::qimageToTensor(QImage &image) {
     int width = image.width();
     int height = image.height();
     int channels = 3;
-    qDebug() << width << " " << height << " " << channels;
 
-    // create tensor
-    torch::TensorOptions option(torch::kFloat32);
-    torch::Tensor tensor = torch::zeros({1, channels, height, width}, option);//N C H W
-
-    // fill tensor
-    for (int w = 0; w < width; ++w) {
-        for (int h = 0; h < height; ++h) {
-            QRgb rgb = image.pixel(w, h);
-            tensor[0][0][h][w] = qRed(rgb) / 255.0; //R
-            tensor[0][1][h][w] = qGreen(rgb) / 255.0; //G
-            tensor[0][2][h][w] = qBlue(rgb) / 255.0; //B
-        }
-    }
-
-    return tensor;
+    torch::TensorOptions options(torch::kUInt8);
+    torch::Tensor tensor = torch::from_blob(image.bits(), {1, width, height, channels}, options);
+    return (tensor / 255.0f).permute({0, 3, 1, 2}).to(torch::kFloat32);
 }
 
 torch::Tensor LibtorchPredictor::FOMMEncoder(const torch::Tensor &image) {
@@ -119,7 +100,8 @@ std::pair<torch::Tensor, torch::Tensor> LibtorchPredictor::KPDetector(const torc
     std::vector<torch::jit::IValue> inputs;
     inputs.emplace_back(image);
     auto outputs = KPDetectorModule.forward(inputs).toTuple();
-    return std::pair<torch::Tensor, torch::Tensor>(outputs->elements()[0].toTensor(), outputs->elements()[1].toTensor());
+    return std::pair<torch::Tensor, torch::Tensor>(outputs->elements()[0].toTensor(),
+                                                   outputs->elements()[1].toTensor());
 }
 
 torch::Tensor LibtorchPredictor::FOMMNoEncoderNoKPDetector(const torch::Tensor &kpDriving,

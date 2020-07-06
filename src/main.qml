@@ -169,7 +169,7 @@ ApplicationWindow {
 
                 ListView {
                     id: avatarSelector
-                    spacing: 3
+                    spacing: 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.fillWidth: true
                     Layout.fillHeight: true
