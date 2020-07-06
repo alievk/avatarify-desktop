@@ -211,8 +211,13 @@ ApplicationWindow {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    avatarSelector.currentIndex = index;
-                                    manager.avatarPath = avatarModel.folder + "/" + model.fileName
+                                    if (avatarSelector.currentIndex != index) {
+                                        avatarSelector.currentIndex = index;
+                                        manager.avatarPath = avatarModel.folder + "/" + model.fileName
+                                    } else {
+                                        avatarSelector.currentIndex = -1;
+                                        manager.avatarPath = "none";
+                                    }
                                 }
                             }
                         }

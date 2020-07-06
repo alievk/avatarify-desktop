@@ -3,8 +3,6 @@
 InferenceManager::~InferenceManager() {
     if (worker != nullptr) {
         worker->stop();
-        worker->quit();
-        worker->wait();
     }
 }
 
@@ -64,7 +62,7 @@ QString InferenceManager::avatarPath() const {
     return m_avatarPath;
 }
 
-void InferenceManager::setAvatarPath(QString avatarPath) {
+void InferenceManager::setAvatarPath(const QString& avatarPath) {
     qDebug() << "InferenceManager::setAvatarPath " << avatarPath;
 
     if (m_avatarPath == avatarPath)

@@ -2,15 +2,13 @@
 #define PREDICTOR_H
 
 #include <QImage>
+#include <QString>
 
 class Predictor {
 public:
-    void setSourceImage(QImage &newAvatar);
+    virtual void setSourceImage(QString &avatarPath) = 0;
 
     virtual QImage predict(QImage &frame) = 0;
-
-private:
-    QImage avatar;
 };
 
 #endif //PREDICTOR_H

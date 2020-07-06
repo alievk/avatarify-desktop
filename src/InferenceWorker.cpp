@@ -22,7 +22,6 @@ void InferenceWorker::setAvatarPath(QString avatarPath) {
     m_avatarPath = std::move(avatarPath);
 }
 
-
 void InferenceWorker::stop() {
     isAlive = false;
 }
@@ -44,7 +43,12 @@ void InferenceWorker::run() {
 
 void InferenceWorker::inference() {
     QImage srcImage = m_camera->frame();
-    QImage resultImage = predictor.predict(srcImage);
+    QImage resultImage;
+//    if (m_avatarPath != "none") {
+//        resultImage = libtorchPredictor.predict(srcImage);
+//    } else {
+        resultImage = identityPredictor.predict(srcImage);
+//    }
 
     // preview
     QVideoFrame previewFrame(m_mirror ? resultImage.mirrored(true, false) : resultImage);

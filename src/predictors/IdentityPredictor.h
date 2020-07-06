@@ -5,6 +5,8 @@
 
 class IdentityPredictor : Predictor {
 public:
+    void setSourceImage(QString &AvatarPath) override;
+
     QImage predict(QImage &frame) override;
 };
 

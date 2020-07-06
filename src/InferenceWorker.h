@@ -5,6 +5,7 @@
 #include <QAbstractVideoSurface>
 #include "AsyncCameraCapture.h"
 #include "predictors/IdentityPredictor.h"
+//#include "predictors/LibtorchPredictor.h"
 
 class InferenceWorker : public QThread {
 Q_OBJECT
@@ -31,7 +32,8 @@ private:
 
     AsyncCameraCapture *m_camera;
     QAbstractVideoSurface *m_videoSurface;
-    IdentityPredictor predictor;
+    IdentityPredictor identityPredictor;
+//    LibtorchPredictor libtorchPredictor;
     bool m_mirror{};
     bool m_virtualCamera;
     QString m_avatarPath;

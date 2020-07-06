@@ -35,7 +35,7 @@ public:
 
     QString avatarPath() const;
 
-    void setAvatarPath(QString avatarPath);
+    void setAvatarPath(const QString& avatarPath);
 
     void startWorkerIfReady();
 
