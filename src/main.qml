@@ -177,6 +177,7 @@ ApplicationWindow {
                     flickableDirection: Flickable.HorizontalFlick
                     clip: true
                     highlightFollowsCurrentItem: false
+                    currentIndex: -1
 
                     model: FolderListModel {
                         id: avatarModel
@@ -213,7 +214,7 @@ ApplicationWindow {
                                 onClicked: {
                                     if (avatarSelector.currentIndex != index) {
                                         avatarSelector.currentIndex = index;
-                                        manager.avatarPath = avatarModel.folder + "/" + model.fileName
+                                        manager.avatarPath = "/Users/vlivashkin/.avatarify/avatars/" + model.fileName
                                     } else {
                                         avatarSelector.currentIndex = -1;
                                         manager.avatarPath = "none";

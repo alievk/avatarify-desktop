@@ -3,6 +3,7 @@
 InferenceManager::~InferenceManager() {
     if (worker != nullptr) {
         worker->stop();
+        worker->wait();
     }
 }
 

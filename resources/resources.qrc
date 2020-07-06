@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="play">icons8/icons8-play-64.png</file>
+        <file alias="stop">icons8/icons8-stop-64.png</file>
+        <file alias="save">icons8/icons8-save-64.png</file>
+        <file alias="switch-off">icons8/icons8-switch-off-64.png</file>
+        <file alias="toggle-on">icons8/icons8-toggle-on-64.png</file>
+        <file alias="toggle-off">icons8/icons8-toggle-off-64.png</file>
+    </qresource>
+</RCC>

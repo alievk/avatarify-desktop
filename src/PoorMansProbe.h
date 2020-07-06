@@ -19,7 +19,7 @@ public:
 
     bool setSource(QCamera *newSource);
 
-signals:
+Q_SIGNALS:
 
     // Users of this class will get frames via this signal
     void videoFrameProbed(const QVideoFrame &videoFrame);

@@ -1,9 +1,12 @@
 #include "IdentityPredictor.h"
+#include <QDebug>
 
-void IdentityPredictor::setSourceImage(QString &AvatarPath) {
+void IdentityPredictor::setSourceImage(QString &avatarPath) {
+    qDebug() << "IdentityPredictor::setSourceImage";
 }
 
 
-QImage IdentityPredictor::predict(QImage &frame) {
-    return frame;
+QImage IdentityPredictor::predict(QImage &drivingFrame) {
+//    qDebug() << "IdentityPredictor::predict";
+    return drivingFrame;
 }

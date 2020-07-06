@@ -27,7 +27,7 @@ public:
 
     QImage frame();
 
-private slots:
+private Q_SLOTS:
 
     void setCamera(const QCameraInfo &cameraInfo);
 

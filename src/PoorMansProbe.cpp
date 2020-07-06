@@ -47,7 +47,7 @@ PoorMansProbe::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType
 
 bool PoorMansProbe::present(const QVideoFrame &frame) {
     if (frame.isValid()) {
-        emit videoFrameProbed(frame);
+        Q_EMIT videoFrameProbed(frame);
         return true;
     }
     return false;
