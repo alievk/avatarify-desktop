@@ -6,8 +6,6 @@
 
 class LibtorchPredictor : Predictor {
 public:
-    LibtorchPredictor();
-
     void setSourceImage(QString &avatarPath) override;
 
     QImage predict(QImage &drivingFrame) override;
@@ -17,29 +15,11 @@ private:
 
     static torch::Tensor qimageToTensor(QImage &image);
 
-    torch::Tensor FOMMEncoder(const torch::Tensor &image);
+    virtual void setSourceImageInternal(torch::Tensor &avatar) = 0;
 
-    std::pair<torch::Tensor, torch::Tensor> KPDetector(const torch::Tensor &image);
-
-    torch::Tensor FOMMNoEncoderNoKPDetector(const torch::Tensor &kpDriving, const torch::Tensor &kpDrivingJacobian);
-
-    QString FOMMEncoderPath = "/Users/vlivashkin/.avatarify/models/FOMMEncoder.pt";
-    QString KPDetectorPath = "/Users/vlivashkin/.avatarify/models/KPDetector.pt";
-    QString FOMMNoEncoderNoKPDetectorPath = "/Users/vlivashkin/.avatarify/models/FOMMNoEncoderNoKPDetector.pt";
-
-    torch::jit::script::Module FOMMEncoderModule;
-    torch::jit::script::Module KPDetectorModule;
-    torch::jit::script::Module FOMMNoEncoderNoKPDetectorModule;
-
-    torch::Tensor sourceImage;
-    torch::Tensor sourceEncoded;
-    torch::Tensor kpSource;
-    torch::Tensor kpSourceJacobian;
-    torch::Tensor kpInitial;
-    torch::Tensor kpInitialJacobian;
+    virtual torch::Tensor predictInternal(torch::Tensor &drivingImage) = 0;
 
     bool isSourceImageReady = false;
-    bool isCalibrated = false;
 };
 
 

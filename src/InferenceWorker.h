@@ -2,9 +2,9 @@
 #define INFERENCEWORKER_H
 
 #include <QThread>
+#include <src/predictors/IdentityPredictor.h>
+#include <src/predictors/LibtorchFOMM.h>
 #include "src/camera/AsyncCameraCapture.h"
-#include "predictors/IdentityPredictor.h"
-#include "predictors/LibtorchPredictor.h"
 
 class InferenceWorker : public QThread {
 Q_OBJECT
@@ -30,7 +30,7 @@ private:
 
     AsyncCameraCapture *m_camera;
     IdentityPredictor identityPredictor;
-    LibtorchPredictor libtorchPredictor;
+    LibtorchFOMM libtorchPredictor;
     QString m_avatarPath = "none";
     bool isAlive = true;
 };

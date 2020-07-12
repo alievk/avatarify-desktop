@@ -8,10 +8,11 @@ InferenceWorker::InferenceWorker(AsyncCameraCapture *camera) {
     m_camera = camera;
 }
 
-
 void InferenceWorker::setAvatarPath(QString avatarPath) {
     m_avatarPath = std::move(avatarPath);
-    libtorchPredictor.setSourceImage(m_avatarPath);
+    if (m_avatarPath != "none") {
+        libtorchPredictor.setSourceImage(m_avatarPath);
+    }
 }
 
 void InferenceWorker::stop() {

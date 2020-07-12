@@ -230,7 +230,7 @@ ApplicationWindow {
                         radius: 5
                         width: 144
                         height: 144
-                        x: avatarSelector.currentItem.x
+                        x: avatarSelector.currentItem != null ? avatarSelector.currentItem.x : -1000
                         z: Infinity
                     }
                 }

@@ -38,7 +38,7 @@ QImage AsyncCameraCapture::frame() {
 
 void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
     m_camera.reset(new QCamera(cameraInfo));
-    m_camera->setCaptureMode(QCamera::CaptureVideo);
+    m_camera->setCaptureMode(QCamera::CaptureViewfinder);
     m_camera->setViewfinderSettings(*m_vfsettings);
     m_videoprobe.reset(new PoorMansProbe());
     connect(m_videoprobe.data(), &PoorMansProbe::videoFrameProbed, this, &AsyncCameraCapture::processFrame);
