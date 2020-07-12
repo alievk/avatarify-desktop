@@ -1,7 +1,17 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "src/camera/AsyncCameraCapture.h"
+#include "camera/AsyncCameraCapture.h"
 #include "InferenceManager.h"
+
+#if defined(WINDOWS)
+#include "vcam/DirectShowVCam.h"
+typedef DirectShowVCam VCamImpl;
+#else
+
+#include "vcam/StubVCam.h"
+
+typedef StubVCam VCamImpl;
+#endif
 
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -12,6 +22,7 @@ int main(int argc, char *argv[]) {
 
     qmlRegisterType<AsyncCameraCapture>("com.avatarify.desktop", 1, 0, "AsyncCameraCapture");
     qmlRegisterType<InferenceManager>("com.avatarify.desktop", 1, 0, "InferenceManager");
+    qmlRegisterType<VCamImpl>("com.avatarify.desktop", 1, 0, "AbstractVCam");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

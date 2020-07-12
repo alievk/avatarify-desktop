@@ -32,9 +32,11 @@ set(HEADERS ${HEADERS}
         src/predictors/LibtorchPredictor.h
         src/predictors/LibtorchIdentityPredictor.h
         src/predictors/LibtorchFOMM.h
+        src/vcam/AbstractVCam.h
+        src/vcam/DirectShowVCam.h
+        src/vcam/StubVCam.h
         src/InferenceManager.h
         src/InferenceWorker.h
-
         )
 set(SOURCES ${SOURCES}
         src/camera/AsyncCameraCapture.cpp
@@ -44,6 +46,9 @@ set(SOURCES ${SOURCES}
         src/predictors/LibtorchPredictor.cpp
         src/predictors/LibtorchIdentityPredictor.cpp
         src/predictors/LibtorchFOMM.cpp
+        src/vcam/AbstractVCam.cpp
+        src/vcam/DirectShowVCam.cpp
+        src/vcam/StubVCam.cpp
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp

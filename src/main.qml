@@ -42,11 +42,16 @@ ApplicationWindow {
         smartCrop: input_settings.smartCrop
     }
 
+    AbstractVCam {
+        id: vcam
+        enabled: input_settings.vcam
+    }
+
     InferenceManager {
         id: manager
         camera: cam
+        virtualCamera: vcam
         mirror: input_settings.mirror
-        virtualCamera: input_settings.vcam
     }
 
     ColumnLayout {

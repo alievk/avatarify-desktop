@@ -1,5 +1,5 @@
-#include "InferenceManager.h"
 #include <QVideoSurfaceFormat>
+#include "InferenceManager.h"
 
 InferenceManager::~InferenceManager() {
     if (worker != nullptr) {
@@ -16,6 +16,17 @@ void InferenceManager::setCamera(AsyncCameraCapture *camera) {
     qDebug() << "InferenceManager::setCamera";
     m_camera = camera;
     startWorkerIfReady();
+}
+
+AbstractVCam *InferenceManager::virtualCamera() {
+    return m_virtualCamera;
+}
+
+void InferenceManager::setVirtualCamera(AbstractVCam *virtualCamera) {
+    qDebug() << "InferenceManager::setVirtualCamera";
+    if (m_virtualCamera == virtualCamera)
+        return;
+    m_virtualCamera = virtualCamera;
 }
 
 QAbstractVideoSurface *InferenceManager::videoSurface() {
@@ -37,17 +48,6 @@ void InferenceManager::setMirror(bool mirror) {
     if (m_mirror == mirror)
         return;
     m_mirror = mirror;
-}
-
-bool InferenceManager::virtualCamera() const {
-    return m_virtualCamera;
-}
-
-void InferenceManager::setVirtualCamera(bool virtualCamera) {
-    qDebug() << "InferenceManager::setVirtualCamera" << virtualCamera;
-    if (m_virtualCamera == virtualCamera)
-        return;
-    m_virtualCamera = virtualCamera;
 }
 
 QString InferenceManager::avatarPath() const {

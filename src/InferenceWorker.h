@@ -2,9 +2,9 @@
 #define INFERENCEWORKER_H
 
 #include <QThread>
-#include <src/predictors/IdentityPredictor.h>
-#include <src/predictors/LibtorchFOMM.h>
-#include "src/camera/AsyncCameraCapture.h"
+#include "camera/AsyncCameraCapture.h"
+#include "predictors/IdentityPredictor.h"
+#include "predictors/LibtorchFOMM.h"
 
 class InferenceWorker : public QThread {
 Q_OBJECT
