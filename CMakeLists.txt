@@ -25,8 +25,8 @@ qt5_add_resources(QT_RESOURCES resources/resources.qrc) # add the resources.qrc 
 #qt5_create_translation(QT_RESOURCES ./src/avatarify-desktop_en_US.ts)
 
 set(HEADERS ${HEADERS}
-        src/AsyncCameraCapture.h
-        src/PoorMansProbe.h
+        src/camera/AsyncCameraCapture.h
+        src/camera/PoorMansProbe.h
         src/predictors/Predictor.h
         src/predictors/IdentityPredictor.h
         src/predictors/LibtorchPredictor.h
@@ -34,8 +34,8 @@ set(HEADERS ${HEADERS}
         src/InferenceWorker.h
         )
 set(SOURCES ${SOURCES}
-        src/AsyncCameraCapture.cpp
-        src/PoorMansProbe.cpp
+        src/camera/AsyncCameraCapture.cpp
+        src/camera/PoorMansProbe.cpp
         src/predictors/Predictor.cpp
         src/predictors/IdentityPredictor.cpp
         src/predictors/LibtorchPredictor.cpp

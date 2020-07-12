@@ -4,19 +4,10 @@
 #include <utility>
 #include "InferenceWorker.h"
 
-InferenceWorker::InferenceWorker(AsyncCameraCapture *camera, QAbstractVideoSurface *videoSurface, bool virtualCamera) {
+InferenceWorker::InferenceWorker(AsyncCameraCapture *camera) {
     m_camera = camera;
-    m_videoSurface = videoSurface;
-    m_virtualCamera = virtualCamera;
 }
 
-void InferenceWorker::setMirror(bool mirror) {
-    m_mirror = mirror;
-}
-
-void InferenceWorker::setVirtualCamera(bool virtualCamera) {
-    m_virtualCamera = virtualCamera;
-}
 
 void InferenceWorker::setAvatarPath(QString avatarPath) {
     m_avatarPath = std::move(avatarPath);
@@ -28,9 +19,6 @@ void InferenceWorker::stop() {
 }
 
 void InferenceWorker::run() {
-    QVideoSurfaceFormat format(QSize(640, 480), QVideoFrame::PixelFormat::Format_ARGB32);
-    m_videoSurface->start(format);
-
     qint64 targetTime = 1000 / fpsLimit;
     while (isAlive) {
         QTime startTime = QTime::currentTime();
@@ -51,10 +39,6 @@ void InferenceWorker::inference() {
         generatedFrame = identityPredictor.predict(drivingFrame);
     }
 
-    // preview
-    QImage generatedFrameRGBA = generatedFrame.convertToFormat(QImage::Format_ARGB32);
-    QVideoFrame previewFrame(m_mirror ? generatedFrameRGBA.mirrored(true, false) : generatedFrameRGBA);
-    m_videoSurface->present(previewFrame);
-
+    presentPreview(generatedFrame);
     // TODO: virtual camera
 }

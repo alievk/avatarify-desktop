@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QThread>
-#include "AsyncCameraCapture.h"
+#include "src/camera/AsyncCameraCapture.h"
 #include "InferenceWorker.h"
 
 class InferenceManager : public QObject {
@@ -38,6 +38,9 @@ public:
     void setAvatarPath(const QString& avatarPath);
 
     void startWorkerIfReady();
+
+public Q_SLOTS:
+    void presentPreviewFrame(const QImage& generatedFrame);
 
 private:
     AsyncCameraCapture *m_camera = nullptr;

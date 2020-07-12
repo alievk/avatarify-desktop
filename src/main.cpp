@@ -1,6 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "AsyncCameraCapture.h"
+#include "src/camera/AsyncCameraCapture.h"
 #include "InferenceManager.h"
 
 int main(int argc, char *argv[]) {
