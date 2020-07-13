@@ -25,7 +25,7 @@ void LibtorchPredictor::setSourceImage(QString &avatarPath) {
 QImage LibtorchPredictor::predict(QImage &drivingFrame) {
 //    qDebug() << "LibtorchPredictor::predictInternal";
 
-    if (not isSourceImageReady) {
+    if (!isSourceImageReady) {
         qWarning() << "isSourceImageReady=false";
         return drivingFrame;
     }

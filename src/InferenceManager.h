@@ -9,6 +9,7 @@
 
 class InferenceManager : public QObject {
 Q_OBJECT
+    Q_PROPERTY(QString rootFolder READ rootFolder)
     Q_PROPERTY(AsyncCameraCapture *camera READ camera WRITE setCamera)
     Q_PROPERTY(AbstractVCam *virtualCamera READ virtualCamera WRITE setVirtualCamera)
     Q_PROPERTY(QAbstractVideoSurface *videoSurface READ videoSurface WRITE setVideoSurface)
@@ -17,6 +18,8 @@ Q_OBJECT
 
 public:
     ~InferenceManager() override;
+
+    QString rootFolder();
 
     AsyncCameraCapture *camera();
 
@@ -36,7 +39,7 @@ public:
 
     QString avatarPath() const;
 
-    void setAvatarPath(const QString &avatarPath);
+    void setAvatarPath(const QString &avatarFilename);
 
     void startWorkerIfReady();
 
@@ -45,6 +48,8 @@ public Q_SLOTS:
     void presentPreviewFrame(const QImage &generatedFrame);
 
 private:
+    const QString ROOT_FOLDER = QDir::homePath();
+
     AsyncCameraCapture *m_camera = nullptr;
     AbstractVCam *m_virtualCamera = nullptr;
     QAbstractVideoSurface *m_videoSurface = nullptr;

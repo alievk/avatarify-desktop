@@ -42,7 +42,7 @@ ApplicationWindow {
         smartCrop: input_settings.smartCrop
     }
 
-    AbstractVCam {
+    VCam {
         id: vcam
         enabled: input_settings.vcam
     }
@@ -186,7 +186,7 @@ ApplicationWindow {
 
                     model: FolderListModel {
                         id: avatarModel
-                        folder: "file:///Users/vlivashkin/.avatarify/avatars"
+                        folder: "file:///" + manager.rootFolder + "/.avatarify/avatars"
                         nameFilters: ['*.jpg', '*.jpeg', '*.png']
                     }
                     delegate: Component {
@@ -219,7 +219,7 @@ ApplicationWindow {
                                 onClicked: {
                                     if (avatarSelector.currentIndex != index) {
                                         avatarSelector.currentIndex = index;
-                                        manager.avatarPath = "/Users/vlivashkin/.avatarify/avatars/" + model.fileName
+                                        manager.avatarPath = model.fileName;
                                     } else {
                                         avatarSelector.currentIndex = -1;
                                         manager.avatarPath = "none";

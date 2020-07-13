@@ -1,7 +1,7 @@
 #ifndef LIBTORCHFOMM_H
 #define LIBTORCHFOMM_H
 
-
+#include <QDir>
 #include "LibtorchPredictor.h"
 
 class LibtorchFOMM : public LibtorchPredictor {
@@ -19,9 +19,9 @@ private:
 
     torch::Tensor FOMMNoEncoderNoKPDetector(const torch::Tensor &kpDriving, const torch::Tensor &kpDrivingJacobian);
 
-    QString FOMMEncoderPath = "/Users/vlivashkin/.avatarify/models/FOMMEncoder.pt";
-    QString KPDetectorPath = "/Users/vlivashkin/.avatarify/models/KPDetector.pt";
-    QString FOMMNoEncoderNoKPDetectorPath = "/Users/vlivashkin/.avatarify/models/FOMMNoEncoderNoKPDetector.pt";
+    const QString FOMMEncoderPath = QDir::homePath() + "/.avatarify/models/FOMMEncoder.pt";
+    const QString KPDetectorPath = QDir::homePath() + "/.avatarify/models/KPDetector.pt";
+    const QString FOMMNoEncoderNoKPDetectorPath = QDir::homePath() + "/.avatarify/models/FOMMNoEncoderNoKPDetector.pt";
 
     torch::jit::script::Module FOMMEncoderModule;
     torch::jit::script::Module KPDetectorModule;

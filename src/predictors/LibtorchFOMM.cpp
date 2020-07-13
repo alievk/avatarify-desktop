@@ -5,13 +5,13 @@
 #include "LibtorchFOMM.h"
 
 LibtorchFOMM::LibtorchFOMM() {
-    if (not QFileInfo::exists(FOMMEncoderPath)) {
+    if (!QFileInfo::exists(FOMMEncoderPath)) {
         qWarning() << "FOMMEncoderPath doesn't exist";
     }
-    if (not QFileInfo::exists(KPDetectorPath)) {
+    if (!QFileInfo::exists(KPDetectorPath)) {
         qWarning() << "KPDetectorPath doesn't exist";
     }
-    if (not QFileInfo::exists(FOMMNoEncoderNoKPDetectorPath)) {
+    if (!QFileInfo::exists(FOMMNoEncoderNoKPDetectorPath)) {
         qWarning() << "FOMMNoEncoderNoKPDetectorPath doesn't exist";
     }
 
@@ -35,7 +35,7 @@ torch::Tensor LibtorchFOMM::predictInternal(torch::Tensor &drivingImage) {
     torch::Tensor kpDriving = kpAndJacobian.first;
     torch::Tensor kpDrivingJacobian = kpAndJacobian.second;
 
-    if (not isCalibrated) {
+    if (!isCalibrated) {
         kpInitial = kpDriving;
         kpInitialJacobian = kpDrivingJacobian;
         isCalibrated = true;

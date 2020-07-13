@@ -1,7 +1,5 @@
-#include "PoorMansProbe.h"
-
-#include <QVideoFrame>
 #include <QCamera>
+#include "PoorMansProbe.h"
 
 
 PoorMansProbe::PoorMansProbe(QObject *parent) : QAbstractVideoSurface(parent), source(nullptr) {
@@ -9,6 +7,7 @@ PoorMansProbe::PoorMansProbe(QObject *parent) : QAbstractVideoSurface(parent), s
 
 QList<QVideoFrame::PixelFormat>
 PoorMansProbe::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType) const {
+    qDebug() << "PoorMansProbe::supportedPixelFormats" << handleType;
     Q_UNUSED(handleType);
     return QList<QVideoFrame::PixelFormat>()
             << QVideoFrame::Format_ARGB32

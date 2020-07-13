@@ -3,7 +3,13 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 set(PROJECT "avatarify")
 project(${PROJECT})
 
-set(CMAKE_PREFIX_PATH "/usr/local/Cellar/qt/5.15.0/lib/cmake;/Users/vlivashkin/Documents/GitHub/avatarify-desktop-cpp/lib/libtorch")
+if(MSVC)
+    set(QT_INSTALL_PREFIX "C:\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake")
+else()
+    set(QT_INSTALL_PREFIX "/usr/local/Cellar/qt/5.15.0/lib/cmake")
+endif()
+set(TORCH_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/lib/libtorch")
+set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_INSTALL_PREFIX}")
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
@@ -14,7 +20,6 @@ include_directories(${Qt5Widgets_INCLUDE_DIRS} ${QtQml_INCLUDE_DIRS})
 add_definitions(${Qt5Widgets_DEFINITIONS} ${QtQml_DEFINITIONS} ${${Qt5Quick_DEFINITIONS}} -DQT_NO_KEYWORDS)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -std=c++14 -fstrict-aliasing -pedantic-errors -pedantic -Wno-deprecated-declarations -Wno-unused-variable")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)  # Find includes in corresponding build directories
 set(CMAKE_AUTOMOC ON)  # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOUIC ON)  # if you have any .ui files
@@ -52,7 +57,7 @@ set(SOURCES ${SOURCES}
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp
-        )
+        src/camera/yuv2rgb.cpp src/camera/yuv2rgb.h)
 add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
 target_link_libraries(${PROJECT}
         Qt5::Widgets
@@ -63,14 +68,20 @@ target_link_libraries(${PROJECT}
         )
 set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 14)
 
+if(MSVC)
+#    target_compile_options(${PROJECT} PRIVATE /W4 /WX)
+else()
+    target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
+
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,
 # the DLLs need to be copied to avoid memory errors.
 if (MSVC)
     file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-    add_custom_command(TARGET example-app
+    add_custom_command(TARGET ${PROJECT}
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${TORCH_DLLS}
-            $<TARGET_FILE_DIR:example-app>)
+            $<TARGET_FILE_DIR:${PROJECT}>)
 endif (MSVC)

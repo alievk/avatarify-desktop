@@ -8,6 +8,11 @@ InferenceManager::~InferenceManager() {
     }
 }
 
+QString InferenceManager::rootFolder() {
+//    qDebug() << ROOT_FOLDER;
+    return ROOT_FOLDER;
+}
+
 AsyncCameraCapture *InferenceManager::camera() {
     return m_camera;
 }
@@ -54,9 +59,10 @@ QString InferenceManager::avatarPath() const {
     return m_avatarPath;
 }
 
-void InferenceManager::setAvatarPath(const QString &avatarPath) {
-    qDebug() << "InferenceManager::setAvatarPath " << avatarPath;
+void InferenceManager::setAvatarPath(const QString &avatarFilename) {
+    qDebug() << "InferenceManager::setAvatarPath " << avatarFilename;
 
+    QString avatarPath = ROOT_FOLDER + "/.avatarify/avatars/" + avatarFilename;
     if (m_avatarPath == avatarPath)
         return;
 

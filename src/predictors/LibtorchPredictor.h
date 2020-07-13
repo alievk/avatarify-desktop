@@ -4,7 +4,7 @@
 #include <torch/torch.h>
 #include "Predictor.h"
 
-class LibtorchPredictor : Predictor {
+class LibtorchPredictor : public Predictor {
 public:
     void setSourceImage(QString &avatarPath) override;
 

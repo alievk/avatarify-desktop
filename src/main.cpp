@@ -3,8 +3,10 @@
 #include "camera/AsyncCameraCapture.h"
 #include "InferenceManager.h"
 
-#if defined(WINDOWS)
+#if defined(WIN32)
+
 #include "vcam/DirectShowVCam.h"
+
 typedef DirectShowVCam VCamImpl;
 #else
 
@@ -22,7 +24,7 @@ int main(int argc, char *argv[]) {
 
     qmlRegisterType<AsyncCameraCapture>("com.avatarify.desktop", 1, 0, "AsyncCameraCapture");
     qmlRegisterType<InferenceManager>("com.avatarify.desktop", 1, 0, "InferenceManager");
-    qmlRegisterType<VCamImpl>("com.avatarify.desktop", 1, 0, "AbstractVCam");
+    qmlRegisterType<VCamImpl>("com.avatarify.desktop", 1, 0, "VCam");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

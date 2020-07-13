@@ -1,13 +1,14 @@
 #include <iostream>
 #include "AsyncCameraCapture.h"
+#include "yuv2rgb.h"
 
 AsyncCameraCapture::AsyncCameraCapture(QObject *parent) : QObject(parent) {
     m_cameraInfo = QCameraInfo::defaultCamera();
 
     m_vfsettings.reset(new QCameraViewfinderSettings());
     m_vfsettings->setResolution(640, 480);
-    m_vfsettings->setMinimumFrameRate(15.0);
-    m_vfsettings->setMaximumFrameRate(30.0);
+//    m_vfsettings->setMinimumFrameRate(15.0);
+//    m_vfsettings->setMaximumFrameRate(30.0);
 
     setCamera(m_cameraInfo);
 }
@@ -37,6 +38,8 @@ QImage AsyncCameraCapture::frame() {
 }
 
 void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
+    qDebug() << "cameraInfo: " << cameraInfo;
+
     m_camera.reset(new QCamera(cameraInfo));
     m_camera->setCaptureMode(QCamera::CaptureViewfinder);
     m_camera->setViewfinderSettings(*m_vfsettings);
@@ -52,10 +55,23 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
     QVideoFrame cloneFrame(frame);
     cloneFrame.map(QAbstractVideoBuffer::ReadOnly);
     QImage::Format format = QVideoFrame::imageFormatFromPixelFormat(cloneFrame.pixelFormat());
-    if (format == QImage::Format_Invalid) {
-        qDebug() << "FUCK";
+    QImage image;
+    if (format != QImage::Format_Invalid) {
+        image = QImage(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), format);
+    } else if (cloneFrame.pixelFormat() == QVideoFrame::Format_NV12) {
+        image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_RGB888);
+        nv12_to_rgb(image.bits(), cloneFrame.bits(), cloneFrame.width(), cloneFrame.height());
+    } else if (cloneFrame.pixelFormat() == QVideoFrame::Format_NV21) {
+        image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_RGB888);
+        nv21_to_rgb(image.bits(), cloneFrame.bits(), cloneFrame.width(), cloneFrame.height());
+    } else {
+        qDebug() << "FUCK " << cloneFrame.pixelFormat();
+        int nbytes = cloneFrame.mappedBytes();
+        image = QImage::fromData(cloneFrame.bits(), nbytes);
+        qDebug() << image.width() << " " << image.height();
     }
-    QImage image(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), format);
+    cloneFrame.unmap();
+
     if (format != QImage::Format_RGB888) {
         image = image.convertToFormat(QImage::Format_RGB888);
     }
