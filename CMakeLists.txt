@@ -29,80 +29,6 @@ qt5_add_resources(QT_RESOURCES src/qml.qrc) # add the resources.qrc file
 qt5_add_resources(QT_RESOURCES resources/resources.qrc) # add the resources.qrc file
 #qt5_create_translation(QT_RESOURCES ./src/avatarify-desktop_en_US.ts)
 
-set(WINSDK71_HEADERS
-        src/vcam/baseclasses/amextra.h
-        src/vcam/baseclasses/amfilter.h
-        src/vcam/baseclasses/cache.h
-        src/vcam/baseclasses/checkbmi.h
-        src/vcam/baseclasses/combase.h
-        src/vcam/baseclasses/cprop.h
-        src/vcam/baseclasses/ctlutil.h
-        src/vcam/baseclasses/ddmm.h
-        src/vcam/baseclasses/dllsetup.h
-        src/vcam/baseclasses/dxmperf.h
-        src/vcam/baseclasses/fourcc.h
-        src/vcam/baseclasses/measure.h
-        src/vcam/baseclasses/msgthrd.h
-        src/vcam/baseclasses/mtype.h
-        src/vcam/baseclasses/outputq.h
-        src/vcam/baseclasses/perflog.h
-        src/vcam/baseclasses/perfstruct.h
-        src/vcam/baseclasses/pstream.h
-        src/vcam/baseclasses/pullpin.h
-        src/vcam/baseclasses/refclock.h
-        src/vcam/baseclasses/reftime.h
-        src/vcam/baseclasses/renbase.h
-        src/vcam/baseclasses/schedule.h
-        src/vcam/baseclasses/seekpt.h
-        src/vcam/baseclasses/source.h
-        src/vcam/baseclasses/stdafx.h
-        src/vcam/baseclasses/streams.h
-        src/vcam/baseclasses/strmctl.h
-        src/vcam/baseclasses/sysclock.h
-        src/vcam/baseclasses/transfrm.h
-        src/vcam/baseclasses/transip.h
-        src/vcam/baseclasses/videoctl.h
-        src/vcam/baseclasses/vtrans.h
-        src/vcam/baseclasses/winctrl.h
-        src/vcam/baseclasses/winutil.h
-        src/vcam/baseclasses/wxdebug.h
-        src/vcam/baseclasses/wxlist.h
-        src/vcam/baseclasses/wxutil.h
-        )
-set(WINSDK71_SOURCES
-        src/vcam/baseclasses/amfilter.cpp
-        src/vcam/baseclasses/amvideo.cpp
-        src/vcam/baseclasses/arithutil.cpp
-        src/vcam/baseclasses/combase.cpp
-        src/vcam/baseclasses/cprop.cpp
-        src/vcam/baseclasses/ctlutil.cpp
-        src/vcam/baseclasses/ddmm.cpp
-        src/vcam/baseclasses/dllentry.cpp
-        src/vcam/baseclasses/dllsetup.cpp
-        src/vcam/baseclasses/mtype.cpp
-        src/vcam/baseclasses/outputq.cpp
-        src/vcam/baseclasses/perflog.cpp
-        src/vcam/baseclasses/pstream.cpp
-        src/vcam/baseclasses/pullpin.cpp
-        src/vcam/baseclasses/refclock.cpp
-        src/vcam/baseclasses/renbase.cpp
-        src/vcam/baseclasses/schedule.cpp
-        src/vcam/baseclasses/seekpt.cpp
-        src/vcam/baseclasses/source.cpp
-        src/vcam/baseclasses/stdafx.cpp
-        src/vcam/baseclasses/strmctl.cpp
-        src/vcam/baseclasses/sysclock.cpp
-        src/vcam/baseclasses/transfrm.cpp
-        src/vcam/baseclasses/transip.cpp
-        src/vcam/baseclasses/videoctl.cpp
-        src/vcam/baseclasses/vtrans.cpp
-        src/vcam/baseclasses/winctrl.cpp
-        src/vcam/baseclasses/winutil.cpp
-        src/vcam/baseclasses/wxdebug.cpp
-        src/vcam/baseclasses/wxlist.cpp
-        src/vcam/baseclasses/wxutil.cpp
-        )
-
 set(HEADERS ${HEADERS}
         src/camera/AsyncCameraCapture.h
         src/camera/PoorMansProbe.h
@@ -115,9 +41,6 @@ set(HEADERS ${HEADERS}
         src/vcam/AbstractVCam.h
         src/vcam/DirectShowVCam.h
         src/vcam/StubVCam.h
-        src/vcam/svcam/stdafx.h
-        src/vcam/svcam/SVCam.h
-        src/vcam/svcam/targetver.h
         src/InferenceManager.h
         src/InferenceWorker.h
         )
@@ -133,15 +56,12 @@ set(SOURCES ${SOURCES}
         src/vcam/AbstractVCam.cpp
         src/vcam/DirectShowVCam.cpp
         src/vcam/StubVCam.cpp
-        src/vcam/svcam/dllmain.cpp
-        src/vcam/svcam/stdafx.cpp
-        src/vcam/svcam/SVCam.cpp
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp
         )
 
-add_executable(${PROJECT} ${WINSDK71} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
+add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
 target_link_libraries(${PROJECT}
         Qt5::Widgets
         Qt5::Qml

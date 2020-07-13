@@ -55,7 +55,6 @@ Thumbs.db
 *.ncb
 *.sdf
 *.opensdf
-*.vcxproj
 *vcxproj.*
 
 # MinGW generated files
@@ -102,5 +101,8 @@ Thumbs.db
 /cmake-build-debug
 /cmake-build-release
 /.idea
-/lib
+/lib/libtorch
 *.pt
+*.log
+*.tlog
+*.lastbuildstate
