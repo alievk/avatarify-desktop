@@ -37,21 +37,19 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
     return tensorToQImage(generatedImage);
 }
 
+torch::Tensor LibtorchPredictor::qimageToTensor(QImage &image) {
+    int height = image.height();
+    int width = image.width();
+
+    torch::TensorOptions options(torch::kUInt8);
+    torch::Tensor tensor = torch::from_blob(image.bits(), {1, height, width, 3}, options);
+    return (tensor / 255.0f).permute({0, 3, 1, 2}).to(torch::kFloat32);  // N C H W
+}
+
 QImage LibtorchPredictor::tensorToQImage(torch::Tensor &tensor) {
-    int width = tensor.size(3);
     int height = tensor.size(2);
+    int width = tensor.size(3);
 
     tensor = (tensor * 255.0f).permute({0, 2, 3, 1}).to(torch::kUInt8).flatten();
     return QImage((uchar *) tensor.data_ptr(), width, height, QImage::Format_RGB888).copy();
 }
-
-torch::Tensor LibtorchPredictor::qimageToTensor(QImage &image) {
-    int width = image.width();
-    int height = image.height();
-
-    torch::TensorOptions options(torch::kUInt8);
-    torch::Tensor tensor = torch::from_blob(image.bits(), {1, width, height, 3}, options);
-    return (tensor / 255.0f).permute({0, 3, 1, 2}).to(torch::kFloat32);
-}
-
-

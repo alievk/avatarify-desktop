@@ -10,16 +10,17 @@ public:
 
     QImage predict(QImage &drivingFrame) override;
 
-private:
-    static QImage tensorToQImage(torch::Tensor &tensor);
+    bool isSourceImageReady = false;
 
+private:
     static torch::Tensor qimageToTensor(QImage &image);
+
+    static QImage tensorToQImage(torch::Tensor &tensor);
 
     virtual void setSourceImageInternal(torch::Tensor &avatar) = 0;
 
     virtual torch::Tensor predictInternal(torch::Tensor &drivingImage) = 0;
 
-    bool isSourceImageReady = false;
 };
 
 

@@ -5,6 +5,8 @@
 #include "LibtorchPredictor.h"
 
 class LibtorchIdentityPredictor : public LibtorchPredictor {
+public:
+    LibtorchIdentityPredictor();
 private:
     void setSourceImageInternal(torch::Tensor &newSourceImage) override;
 
