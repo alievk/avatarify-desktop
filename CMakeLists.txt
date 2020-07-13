@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 set(PROJECT "avatarify")
 project(${PROJECT})
 
-if(MSVC)
+if (MSVC)
     set(QT_INSTALL_PREFIX "C:\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake")
-else()
+else ()
     set(QT_INSTALL_PREFIX "/usr/local/Cellar/qt/5.15.0/lib/cmake")
-endif()
+endif ()
 set(TORCH_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/lib/libtorch")
 set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_INSTALL_PREFIX}")
 
@@ -29,43 +29,7 @@ qt5_add_resources(QT_RESOURCES src/qml.qrc) # add the resources.qrc file
 qt5_add_resources(QT_RESOURCES resources/resources.qrc) # add the resources.qrc file
 #qt5_create_translation(QT_RESOURCES ./src/avatarify-desktop_en_US.ts)
 
-set(WINSDK71_SOURCES
-        src/vcam/baseclasses/amfilter.cpp
-        src/vcam/baseclasses/amvideo.cpp
-        src/vcam/baseclasses/arithutil.cpp
-        src/vcam/baseclasses/combase.cpp
-        src/vcam/baseclasses/cprop.cpp
-        src/vcam/baseclasses/ctlutil.cpp
-        src/vcam/baseclasses/ddmm.cpp
-        src/vcam/baseclasses/dllentry.cpp
-        src/vcam/baseclasses/dllsetup.cpp
-        src/vcam/baseclasses/mtype.cpp
-        src/vcam/baseclasses/outputq.cpp
-        src/vcam/baseclasses/perflog.cpp
-        src/vcam/baseclasses/pstream.cpp
-        src/vcam/baseclasses/pullpin.cpp
-        src/vcam/baseclasses/refclock.cpp
-        src/vcam/baseclasses/renbase.cpp
-        src/vcam/baseclasses/schedule.cpp
-        src/vcam/baseclasses/seekpt.cpp
-        src/vcam/baseclasses/source.cpp
-        src/vcam/baseclasses/stdafx.cpp
-        src/vcam/baseclasses/strmctl.cpp
-        src/vcam/baseclasses/sysclock.cpp
-        src/vcam/baseclasses/transfrm.cpp
-        src/vcam/baseclasses/transip.cpp
-        src/vcam/baseclasses/videoctl.cpp
-        src/vcam/baseclasses/vtrans.cpp
-        src/vcam/baseclasses/winctrl.cpp
-        src/vcam/baseclasses/winutil.cpp
-        src/vcam/baseclasses/wxdebug.cpp
-        src/vcam/baseclasses/wxlist.cpp
-        src/vcam/baseclasses/wxutil.cpp
-
-        )
-
-
-set(WINSDK71
+set(WINSDK71_HEADERS
         src/vcam/baseclasses/amextra.h
         src/vcam/baseclasses/amfilter.h
         src/vcam/baseclasses/cache.h
@@ -105,6 +69,39 @@ set(WINSDK71
         src/vcam/baseclasses/wxlist.h
         src/vcam/baseclasses/wxutil.h
         )
+set(WINSDK71_SOURCES
+        src/vcam/baseclasses/amfilter.cpp
+        src/vcam/baseclasses/amvideo.cpp
+        src/vcam/baseclasses/arithutil.cpp
+        src/vcam/baseclasses/combase.cpp
+        src/vcam/baseclasses/cprop.cpp
+        src/vcam/baseclasses/ctlutil.cpp
+        src/vcam/baseclasses/ddmm.cpp
+        src/vcam/baseclasses/dllentry.cpp
+        src/vcam/baseclasses/dllsetup.cpp
+        src/vcam/baseclasses/mtype.cpp
+        src/vcam/baseclasses/outputq.cpp
+        src/vcam/baseclasses/perflog.cpp
+        src/vcam/baseclasses/pstream.cpp
+        src/vcam/baseclasses/pullpin.cpp
+        src/vcam/baseclasses/refclock.cpp
+        src/vcam/baseclasses/renbase.cpp
+        src/vcam/baseclasses/schedule.cpp
+        src/vcam/baseclasses/seekpt.cpp
+        src/vcam/baseclasses/source.cpp
+        src/vcam/baseclasses/stdafx.cpp
+        src/vcam/baseclasses/strmctl.cpp
+        src/vcam/baseclasses/sysclock.cpp
+        src/vcam/baseclasses/transfrm.cpp
+        src/vcam/baseclasses/transip.cpp
+        src/vcam/baseclasses/videoctl.cpp
+        src/vcam/baseclasses/vtrans.cpp
+        src/vcam/baseclasses/winctrl.cpp
+        src/vcam/baseclasses/winutil.cpp
+        src/vcam/baseclasses/wxdebug.cpp
+        src/vcam/baseclasses/wxlist.cpp
+        src/vcam/baseclasses/wxutil.cpp
+        )
 
 set(HEADERS ${HEADERS}
         src/camera/AsyncCameraCapture.h
@@ -143,6 +140,7 @@ set(SOURCES ${SOURCES}
         src/InferenceWorker.cpp
         src/main.cpp
         )
+
 add_executable(${PROJECT} ${WINSDK71} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
 target_link_libraries(${PROJECT}
         Qt5::Widgets
@@ -153,11 +151,11 @@ target_link_libraries(${PROJECT}
         )
 set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 14)
 
-if(MSVC)
-#    target_compile_options(${PROJECT} PRIVATE /W4 /WX)
-else()
+if (MSVC)
+    #    target_compile_options(${PROJECT} PRIVATE /W4 /WX)
+else ()
     target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -pedantic -Werror)
-endif()
+endif ()
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,

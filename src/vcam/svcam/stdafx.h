@@ -19,7 +19,7 @@
 #include <src/vcam/baseclasses/dllsetup.h>
 
 #include <dvdmedia.h>
-#include <math.h>
+#include <cmath>
 #include <direct.h>
 #include <dos.h>
 

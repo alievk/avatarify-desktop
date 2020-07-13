@@ -5,7 +5,6 @@
 EXTERN_C const GUID CLSID_SimpleVirtualCamFilter;
 
 
-
 //------------------------------------------------------------------------------
 // Forward Declarations
 //------------------------------------------------------------------------------
@@ -18,20 +17,20 @@ class CSimpleVirtualCamFilterStream;
 // This is the main class for the virtual cam filter. It inherits from
 // CSource, the DirectShow base class for source filters.
 //------------------------------------------------------------------------------
-class CSimpleVirtualCamFilter : public CSource
-{
+class CSimpleVirtualCamFilter : public CSource {
 public:
 
-	// The only allowed way to create Bouncing balls!
-	static CUnknown * WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT *phr);
-	STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
+    // The only allowed way to create Bouncing balls!
+    static CUnknown *WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT *phr);
 
-	IFilterGraph *GetGraph() { return m_pGraph; }
+    STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
+
+    IFilterGraph *GetGraph() { return m_pGraph; }
 
 private:
 
-	// It is only allowed to to create these objects with CreateInstance
-	CSimpleVirtualCamFilter(LPUNKNOWN lpunk, HRESULT *phr);
+    // It is only allowed to to create these objects with CreateInstance
+    CSimpleVirtualCamFilter(LPUNKNOWN lpunk, HRESULT *phr);
 
 }; // CSimpleVirtualCamFilter
 
@@ -42,65 +41,81 @@ private:
 // data from the source filter. It inherits from DirectShows's base
 // CSourceStream class.
 //------------------------------------------------------------------------------
-class CSimpleVirtualCamFilterStream : public CSourceStream, public IAMStreamConfig, public IKsPropertySet, public IAMFilterMiscFlags
-{
+class CSimpleVirtualCamFilterStream
+        : public CSourceStream, public IAMStreamConfig, public IKsPropertySet, public IAMFilterMiscFlags {
 
 public:
 
-	//////////////////////////////////////////////////////////////////////////
-	//  IUnknown
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
-	STDMETHODIMP_(ULONG) AddRef();
-	STDMETHODIMP_(ULONG) Release();
+    //////////////////////////////////////////////////////////////////////////
+    //  IUnknown
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
 
-	//////////////////////////////////////////////////////////////////////////
-	//  IQualityControl
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHODIMP Notify(IBaseFilter * pSender, Quality q);
+    STDMETHODIMP_(ULONG) AddRef();
 
-	//////////////////////////////////////////////////////////////////////////
-	//  IAMStreamConfig
-	//////////////////////////////////////////////////////////////////////////
-	HRESULT STDMETHODCALLTYPE SetFormat(AM_MEDIA_TYPE *pmt);
-	HRESULT STDMETHODCALLTYPE GetFormat(AM_MEDIA_TYPE **ppmt);
-	HRESULT STDMETHODCALLTYPE GetNumberOfCapabilities(int *piCount, int *piSize);
-	HRESULT STDMETHODCALLTYPE GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC);
+    STDMETHODIMP_(ULONG) Release();
 
-	//////////////////////////////////////////////////////////////////////////
-	//  IKsPropertySet
-	//////////////////////////////////////////////////////////////////////////
-	HRESULT STDMETHODCALLTYPE Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData, DWORD cbInstanceData, void *pPropData, DWORD cbPropData);
-	HRESULT STDMETHODCALLTYPE Get(REFGUID guidPropSet, DWORD dwPropID, void *pInstanceData, DWORD cbInstanceData, void *pPropData, DWORD cbPropData, DWORD *pcbReturned);
-	HRESULT STDMETHODCALLTYPE QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport);
+    //////////////////////////////////////////////////////////////////////////
+    //  IQualityControl
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHODIMP Notify(IBaseFilter *pSender, Quality q);
 
-	//////////////////////////////////////////////////////////////////////////
-	//  IAMFilterMiscFlags
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    //  IAMStreamConfig
+    //////////////////////////////////////////////////////////////////////////
+    HRESULT STDMETHODCALLTYPE SetFormat(AM_MEDIA_TYPE *pmt);
 
-	ULONG STDMETHODCALLTYPE GetMiscFlags(void);
+    HRESULT STDMETHODCALLTYPE GetFormat(AM_MEDIA_TYPE **ppmt);
 
-	//////////////////////////////////////////////////////////////////////////
-	//  CSourceStream
-	//////////////////////////////////////////////////////////////////////////
-	CSimpleVirtualCamFilterStream(HRESULT *phr, CSimpleVirtualCamFilter *pParent, LPCWSTR pPinName);
-	~CSimpleVirtualCamFilterStream();
+    HRESULT STDMETHODCALLTYPE GetNumberOfCapabilities(int *piCount, int *piSize);
 
-	HRESULT FillBuffer(IMediaSample *pms);
-	HRESULT DecideBufferSize(IMemAllocator *pIMemAlloc, ALLOCATOR_PROPERTIES *pProperties);
-	HRESULT CheckMediaType(const CMediaType *pMediaType);
-	HRESULT GetMediaType(int iPosition, CMediaType *pmt);
-	HRESULT SetMediaType(const CMediaType *pmt);
-	HRESULT OnThreadCreate(void);
+    HRESULT STDMETHODCALLTYPE GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC);
+
+    //////////////////////////////////////////////////////////////////////////
+    //  IKsPropertySet
+    //////////////////////////////////////////////////////////////////////////
+    HRESULT
+    STDMETHODCALLTYPE Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData, DWORD cbInstanceData, void *pPropData,
+                          DWORD cbPropData);
+
+    HRESULT STDMETHODCALLTYPE Get(REFGUID guidPropSet, DWORD dwPropID, void *pInstanceData, DWORD cbInstanceData,
+                                  void *pPropData, DWORD cbPropData, DWORD *pcbReturned);
+
+    HRESULT STDMETHODCALLTYPE QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport);
+
+    //////////////////////////////////////////////////////////////////////////
+    //  IAMFilterMiscFlags
+    //////////////////////////////////////////////////////////////////////////
+
+    ULONG STDMETHODCALLTYPE GetMiscFlags(void);
+
+    //////////////////////////////////////////////////////////////////////////
+    //  CSourceStream
+    //////////////////////////////////////////////////////////////////////////
+    CSimpleVirtualCamFilterStream(HRESULT *phr, CSimpleVirtualCamFilter *pParent, LPCWSTR pPinName);
+
+    ~CSimpleVirtualCamFilterStream();
+
+    HRESULT FillBuffer(IMediaSample *pms);
+
+    HRESULT DecideBufferSize(IMemAllocator *pIMemAlloc, ALLOCATOR_PROPERTIES *pProperties);
+
+    HRESULT CheckMediaType(const CMediaType *pMediaType);
+
+    HRESULT GetMediaType(int iPosition, CMediaType *pmt);
+
+    HRESULT SetMediaType(const CMediaType *pmt);
+
+    HRESULT OnThreadCreate(void);
 
 private:
-	
-	CSimpleVirtualCamFilter *m_pParent;
-	REFERENCE_TIME m_rtLastTime;
-	HBITMAP m_hLogoBmp;
-	CCritSec m_cSharedState;
-	IReferenceClock *m_pClock;
-	
+
+    CSimpleVirtualCamFilter *m_pParent;
+    REFERENCE_TIME m_rtLastTime;
+    HBITMAP m_hLogoBmp;
+    CCritSec m_cSharedState;
+    IReferenceClock *m_pClock;
+
 }; // CSimpleVirtualCamFilterStream
 
 
