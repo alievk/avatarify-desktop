@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 set(PROJECT "avatarify")
 project(${PROJECT})
 
+message("-- build ${PROJECT}")
+
 if (MSVC)
     set(QT_INSTALL_PREFIX "C:\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake")
 else ()
