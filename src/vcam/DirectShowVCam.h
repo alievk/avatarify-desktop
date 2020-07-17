@@ -6,6 +6,8 @@
 
 class DirectShowVCam : public AbstractVCam {
 public:
+    DirectShowVCam();
+
     void present(const QImage &generatedFrame) override;
 };
 

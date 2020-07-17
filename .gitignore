@@ -97,9 +97,9 @@ Thumbs.db
 *.tar
 *.dat
 
-/build
-/cmake-build-debug
-/cmake-build-release
+build/
+cmake-build-debug
+cmake-build-release
 /.idea
 /lib/libtorch
 *.pt
@@ -107,5 +107,6 @@ Thumbs.db
 *.tlog
 *.lastbuildstate
 *.exp
-/lib/baseclasses/.vs/
-/lib/svcam/.vs/
+.vs/
+CMake/
+

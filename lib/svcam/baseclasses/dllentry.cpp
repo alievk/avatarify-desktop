@@ -21,7 +21,9 @@
 
 #include <tchar.h>
 #endif // DEBUG
+
 #include <strsafe.h>
+#include "../libshared_export.h"
 
 extern CFactoryTemplate g_Templates[];
 extern int g_cTemplates;
@@ -33,8 +35,7 @@ HINSTANCE g_hInst;
 // it uses the CFactoryTemplate object it is given to support the
 // IClassFactory interface
 
-class CClassFactory : public IClassFactory, public CBaseObject
-{
+class CClassFactory : public IClassFactory, public CBaseObject {
 
 private:
     const CFactoryTemplate *const m_pTemplate;
@@ -46,12 +47,15 @@ public:
     CClassFactory(const CFactoryTemplate *);
 
     // IUnknown
-    STDMETHODIMP QueryInterface(REFIID riid, __deref_out void ** ppv);
+    STDMETHODIMP QueryInterface(REFIID riid, __deref_out void **ppv);
+
     STDMETHODIMP_(ULONG)AddRef();
+
     STDMETHODIMP_(ULONG)Release();
 
     // IClassFactory
     STDMETHODIMP CreateInstance(LPUNKNOWN pUnkOuter, REFIID riid, __deref_out void **pv);
+
     STDMETHODIMP LockServer(BOOL fLock);
 
     // allow DLLGetClassObject to know about global server lock status
@@ -64,24 +68,20 @@ public:
 int CClassFactory::m_cLocked = 0;
 
 CClassFactory::CClassFactory(const CFactoryTemplate *pTemplate)
-: CBaseObject(NAME("Class Factory"))
-, m_cRef(0)
-, m_pTemplate(pTemplate)
-{
+        : CBaseObject(NAME("Class Factory")), m_cRef(0), m_pTemplate(pTemplate) {
 }
 
 
 STDMETHODIMP
-CClassFactory::QueryInterface(REFIID riid,__deref_out void **ppv)
-{
-    CheckPointer(ppv,E_POINTER)
-    ValidateReadWritePtr(ppv,sizeof(PVOID));
+CClassFactory::QueryInterface(REFIID riid, __deref_out void **ppv) {
+    CheckPointer(ppv, E_POINTER)
+    ValidateReadWritePtr(ppv, sizeof(PVOID));
     *ppv = NULL;
 
     // any interface on this object is the object pointer.
     if ((riid == IID_IUnknown) || (riid == IID_IClassFactory)) {
         *ppv = (LPVOID) this;
-	// AddRef returned interface pointer
+        // AddRef returned interface pointer
         ((LPUNKNOWN) *ppv)->AddRef();
         return NOERROR;
     }
@@ -91,15 +91,13 @@ CClassFactory::QueryInterface(REFIID riid,__deref_out void **ppv)
 
 
 STDMETHODIMP_(ULONG)
-CClassFactory::AddRef()
-{
+CClassFactory::AddRef() {
     return ++m_cRef;
 }
 
 STDMETHODIMP_(ULONG)
-CClassFactory::Release()
-{
-    LONG lRef = InterlockedDecrement((volatile LONG *)&m_cRef);
+CClassFactory::Release() {
+    LONG lRef = InterlockedDecrement((volatile LONG *) &m_cRef);
     if (lRef == 0) {
         delete this;
         return 0;
@@ -110,18 +108,17 @@ CClassFactory::Release()
 
 STDMETHODIMP
 CClassFactory::CreateInstance(
-    LPUNKNOWN pUnkOuter,
-    REFIID riid,
-    __deref_out void **pv)
-{
-    CheckPointer(pv,E_POINTER)
-    ValidateReadWritePtr(pv,sizeof(void *));
+        LPUNKNOWN pUnkOuter,
+        REFIID riid,
+        __deref_out void **pv) {
+    CheckPointer(pv, E_POINTER)
+    ValidateReadWritePtr(pv, sizeof(void *));
     *pv = NULL;
 
     /* Enforce the normal OLE rules regarding interfaces and delegation */
 
     if (pUnkOuter != NULL) {
-        if (IsEqualIID(riid,IID_IUnknown) == FALSE) {
+        if (IsEqualIID(riid, IID_IUnknown) == FALSE) {
             *pv = NULL;
             return ResultFromScode(E_NOINTERFACE);
         }
@@ -130,14 +127,14 @@ CClassFactory::CreateInstance(
     /* Create the new object through the derived class's create function */
 
     HRESULT hr = NOERROR;
-    CUnknown *pObj = m_pTemplate->CreateInstance(pUnkOuter, &hr);
+    CUnknown * pObj = m_pTemplate->CreateInstance(pUnkOuter, &hr);
 
     if (pObj == NULL) {
         *pv = NULL;
-	if (SUCCEEDED(hr)) {
-	    hr = E_OUTOFMEMORY;
-	}
-	return hr;
+        if (SUCCEEDED(hr)) {
+            hr = E_OUTOFMEMORY;
+        }
+        return hr;
     }
 
     /* Delete the object if we got a construction error */
@@ -171,8 +168,7 @@ CClassFactory::CreateInstance(
 }
 
 STDMETHODIMP
-CClassFactory::LockServer(BOOL fLock)
-{
+CClassFactory::LockServer(BOOL fLock) {
     if (fLock) {
         m_cLocked++;
     } else {
@@ -185,21 +181,20 @@ CClassFactory::LockServer(BOOL fLock)
 // --- COM entrypoints -----------------------------------------
 
 //called by COM to get the class factory object for a given class
-__control_entrypoint(DllExport) STDAPI
-DllGetClassObject(
-    __in REFCLSID rClsID,
-    __in REFIID riid,
-    __deref_out void **pv)
-{
+LIBSHARED_EXPORT
+__control_entrypoint(DllExport) STDAPI DllGetClassObject(
+        __in REFCLSID rClsID,
+        __in REFIID riid,
+        __deref_out void **pv) {
     *pv = NULL;
     if (!(riid == IID_IUnknown) && !(riid == IID_IClassFactory)) {
-            return E_NOINTERFACE;
+        return E_NOINTERFACE;
     }
 
     // traverse the array of templates looking for one with this
     // class id
     for (int i = 0; i < g_cTemplates; i++) {
-        const CFactoryTemplate * pT = &g_Templates[i];
+        const CFactoryTemplate *pT = &g_Templates[i];
         if (pT->IsClassID(rClsID)) {
 
             // found a template - make a class factory based on this
@@ -209,7 +204,7 @@ DllGetClassObject(
             if (*pv == NULL) {
                 return E_OUTOFMEMORY;
             }
-            ((LPUNKNOWN)*pv)->AddRef();
+            ((LPUNKNOWN) *pv)->AddRef();
             return NOERROR;
         }
     }
@@ -219,15 +214,14 @@ DllGetClassObject(
 //
 //  Call any initialization routines
 //
-void
-DllInitClasses(BOOL bLoading)
-{
+LIBSHARED_EXPORT
+void DllInitClasses(BOOL bLoading) {
     int i;
 
     // traverse the array of templates calling the init routine
     // if they have one
     for (i = 0; i < g_cTemplates; i++) {
-        const CFactoryTemplate * pT = &g_Templates[i];
+        const CFactoryTemplate *pT = &g_Templates[i];
         if (pT->m_lpfnInit != NULL) {
             (*pT->m_lpfnInit)(bLoading, pT->m_ClsID);
         }
@@ -243,14 +237,13 @@ DllInitClasses(BOOL bLoading)
 // and CCOMObject has a static function that can tell us about the active
 // object count
 STDAPI
-DllCanUnloadNow()
-{
-    DbgLog((LOG_MEMORY,2,TEXT("DLLCanUnloadNow called - IsLocked = %d, Active objects = %d"),
-        CClassFactory::IsLocked(),
-        CBaseObject::ObjectsActive()));
+DllCanUnloadNow() {
+    DbgLog((LOG_MEMORY, 2, TEXT("DLLCanUnloadNow called - IsLocked = %d, Active objects = %d"),
+            CClassFactory::IsLocked(),
+            CBaseObject::ObjectsActive()));
 
     if (CClassFactory::IsLocked() || CBaseObject::ObjectsActive()) {
-	return S_FALSE;
+        return S_FALSE;
     } else {
         return S_OK;
     }
@@ -266,15 +259,14 @@ extern "C" BOOL WINAPI _DllEntryPoint(HINSTANCE, ULONG, __inout_opt LPVOID);
 
 extern "C"
 DECLSPEC_NOINLINE
-BOOL 
+BOOL
 WINAPI
 DllEntryPoint(
-    HINSTANCE hInstance, 
-    ULONG ulReason, 
-    __inout_opt LPVOID pv
-    )
-{
-    if ( ulReason == DLL_PROCESS_ATTACH ) {
+        HINSTANCE hInstance,
+        ULONG ulReason,
+        __inout_opt LPVOID pv
+) {
+    if (ulReason == DLL_PROCESS_ATTACH) {
         // Must happen before any other code is executed.  Thankfully - it's re-entrant
         __security_init_cookie();
     }
@@ -283,64 +275,62 @@ DllEntryPoint(
 
 
 DECLSPEC_NOINLINE
-BOOL 
+BOOL
 WINAPI
 _DllEntryPoint(
-    HINSTANCE hInstance, 
-    ULONG ulReason, 
-    __inout_opt LPVOID pv
-    )
-{
+        HINSTANCE hInstance,
+        ULONG ulReason,
+        __inout_opt LPVOID pv
+) {
 #ifdef DEBUG
     extern bool g_fDbgInDllEntryPoint;
     g_fDbgInDllEntryPoint = true;
 #endif
 
-    switch (ulReason)
-    {
+    switch (ulReason) {
 
-    case DLL_PROCESS_ATTACH:
-        DisableThreadLibraryCalls(hInstance);
-        DbgInitialise(hInstance);
+        case DLL_PROCESS_ATTACH:
+            DisableThreadLibraryCalls(hInstance);
+            DbgInitialise(hInstance);
 
-        g_hInst = hInstance;
-        DllInitClasses(TRUE);
-        break;
+            g_hInst = hInstance;
+            DllInitClasses(TRUE);
+            break;
 
-    case DLL_PROCESS_DETACH:
-        DllInitClasses(FALSE);
+        case DLL_PROCESS_DETACH:
+            DllInitClasses(FALSE);
 
 #ifdef DEBUG
-        if (CBaseObject::ObjectsActive()) {
-            DbgSetModuleLevel(LOG_MEMORY, 2);
-            TCHAR szInfo[512];
-            extern TCHAR m_ModuleName[];     // Cut down module name
+            if (CBaseObject::ObjectsActive()) {
+                DbgSetModuleLevel(LOG_MEMORY, 2);
+                TCHAR szInfo[512];
+                extern TCHAR m_ModuleName[];     // Cut down module name
 
-            TCHAR FullName[_MAX_PATH];      // Load the full path and module name
-            TCHAR *pName;                   // Searches from the end for a backslash
+                TCHAR FullName[_MAX_PATH];      // Load the full path and module name
+                TCHAR *pName;                   // Searches from the end for a backslash
 
-            GetModuleFileName(NULL,FullName,_MAX_PATH);
-            pName = _tcsrchr(FullName,'\\');
-            if (pName == NULL) {
-                pName = FullName;
-            } else {
-                pName++;
+                GetModuleFileName(NULL,FullName,_MAX_PATH);
+                pName = _tcsrchr(FullName,'\\');
+                if (pName == NULL) {
+                    pName = FullName;
+                } else {
+                    pName++;
+                }
+
+                (void)StringCchPrintf(szInfo, NUMELMS(szInfo), TEXT("Executable: %s  Pid %x  Tid %x. "),
+                    pName, GetCurrentProcessId(), GetCurrentThreadId());
+
+                (void)StringCchPrintf(szInfo+lstrlen(szInfo), NUMELMS(szInfo) - lstrlen(szInfo), TEXT("Module %s, %d objects left active!"),
+                         m_ModuleName, CBaseObject::ObjectsActive());
+                DbgAssert(szInfo, TEXT(__FILE__),__LINE__);
+
+            // If running remotely wait for the Assert to be acknowledged
+            // before dumping out the object register
+                DbgDumpObjectRegister();
             }
-
-            (void)StringCchPrintf(szInfo, NUMELMS(szInfo), TEXT("Executable: %s  Pid %x  Tid %x. "),
-			    pName, GetCurrentProcessId(), GetCurrentThreadId());
-
-            (void)StringCchPrintf(szInfo+lstrlen(szInfo), NUMELMS(szInfo) - lstrlen(szInfo), TEXT("Module %s, %d objects left active!"),
-                     m_ModuleName, CBaseObject::ObjectsActive());
-            DbgAssert(szInfo, TEXT(__FILE__),__LINE__);
-
-	    // If running remotely wait for the Assert to be acknowledged
-	    // before dumping out the object register
-            DbgDumpObjectRegister();
-        }
-        DbgTerminate();
+            DbgTerminate();
 #endif
-        break;
+            break;
     }
 
 #ifdef DEBUG

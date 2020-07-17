@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #define DECLARE_PTR(type, ptr, expr) type* ptr = (type*)(expr);
 

@@ -13,10 +13,10 @@
 
 
 // TODO: reference additional headers your program requires here
-#include "streams.h"
+#include "baseclasses/streams.h"
 #include <OleCtl.h>
 #include <initguid.h>
-#include "dllsetup.h"
+#include "baseclasses/dllsetup.h"
 
 #include <dvdmedia.h>
 #include <cmath>

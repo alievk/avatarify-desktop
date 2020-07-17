@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include <strsafe.h>
+#include <stdio.h>
 
 //---------------------------------------------------------------------------
 // defines

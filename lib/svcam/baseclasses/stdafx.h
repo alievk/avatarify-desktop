@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include "Streams.h"
+#include "streams.h"
 
 using std::min;
 using std::max;

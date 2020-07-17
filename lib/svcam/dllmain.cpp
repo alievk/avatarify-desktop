@@ -1,6 +1,3 @@
-
-
-
 #pragma comment(lib, "kernel32")
 #pragma comment(lib, "user32")
 #pragma comment(lib, "gdi32")
@@ -9,6 +6,9 @@
 #pragma comment(lib, "ole32")
 #pragma comment(lib, "oleaut32")
 
+#if _MSC_VER >= 1900
+#pragma comment(lib, "legacy_stdio_definitions.lib")
+#endif
 
 #ifdef _DEBUG
 #pragma comment(lib, "strmbasd")
@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "SVCam.h"
+#include "libshared_export.h"
 
 
 #define CreateComObject(clsid, iid, var) CoCreateInstance( clsid, NULL, CLSCTX_INPROC_SERVER, iid, (void **)&var);
@@ -148,6 +149,7 @@ STDAPI RegisterFilters(BOOL bRegister)
 //
 // Exported entry points for registration and unregistration
 //
+LIBSHARED_EXPORT
 STDAPI DllRegisterServer() {
     HRESULT hr;
     IFilterMapper2 *pFM2 = NULL;
@@ -182,6 +184,8 @@ STDAPI DllRegisterServer() {
 //
 // DllUnregisterServer
 //
+
+LIBSHARED_EXPORT
 STDAPI DllUnregisterServer() {
     HRESULT hr;
     IFilterMapper2 *pFM2 = NULL;
@@ -210,6 +214,7 @@ STDAPI DllUnregisterServer() {
 //
 extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
 
+LIBSHARED_EXPORT
 BOOL APIENTRY DllMain(HMODULE hModule,
                       DWORD ul_reason_for_call,
                       LPVOID lpReserved

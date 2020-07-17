@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #define STRSAFE_NO_DEPRECATE
 #include <strsafe.h>
+#include <stdio.h>
 
 
 // --- CAMEvent -----------------------
