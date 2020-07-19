@@ -1073,6 +1073,10 @@ void WINAPI DbgSetWaitTimeout(DWORD dwTimeout)
 "winapifamily.h"
 "winapifamily.h"
 "winapifamily.h"
+
+            "winapifamily.h"
+"winapifamily.h"
+"winapifamily.h"
     };
 
     CGuidNameList GuidNames;

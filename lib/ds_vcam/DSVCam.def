@@ -1,4 +1,4 @@
-LIBRARY     SVCam.dll
+LIBRARY     DSVCam.dll
 EXPORTS
             DllMain             PRIVATE
             DllGetClassObject   PRIVATE

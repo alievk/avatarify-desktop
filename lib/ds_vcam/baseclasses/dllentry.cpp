@@ -23,7 +23,6 @@
 #endif // DEBUG
 
 #include <strsafe.h>
-#include "../libshared_export.h"
 
 extern CFactoryTemplate g_Templates[];
 extern int g_cTemplates;
@@ -181,7 +180,6 @@ CClassFactory::LockServer(BOOL fLock) {
 // --- COM entrypoints -----------------------------------------
 
 //called by COM to get the class factory object for a given class
-LIBSHARED_EXPORT
 __control_entrypoint(DllExport) STDAPI DllGetClassObject(
         __in REFCLSID rClsID,
         __in REFIID riid,

@@ -1,20 +1,21 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-set(PROJECT "SVCam")
+set(PROJECT "DSVCam")
 project(${PROJECT})
 
 message("  -- build ${PROJECT}")
 
-include_directories("${PROJECT_SOURCE_DIR}/lib/svcam/baseclasses")
 add_subdirectory(baseclasses)
 
 set(SOURCES
-        dll.def
+        CVCamFilter.cpp
+        CVCamFilter.h
+        CVCamOutStream.cpp
+        CVCamOutStream.h
         dllmain.cpp
+        DSVCam.def
         stdafx.cpp
         stdafx.h
-        SVCam.cpp
-        SVCam.h
         targetver.h
         )
 

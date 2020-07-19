@@ -1,62 +1,28 @@
-// SVCam.cpp : Defines the exported functions for the DLL application.
-//
-
-#include "SVCam.h"
+#include "CVCamOutStream.h"
 
 
 //////////////////////////////////////////////////////////////////////////
-//  CSimpleVirtualCamFilter is the source filter which masquerades as a capture device
-//////////////////////////////////////////////////////////////////////////
-CUnknown *WINAPI CSimpleVirtualCamFilter::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr) {
-    ASSERT(phr);
-    CUnknown *punk = new CSimpleVirtualCamFilter(lpunk, phr);
-    return punk;
-}
-
-CSimpleVirtualCamFilter::CSimpleVirtualCamFilter(LPUNKNOWN lpunk, HRESULT *phr) :
-        CSource(NAME("Simple Virtual Cam"), lpunk, CLSID_SimpleVirtualCamFilter) {
-    ASSERT(phr);
-    CAutoLock cAutoLock(&m_cStateLock);
-
-    // Create the one and only output pin
-    m_paStreams = (CSourceStream **) new CSimpleVirtualCamFilterStream *[1];
-    m_paStreams[0] = new CSimpleVirtualCamFilterStream(phr, this, L"Simple Virtual Cam");
-}
-
-HRESULT CSimpleVirtualCamFilter::QueryInterface(REFIID riid, void **ppv) {
-    //Forward request for IAMStreamConfig & IKsPropertySet to the pin
-    if (riid == _uuidof(IAMStreamConfig) || riid == _uuidof(IKsPropertySet))
-        return m_paStreams[0]->QueryInterface(riid, ppv);
-    else
-        return CSource::QueryInterface(riid, ppv);
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-// CKCamStream is the one and only output pin of CKCam which handles 
+// CKCamStream is the one and only output pin of CKCam which handles
 // all the stuff.
 //////////////////////////////////////////////////////////////////////////
-CSimpleVirtualCamFilterStream::CSimpleVirtualCamFilterStream(HRESULT *phr, CSimpleVirtualCamFilter *pParent,
-                                                             LPCWSTR pPinName) :
-        CSourceStream(NAME("Simple Virtual Cam"), phr, pParent, pPinName), m_pParent(pParent) {
+CVCamOutStream::CVCamOutStream(HRESULT *phr, CVCamFilter *pParent, LPCWSTR pPinName) :
+        CSourceStream(NAME("Capture"), phr, pParent, pPinName), m_pParent(pParent) {
     // Set the default media type as 640x480x24@30
     GetMediaType(8, &m_mt);
 }
 
-CSimpleVirtualCamFilterStream::~CSimpleVirtualCamFilterStream() {
+CVCamOutStream::~CVCamOutStream() = default;
 
-}
-
-ULONG CSimpleVirtualCamFilterStream::Release() {
+ULONG CVCamOutStream::Release() {
     return GetOwner()->Release();
 }
 
-ULONG CSimpleVirtualCamFilterStream::AddRef() {
+ULONG CVCamOutStream::AddRef() {
 
     return GetOwner()->AddRef();
 }
 
-HRESULT CSimpleVirtualCamFilterStream::QueryInterface(REFIID riid, void **ppv) {
+HRESULT CVCamOutStream::QueryInterface(REFIID riid, void **ppv) {
 
     // Standard OLE stuff
     if (riid == _uuidof(IAMStreamConfig))
@@ -73,7 +39,7 @@ HRESULT CSimpleVirtualCamFilterStream::QueryInterface(REFIID riid, void **ppv) {
 ///////////////////////////////////////////////////////////
 // This is where the magic happens!
 ///////////////////////////////////////////////////////////
-HRESULT CSimpleVirtualCamFilterStream::FillBuffer(IMediaSample *pms) {
+HRESULT CVCamOutStream::FillBuffer(IMediaSample *pms) {
     REFERENCE_TIME rtNow;
 
     REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER *) m_mt.pbFormat)->AvgTimePerFrame;
@@ -97,7 +63,7 @@ HRESULT CSimpleVirtualCamFilterStream::FillBuffer(IMediaSample *pms) {
 //
 // Notify
 // Ignore quality management messages sent from the downstream filter
-STDMETHODIMP CSimpleVirtualCamFilterStream::Notify(IBaseFilter *pSender, Quality q) {
+STDMETHODIMP CVCamOutStream::Notify(IBaseFilter *pSender, Quality q) {
     return E_NOTIMPL;
 } // Notify
 
@@ -105,14 +71,14 @@ STDMETHODIMP CSimpleVirtualCamFilterStream::Notify(IBaseFilter *pSender, Quality
 //////////////////////////////////////////////////////////////////////////
 // This is called when the output format has been negotiated
 //////////////////////////////////////////////////////////////////////////
-HRESULT CSimpleVirtualCamFilterStream::SetMediaType(const CMediaType *pmt) {
+HRESULT CVCamOutStream::SetMediaType(const CMediaType *pmt) {
     DECLARE_PTR(VIDEOINFOHEADER, pvi, pmt->Format());
     HRESULT hr = CSourceStream::SetMediaType(pmt);
     return hr;
 }
 
 // See Directshow help topic for IAMStreamConfig for details on this method
-HRESULT CSimpleVirtualCamFilterStream::GetMediaType(int iPosition, CMediaType *pmt) {
+HRESULT CVCamOutStream::GetMediaType(int iPosition, CMediaType *pmt) {
     if (iPosition < 0) return E_INVALIDARG;
     if (iPosition > 8) return VFW_S_NO_MORE_ITEMS;
 
@@ -153,19 +119,18 @@ HRESULT CSimpleVirtualCamFilterStream::GetMediaType(int iPosition, CMediaType *p
 
 
 // This method is called to see if a given output format is supported
-HRESULT CSimpleVirtualCamFilterStream::CheckMediaType(const CMediaType *pMediaType) {
-    VIDEOINFOHEADER *pvi = (VIDEOINFOHEADER *) (pMediaType->Format());
+HRESULT CVCamOutStream::CheckMediaType(const CMediaType *pMediaType) {
     if (*pMediaType != m_mt)
         return E_INVALIDARG;
     return S_OK;
 } // CheckMediaType
 
 // This method is called after the pins are connected to allocate buffers to stream data
-HRESULT CSimpleVirtualCamFilterStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProperties) {
+HRESULT CVCamOutStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProperties) {
     CAutoLock cAutoLock(m_pFilter->pStateLock());
     HRESULT hr = NOERROR;
 
-    VIDEOINFOHEADER *pvi = (VIDEOINFOHEADER *) m_mt.Format();
+    auto *pvi = (VIDEOINFOHEADER *) m_mt.Format();
     pProperties->cBuffers = 1;
     pProperties->cbBuffer = pvi->bmiHeader.biSizeImage;
 
@@ -179,7 +144,7 @@ HRESULT CSimpleVirtualCamFilterStream::DecideBufferSize(IMemAllocator *pAlloc, A
 } // DecideBufferSize
 
 // Called when graph is run
-HRESULT CSimpleVirtualCamFilterStream::OnThreadCreate() {
+HRESULT CVCamOutStream::OnThreadCreate() {
     m_rtLastTime = 0;
     return NOERROR;
 } // OnThreadCreate
@@ -188,7 +153,7 @@ HRESULT CSimpleVirtualCamFilterStream::OnThreadCreate() {
 //  IAMStreamConfig
 //////////////////////////////////////////////////////////////////////////
 
-HRESULT STDMETHODCALLTYPE CSimpleVirtualCamFilterStream::SetFormat(AM_MEDIA_TYPE *pmt) {
+HRESULT STDMETHODCALLTYPE CVCamOutStream::SetFormat(AM_MEDIA_TYPE *pmt) {
     DECLARE_PTR(VIDEOINFOHEADER, pvi, m_mt.pbFormat);
     m_mt = *pmt;
     IPin *pin;
@@ -200,18 +165,18 @@ HRESULT STDMETHODCALLTYPE CSimpleVirtualCamFilterStream::SetFormat(AM_MEDIA_TYPE
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CSimpleVirtualCamFilterStream::GetFormat(AM_MEDIA_TYPE **ppmt) {
+HRESULT STDMETHODCALLTYPE CVCamOutStream::GetFormat(AM_MEDIA_TYPE **ppmt) {
     *ppmt = CreateMediaType(&m_mt);
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CSimpleVirtualCamFilterStream::GetNumberOfCapabilities(int *piCount, int *piSize) {
+HRESULT STDMETHODCALLTYPE CVCamOutStream::GetNumberOfCapabilities(int *piCount, int *piSize) {
     *piCount = 8;
     *piSize = sizeof(VIDEO_STREAM_CONFIG_CAPS);
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CSimpleVirtualCamFilterStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) {
+HRESULT STDMETHODCALLTYPE CVCamOutStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) {
     *pmt = CreateMediaType(&m_mt);
     DECLARE_PTR(VIDEOINFOHEADER, pvi, (*pmt)->pbFormat);
 
@@ -275,14 +240,14 @@ HRESULT STDMETHODCALLTYPE CSimpleVirtualCamFilterStream::GetStreamCaps(int iInde
 //////////////////////////////////////////////////////////////////////////
 
 
-HRESULT CSimpleVirtualCamFilterStream::Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData,
-                                           DWORD cbInstanceData, void *pPropData,
-                                           DWORD cbPropData) {// Set: Cannot set any properties.
+HRESULT CVCamOutStream::Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData,
+                            DWORD cbInstanceData, void *pPropData,
+                            DWORD cbPropData) {// Set: Cannot set any properties.
     return E_NOTIMPL;
 }
 
-// Get: Return the pin category (our only property). 
-HRESULT CSimpleVirtualCamFilterStream::Get(
+// Get: Return the pin category (our only property).
+HRESULT CVCamOutStream::Get(
         REFGUID guidPropSet,   // Which property set.
         DWORD dwPropID,        // Which property in that set.
         void *pInstanceData,   // Instance data (ignore).
@@ -293,10 +258,10 @@ HRESULT CSimpleVirtualCamFilterStream::Get(
 ) {
     if (guidPropSet != AMPROPSETID_Pin) return E_PROP_SET_UNSUPPORTED;
     if (dwPropID != AMPROPERTY_PIN_CATEGORY) return E_PROP_ID_UNSUPPORTED;
-    if (pPropData == NULL && pcbReturned == NULL) return E_POINTER;
+    if (pPropData == nullptr && pcbReturned == nullptr) return E_POINTER;
 
     if (pcbReturned) *pcbReturned = sizeof(GUID);
-    if (pPropData == NULL) return S_OK; // Caller just wants to know the size.
+    if (pPropData == nullptr) return S_OK; // Caller just wants to know the size.
     if (cbPropData < sizeof(GUID)) return E_UNEXPECTED;// The buffer is too small.
 
     *(GUID *) pPropData = PIN_CATEGORY_CAPTURE;
@@ -304,7 +269,7 @@ HRESULT CSimpleVirtualCamFilterStream::Get(
 }
 
 // QuerySupported: Query whether the pin supports the specified property.
-HRESULT CSimpleVirtualCamFilterStream::QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport) {
+HRESULT CVCamOutStream::QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport) {
     if (guidPropSet != AMPROPSETID_Pin) return E_PROP_SET_UNSUPPORTED;
     if (dwPropID != AMPROPERTY_PIN_CATEGORY) return E_PROP_ID_UNSUPPORTED;
     // We support getting this property, but not setting it.
@@ -313,6 +278,6 @@ HRESULT CSimpleVirtualCamFilterStream::QuerySupported(REFGUID guidPropSet, DWORD
 }
 
 // Set misc flag that this is truly a live source
-ULONG CSimpleVirtualCamFilterStream::GetMiscFlags(void) {
+ULONG CVCamOutStream::GetMiscFlags() {
     return AM_FILTER_MISC_FLAGS_IS_SOURCE;
 }

@@ -14,7 +14,7 @@ set(TORCH_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/lib/libtorch")
 set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_INSTALL_PREFIX}")
 
 #include_directories("${PROJECT_SOURCE_DIR}/lib/svcam")
-add_subdirectory(lib/svcam)
+#add_subdirectory(lib/svcam)
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
@@ -64,6 +64,7 @@ set(SOURCES ${SOURCES}
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp
+#        src/vcam/DShowPlayer.cpp src/vcam/DShowPlayer.h src/vcam/CVideoRenderer.cpp src/vcam/CVideoRenderer.h
         )
 
 add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
