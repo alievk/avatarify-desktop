@@ -10,7 +10,7 @@
 #ifndef __STREAMS__
 #define __STREAMS__
 
-#ifdef	_MSC_VER
+#ifdef    _MSC_VER
 // disable some level-4 warnings, use #pragma warning(enable:###) to re-enable
 #pragma warning(disable:4100) // warning C4100: unreferenced formal parameter
 #pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
@@ -18,12 +18,12 @@
 #pragma warning(disable:4512) // warning C4512: assignment operator could not be generated
 #pragma warning(disable:4514) // warning C4514: "unreferenced inline function has been removed"
 
-#if _MSC_VER>=1100
+#if _MSC_VER >= 1100
 #define AM_NOVTABLE __declspec(novtable)
 #else
 #define AM_NOVTABLE
 #endif
-#endif	// MSC_VER
+#endif    // MSC_VER
 
 
 // Because of differences between Visual C++ and older Microsoft SDKs,
@@ -45,10 +45,10 @@
 
 #ifndef NUMELMS
 #if _WIN32_WINNT < 0x0600
-   #define NUMELMS(aa) (sizeof(aa)/sizeof((aa)[0]))
+#define NUMELMS(aa) (sizeof(aa)/sizeof((aa)[0]))
 #else
-   #define NUMELMS(aa) ARRAYSIZE(aa)
-#endif   
+#define NUMELMS(aa) ARRAYSIZE(aa)
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////
@@ -56,22 +56,22 @@
 // the applicaiton is being compiled with the headers from Visual C++ 6.0.
 /////////////////////////////////////////////////// ////////////////////////
 #ifndef InterlockedExchangePointer
-	#define InterlockedExchangePointer(Target, Value) \
+#define InterlockedExchangePointer(Target, Value) \
    (PVOID)InterlockedExchange((PLONG)(Target), (LONG)(Value))
 #endif
 
 #ifndef _WAVEFORMATEXTENSIBLE_
 #define _WAVEFORMATEXTENSIBLE_
 typedef struct {
-    WAVEFORMATEX    Format;
+    WAVEFORMATEX Format;
     union {
         WORD wValidBitsPerSample;       /* bits of precision  */
         WORD wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
         WORD wReserved;                 /* If neither applies, set to zero. */
     } Samples;
-    DWORD           dwChannelMask;      /* which channels are */
-                                        /* present in stream  */
-    GUID            SubFormat;
+    DWORD dwChannelMask;      /* which channels are */
+    /* present in stream  */
+    GUID SubFormat;
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 #endif // !_WAVEFORMATEXTENSIBLE_
 
@@ -80,68 +80,68 @@ typedef struct {
 #endif // !defined(WAVE_FORMAT_EXTENSIBLE)
 
 #ifndef GetWindowLongPtr
-  #define GetWindowLongPtrA   GetWindowLongA
-  #define GetWindowLongPtrW   GetWindowLongW
-  #ifdef UNICODE
-    #define GetWindowLongPtr  GetWindowLongPtrW
-  #else
-    #define GetWindowLongPtr  GetWindowLongPtrA
-  #endif // !UNICODE
+#define GetWindowLongPtrA   GetWindowLongA
+#define GetWindowLongPtrW   GetWindowLongW
+#ifdef UNICODE
+#define GetWindowLongPtr  GetWindowLongPtrW
+#else
+#define GetWindowLongPtr  GetWindowLongPtrA
+#endif // !UNICODE
 #endif // !GetWindowLongPtr
 
 #ifndef SetWindowLongPtr
-  #define SetWindowLongPtrA   SetWindowLongA
-  #define SetWindowLongPtrW   SetWindowLongW
-  #ifdef UNICODE
-    #define SetWindowLongPtr  SetWindowLongPtrW
-  #else
-    #define SetWindowLongPtr  SetWindowLongPtrA
-  #endif // !UNICODE
+#define SetWindowLongPtrA   SetWindowLongA
+#define SetWindowLongPtrW   SetWindowLongW
+#ifdef UNICODE
+#define SetWindowLongPtr  SetWindowLongPtrW
+#else
+#define SetWindowLongPtr  SetWindowLongPtrA
+#endif // !UNICODE
 #endif // !SetWindowLongPtr
 
 #ifndef GWLP_WNDPROC
-  #define GWLP_WNDPROC        (-4)
+#define GWLP_WNDPROC        (-4)
 #endif
 #ifndef GWLP_HINSTANCE
-  #define GWLP_HINSTANCE      (-6)
+#define GWLP_HINSTANCE      (-6)
 #endif
 #ifndef GWLP_HWNDPARENT
-  #define GWLP_HWNDPARENT     (-8)
+#define GWLP_HWNDPARENT     (-8)
 #endif
 #ifndef GWLP_USERDATA
-  #define GWLP_USERDATA       (-21)
+#define GWLP_USERDATA       (-21)
 #endif
 #ifndef GWLP_ID
-  #define GWLP_ID             (-12)
+#define GWLP_ID             (-12)
 #endif
 #ifndef DWLP_MSGRESULT
-  #define DWLP_MSGRESULT  0
+#define DWLP_MSGRESULT  0
 #endif
-#ifndef DWLP_DLGPROC 
-  #define DWLP_DLGPROC    DWLP_MSGRESULT + sizeof(LRESULT)
+#ifndef DWLP_DLGPROC
+#define DWLP_DLGPROC    DWLP_MSGRESULT + sizeof(LRESULT)
 #endif
 #ifndef DWLP_USER
-  #define DWLP_USER       DWLP_DLGPROC + sizeof(DLGPROC)
+#define DWLP_USER       DWLP_DLGPROC + sizeof(DLGPROC)
 #endif
 
 
 #pragma warning(push)
 #pragma warning(disable: 4312 4244)
+
 // _GetWindowLongPtr
 // Templated version of GetWindowLongPtr, to suppress spurious compiler warning.
-template <class T>
-T _GetWindowLongPtr(HWND hwnd, int nIndex)
-{
-    return (T)GetWindowLongPtr(hwnd, nIndex);
+template<class T>
+T _GetWindowLongPtr(HWND hwnd, int nIndex) {
+    return (T) GetWindowLongPtr(hwnd, nIndex);
 }
 
 // _SetWindowLongPtr
 // Templated version of SetWindowLongPtr, to suppress spurious compiler warning.
-template <class T>
-LONG_PTR _SetWindowLongPtr(HWND hwnd, int nIndex, T p)
-{
-    return SetWindowLongPtr(hwnd, nIndex, (LONG_PTR)p);
+template<class T>
+LONG_PTR _SetWindowLongPtr(HWND hwnd, int nIndex, T p) {
+    return SetWindowLongPtr(hwnd, nIndex, (LONG_PTR) p);
 }
+
 #pragma warning(pop)
 
 ///////////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ LONG_PTR _SetWindowLongPtr(HWND hwnd, int nIndex, T p)
 
 #include "cache.h"      // Simple cache container class
 #include "wxlist.h"     // Non MFC generic list class
-#include "msgthrd.h"	  // CMsgThread
+#include "msgthrd.h"      // CMsgThread
 #include "mtype.h"      // Helper class for managing media types
 #include "fourcc.h"     // conversions between FOURCCs and GUIDs
 #include <control.h>    // generated from control.odl
@@ -175,15 +175,15 @@ LONG_PTR _SetWindowLongPtr(HWND hwnd, int nIndex, T p)
 #include "transfrm.h"   // Generic transform filter
 #include "transip.h"    // Generic transform-in-place filter
 #include <uuids.h>      // declaration of type GUIDs and well-known clsids
-#include "source.h"	    // Generic source filter
+#include "source.h"        // Generic source filter
 #include "outputq.h"    // Output pin queueing
 #include <errors.h>     // HRESULT status and error definitions
 #include "renbase.h"    // Base class for writing ActiveX renderers
 #include "winutil.h"    // Helps with filters that manage windows
 #include "winctrl.h"    // Implements the IVideoWindow interface
 #include "videoctl.h"   // Specifically video related classes
-#include "refclock.h"	// Base clock class
-#include "sysclock.h"	// System clock
+#include "refclock.h"    // Base clock class
+#include "sysclock.h"    // System clock
 #include "pstream.h"    // IPersistStream helper class
 #include "vtrans.h"     // Video Transform Filter base class
 #include "amextra.h"
@@ -193,10 +193,9 @@ LONG_PTR _SetWindowLongPtr(HWND hwnd, int nIndex, T p)
 #include <audevcod.h>   // audio filter device error event codes
 
 
-
 #else
-    #ifdef DEBUG
-    #pragma message("STREAMS.H included TWICE")
-    #endif
+#ifdef DEBUG
+#pragma message("STREAMS.H included TWICE")
+#endif
 #endif // __STREAMS__
 

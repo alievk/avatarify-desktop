@@ -18,6 +18,7 @@
 
 #include "stdafx.h"
 #include "CVCamFilter.h"
+#include "Log.h"
 
 
 #define CreateComObject(clsid, iid, var) CoCreateInstance( clsid, NULL, CLSCTX_INPROC_SERVER, iid, (void **)&var);
@@ -122,6 +123,9 @@ STDAPI DllRegisterServer() {
     if (pFM2)
         pFM2->Release();
 
+    initLogger( R"(C:\Users\illus\.avatarify\vcam.log)", ldebug);
+    L_(linfo) << "Filter registered!";
+
     return hr;
 }
 
@@ -147,6 +151,10 @@ STDAPI DllUnregisterServer() {
     hr = pFM2->UnregisterFilter(&CLSID_VideoInputDeviceCategory, L"Simple Virtual Cam", CLSID_VCamFilter);
 
     pFM2->Release();
+
+    initLogger( R"(C:\Users\illus\.avatarify\vcam.log)", ldebug);
+    L_(linfo) << "Filter unregistered!";
+
     return hr;
 }
 
@@ -157,6 +165,9 @@ STDAPI DllUnregisterServer() {
 extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    initLogger( R"(C:\Users\illus\.avatarify\vcam.log)", ldebug);
+    L_(linfo) << "Entrypoint!";
+
     return DllEntryPoint((HINSTANCE) (hModule), ul_reason_for_call, lpReserved);
 }
 

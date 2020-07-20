@@ -33,7 +33,7 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
     torch::Tensor drivingImage = qimageToTensor(drivingFrame);
     drivingImage = torch::upsample_bilinear2d(drivingImage, {256, 256}, false);
     torch::Tensor generatedImage = predictInternal(drivingImage);
-    generatedImage = at::upsample_bilinear2d(generatedImage, {640, 480}, false);
+    generatedImage = at::upsample_bilinear2d(generatedImage, {480, 640}, false);
     return tensorToQImage(generatedImage);
 }
 

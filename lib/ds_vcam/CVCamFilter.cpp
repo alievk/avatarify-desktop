@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////
 CUnknown *WINAPI CVCamFilter::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr) {
     ASSERT(phr);
-    CUnknown *punk = new CVCamFilter(lpunk, phr);
+    CUnknown * punk = new CVCamFilter(lpunk, phr);
     return punk;
 }
 

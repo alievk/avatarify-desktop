@@ -137,7 +137,7 @@ Number      Average       StdDev     Smallest      Largest Incident_Name
 #define MSR_START(a) ((void)0)
 #define MSR_STOP(a) ((void)0)
 #define MSR_NOTE(a) ((void)0)
-#define MSR_INTEGER(a,b) ((void)0)
+#define MSR_INTEGER(a, b) ((void)0)
 #define MSR_DUMP(a) ((void)0)
 #define MSR_DUMPSTATS(a) ((void)0)
 #endif
@@ -159,7 +159,7 @@ void WINAPI Msr_Terminate(void);
 // Call this to get an Id for an "incident" that you can pass to Start, Stop or Note
 // everything that's logged is called an "incident".
 
-int  WINAPI Msr_Register(__in LPTSTR Incident);
+int WINAPI Msr_Register(__in LPTSTR Incident);
 
 
 // Reset the statistical counts for an incident

@@ -4,6 +4,10 @@
 #include "stdafx.h"
 #include "CVCamFilter.h"
 
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+
+using namespace boost::interprocess;
 
 //------------------------------------------------------------------------------
 // Class CVCamOutStream
@@ -71,7 +75,7 @@ public:
 
     HRESULT CheckMediaType(const CMediaType *pMediaType) override;
 
-    HRESULT GetMediaType(int iPosition, CMediaType *pmt) override;
+    HRESULT GetMediaType(int iPosition, CMediaType *pmt) final;
 
     HRESULT SetMediaType(const CMediaType *pmt) override;
 
@@ -80,6 +84,8 @@ public:
 private:
     CVCamFilter *m_pParent;
     REFERENCE_TIME m_rtLastTime = 0;
+
+    shared_memory_object shm;
 };
 
 #endif

@@ -27,31 +27,33 @@
 #ifndef __WXLIST__
 #define __WXLIST__
 
-   /* A POSITION represents (in some fashion that's opaque) a cursor
-      on the list that can be set to identify any element.  NULL is
-      a valid value and several operations regard NULL as the position
-      "one step off the end of the list".  (In an n element list there
-      are n+1 places to insert and NULL is that "n+1-th" value).
-      The POSITION of an element in the list is only invalidated if
-      that element is deleted.  Move operations may mean that what
-      was a valid POSITION in one list is now a valid POSITION in
-      a different list.
+/* A POSITION represents (in some fashion that's opaque) a cursor
+   on the list that can be set to identify any element.  NULL is
+   a valid value and several operations regard NULL as the position
+   "one step off the end of the list".  (In an n element list there
+   are n+1 places to insert and NULL is that "n+1-th" value).
+   The POSITION of an element in the list is only invalidated if
+   that element is deleted.  Move operations may mean that what
+   was a valid POSITION in one list is now a valid POSITION in
+   a different list.
 
-      Some operations which at first sight are illegal are allowed as
-      harmless no-ops.  For instance RemoveHead is legal on an empty
-      list and it returns NULL.  This allows an atomic way to test if
-      there is an element there, and if so, get it.  The two operations
-      AddTail and RemoveHead thus implement a MONITOR (See Hoare's paper).
+   Some operations which at first sight are illegal are allowed as
+   harmless no-ops.  For instance RemoveHead is legal on an empty
+   list and it returns NULL.  This allows an atomic way to test if
+   there is an element there, and if so, get it.  The two operations
+   AddTail and RemoveHead thus implement a MONITOR (See Hoare's paper).
 
-      Single element operations return POSITIONs, non-NULL means it worked.
-      whole list operations return a BOOL.  TRUE means it all worked.
+   Single element operations return POSITIONs, non-NULL means it worked.
+   whole list operations return a BOOL.  TRUE means it all worked.
 
-      This definition is the same as the POSITION type for MFCs, so we must
-      avoid defining it twice.
-   */
+   This definition is the same as the POSITION type for MFCs, so we must
+   avoid defining it twice.
+*/
 #ifndef __AFX_H__
-struct __POSITION { int unused; };
-typedef __POSITION* POSITION;
+struct __POSITION {
+    int unused;
+};
+typedef __POSITION *POSITION;
 #endif
 
 const int DEFAULTCACHE = 10;    /* Default node object cache size */
@@ -61,7 +63,7 @@ const int DEFAULTCACHE = 10;    /* Default node object cache size */
    to the object that it looks after.
    All of these pointers can be retrieved or set through member functions.
 */
-class CBaseList 
+class CBaseList
 #ifdef DEBUG
     : public CBaseObject
 #endif
@@ -76,6 +78,7 @@ public:
 #ifdef DEBUG
     class CNode : public CBaseObject {
 #else
+
     class CNode {
 #endif
 
@@ -88,7 +91,7 @@ public:
         /* Constructor - initialise the object's pointers */
         CNode()
 #ifdef DEBUG
-            : CBaseObject(NAME("List node"))
+        : CBaseObject(NAME("List node"))
 #endif
         {
         };
@@ -118,13 +121,12 @@ public:
         void SetData(__in void *p) { m_pObject = p; };
     };
 
-    class CNodeCache
-    {
+    class CNodeCache {
     public:
         CNodeCache(INT iCacheSize) : m_iCacheSize(iCacheSize),
                                      m_pHead(NULL),
-                                     m_iUsed(0)
-                                     {};
+                                     m_iUsed(0) {};
+
         ~CNodeCache() {
             CNode *pNode = m_pHead;
             while (pNode) {
@@ -133,8 +135,8 @@ public:
                 delete pCurrent;
             }
         };
-        void AddToCache(__inout CNode *pNode)
-        {
+
+        void AddToCache(__inout CNode *pNode) {
             if (m_iUsed < m_iCacheSize) {
                 pNode->SetNext(m_pHead);
                 m_pHead = pNode;
@@ -143,8 +145,8 @@ public:
                 delete pNode;
             }
         };
-        CNode *RemoveFromCache()
-        {
+
+        CNode *RemoveFromCache() {
             CNode *pNode = m_pHead;
             if (pNode != NULL) {
                 m_pHead = pNode->Next();
@@ -163,8 +165,8 @@ public:
 
 protected:
 
-    CNode* m_pFirst;    /* Pointer to first node in the list */
-    CNode* m_pLast;     /* Pointer to the last node in the list */
+    CNode *m_pFirst;    /* Pointer to first node in the list */
+    CNode *m_pLast;     /* Pointer to the last node in the list */
     LONG m_Count;       /* Number of nodes currently in the list */
 
 private:
@@ -185,6 +187,7 @@ private:
        allocated data.
     */
     CBaseList(const CBaseList &refList);
+
     CBaseList &operator=(const CBaseList &refList);
 
 public:
@@ -193,12 +196,14 @@ public:
               INT iItems);
 
     CBaseList(__in_opt LPCTSTR pName);
+
 #ifdef UNICODE
     CBaseList(__in_opt LPCSTR pName,
               INT iItems);
 
     CBaseList(__in_opt LPCSTR pName);
 #endif
+
     ~CBaseList();
 
     /* Remove all the nodes from *this i.e. make the list empty */
@@ -224,13 +229,14 @@ protected:
        GetPrev is not implemented.
        Use Next, Prev and Get separately.
     */
-    __out void *GetNextI(__inout POSITION& rp) const;
+    __out void *GetNextI(__inout POSITION &rp) const;
 
 
     /* Return a pointer to the object at p
        Asking for the object at NULL will return NULL harmlessly.
     */
     __out_opt void *GetI(__in_opt POSITION p) const;
+
     __out void *GetValidI(__in POSITION p) const;
 
 public:
@@ -258,8 +264,7 @@ public:
           in ALL cases.  All the other arguments probably are reflections
           of the algebraic point.
     */
-    __out_opt POSITION Next(__in_opt POSITION pos) const
-    {
+    __out_opt POSITION Next(__in_opt POSITION pos) const {
         if (pos == NULL) {
             return (POSITION) m_pFirst;
         }
@@ -268,8 +273,7 @@ public:
     } //Next
 
     // See Next
-    __out_opt POSITION Prev(__in_opt POSITION pos) const
-    {
+    __out_opt POSITION Prev(__in_opt POSITION pos) const {
         if (pos == NULL) {
             return (POSITION) m_pLast;
         }
@@ -282,7 +286,7 @@ public:
        pointer.  Return NULL if the pointer was not not found.
     */
 protected:
-    __out_opt POSITION FindI( __in void * pObj) const;
+    __out_opt POSITION FindI(__in void *pObj) const;
 
     // ??? Should there be (or even should there be only)
     // ??? POSITION FindNextAfter(void * pObj, POSITION p)
@@ -318,7 +322,8 @@ protected:
        If you are adding a COM objects, you might want AddRef it first.
        Other existing POSITIONs in *this are still valid
     */
-    __out_opt POSITION AddTailI(__in void * pObj);
+    __out_opt POSITION AddTailI(__in void *pObj);
+
 public:
 
 
@@ -343,7 +348,8 @@ public:
        Existing POSITIONs in *this are still valid
     */
 protected:
-    __out_opt POSITION AddHeadI(__in void * pObj);
+    __out_opt POSITION AddHeadI(__in void *pObj);
+
 public:
 
     /* Add all the elements in *pList to the head of *this.
@@ -362,7 +368,8 @@ public:
        Existing POSITIONs in *this are undisturbed, including p.
     */
 protected:
-    __out_opt POSITION AddAfterI(__in_opt POSITION p, __in void * pObj);
+    __out_opt POSITION AddAfterI(__in_opt POSITION p, __in void *pObj);
+
 public:
 
     /* Add the list *pList to *this after position p in *this
@@ -380,9 +387,10 @@ public:
        Return the position of the new object, NULL if it fails
        Existing POSITIONs in *this are undisturbed, including p.
     */
-    protected:
-    __out_opt POSITION AddBeforeI(__in_opt POSITION p, __in void * pObj);
-    public:
+protected:
+    __out_opt POSITION AddBeforeI(__in_opt POSITION p, __in void *pObj);
+
+public:
 
     /* Add the list *pList to *this before position p in *this
        AddAfter(NULL,x) adds x to the start - equivalent to AddHead
@@ -479,7 +487,7 @@ public:
 
 
     /* set cursor to the position of each element of list in turn  */
-    #define TRAVERSELIST(list, cursor)               \
+#define TRAVERSELIST(list, cursor)               \
     for ( cursor = (list).GetHeadPosition()           \
         ; cursor!=NULL                               \
         ; cursor = (list).Next(cursor)                \
@@ -489,7 +497,7 @@ public:
     /* set cursor to the position of each element of list in turn
        in reverse order
     */
-    #define REVERSETRAVERSELIST(list, cursor)        \
+#define REVERSETRAVERSELIST(list, cursor)        \
     for ( cursor = (list).GetTailPosition()           \
         ; cursor!=NULL                               \
         ; cursor = (list).Prev(cursor)                \
@@ -497,49 +505,62 @@ public:
 
 }; // end of class declaration
 
-template<class OBJECT> class CGenericList : public CBaseList
-{
+template<class OBJECT>
+class CGenericList : public CBaseList {
 public:
     CGenericList(__in_opt LPCTSTR pName,
                  INT iItems,
                  BOOL bLock = TRUE,
                  BOOL bAlert = FALSE) :
-                     CBaseList(pName, iItems) {
+            CBaseList(pName, iItems) {
         UNREFERENCED_PARAMETER(bAlert);
         UNREFERENCED_PARAMETER(bLock);
     };
+
     CGenericList(__in_opt LPCTSTR pName) :
-                     CBaseList(pName) {
+            CBaseList(pName) {
     };
 
-    __out_opt POSITION GetHeadPosition() const { return (POSITION)m_pFirst; }
-    __out_opt POSITION GetTailPosition() const { return (POSITION)m_pLast; }
+    __out_opt POSITION GetHeadPosition() const { return (POSITION) m_pFirst; }
+
+    __out_opt POSITION GetTailPosition() const { return (POSITION) m_pLast; }
+
     int GetCount() const { return m_Count; }
 
-    __out OBJECT *GetNext(__inout POSITION& rp) const { return (OBJECT *) GetNextI(rp); }
+    __out OBJECT *GetNext(__inout POSITION &rp) const { return (OBJECT *) GetNextI(rp); }
 
     __out_opt OBJECT *Get(__in_opt POSITION p) const { return (OBJECT *) GetI(p); }
+
     __out OBJECT *GetValid(__in POSITION p) const { return (OBJECT *) GetValidI(p); }
-    __out_opt OBJECT *GetHead() const  { return Get(GetHeadPosition()); }
+
+    __out_opt OBJECT *GetHead() const { return Get(GetHeadPosition()); }
 
     __out_opt OBJECT *RemoveHead() { return (OBJECT *) RemoveHeadI(); }
 
     __out_opt OBJECT *RemoveTail() { return (OBJECT *) RemoveTailI(); }
 
     __out_opt OBJECT *Remove(__in_opt POSITION p) { return (OBJECT *) RemoveI(p); }
-    __out_opt POSITION AddBefore(__in_opt POSITION p, __in OBJECT * pObj) { return AddBeforeI(p, pObj); }
-    __out_opt POSITION AddAfter(__in_opt POSITION p, __in OBJECT * pObj)  { return AddAfterI(p, pObj); }
-    __out_opt POSITION AddHead(__in OBJECT * pObj) { return AddHeadI(pObj); }
-    __out_opt POSITION AddTail(__in OBJECT * pObj)  { return AddTailI(pObj); }
-    BOOL AddTail(__in CGenericList<OBJECT> *pList)
-            { return CBaseList::AddTail((CBaseList *) pList); }
-    BOOL AddHead(__in CGenericList<OBJECT> *pList)
-            { return CBaseList::AddHead((CBaseList *) pList); }
-    BOOL AddAfter(__in_opt POSITION p, __in CGenericList<OBJECT> *pList)
-            { return CBaseList::AddAfter(p, (CBaseList *) pList); };
-    BOOL AddBefore(__in_opt POSITION p, __in CGenericList<OBJECT> *pList)
-            { return CBaseList::AddBefore(p, (CBaseList *) pList); };
-    __out_opt POSITION Find( __in OBJECT * pObj) const { return FindI(pObj); }
+
+    __out_opt POSITION AddBefore(__in_opt POSITION p, __in OBJECT *pObj) { return AddBeforeI(p, pObj); }
+
+    __out_opt POSITION AddAfter(__in_opt POSITION p, __in OBJECT *pObj) { return AddAfterI(p, pObj); }
+
+    __out_opt POSITION AddHead(__in OBJECT *pObj) { return AddHeadI(pObj); }
+
+    __out_opt POSITION AddTail(__in OBJECT *pObj) { return AddTailI(pObj); }
+
+    BOOL AddTail(__in CGenericList<OBJECT> *pList) { return CBaseList::AddTail((CBaseList *) pList); }
+
+    BOOL AddHead(__in CGenericList<OBJECT> *pList) { return CBaseList::AddHead((CBaseList *) pList); }
+
+    BOOL AddAfter(__in_opt POSITION p, __in CGenericList<OBJECT> *pList) {
+        return CBaseList::AddAfter(p, (CBaseList *) pList);
+    };
+
+    BOOL AddBefore(__in_opt POSITION p, __in CGenericList<OBJECT> *pList) {
+        return CBaseList::AddBefore(p, (CBaseList *) pList);
+    };
+    __out_opt POSITION Find(__in OBJECT *pObj) const { return FindI(pObj); }
 }; // end of class declaration
 
 

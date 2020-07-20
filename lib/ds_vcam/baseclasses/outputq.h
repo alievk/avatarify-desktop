@@ -11,23 +11,23 @@
 
 typedef CGenericList<IMediaSample> CSampleList;
 
-class COutputQueue : public CCritSec
-{
+class COutputQueue : public CCritSec {
 public:
     //  Constructor
-    COutputQueue(IPin      *pInputPin,          //  Pin to send stuff to
+    COutputQueue(IPin *pInputPin,          //  Pin to send stuff to
                  __inout HRESULT *phr,          //  'Return code'
-                 BOOL       bAuto = TRUE,       //  Ask pin if blocks
-                 BOOL       bQueue = TRUE,      //  Send through queue (ignored if
-                                                //  bAuto set)
-                 LONG       lBatchSize = 1,     //  Batch
-                 BOOL       bBatchExact = FALSE,//  Batch exactly to BatchSize
-                 LONG       lListSize =         //  Likely number in the list
-                                DEFAULTCACHE,
-                 DWORD      dwPriority =        //  Priority of thread to create
-                                THREAD_PRIORITY_NORMAL,
-                 bool       bFlushingOpt = false // flushing optimization
-                );
+                 BOOL bAuto = TRUE,       //  Ask pin if blocks
+                 BOOL bQueue = TRUE,      //  Send through queue (ignored if
+            //  bAuto set)
+                 LONG lBatchSize = 1,     //  Batch
+                 BOOL bBatchExact = FALSE,//  Batch exactly to BatchSize
+                 LONG lListSize =         //  Likely number in the list
+                 DEFAULTCACHE,
+                 DWORD dwPriority =        //  Priority of thread to create
+                 THREAD_PRIORITY_NORMAL,
+                 bool bFlushingOpt = false // flushing optimization
+    );
+
     ~COutputQueue();
 
     // enter flush state - discard all data
@@ -35,7 +35,7 @@ public:
 
     // re-enable receives (pass this downstream)
     void EndFlush();        // Complete flush of samples - downstream
-                            // pin guaranteed not to block at this stage
+    // pin guaranteed not to block at this stage
 
     void EOS();             // Call this on End of stream
 
@@ -49,10 +49,10 @@ public:
     HRESULT Receive(IMediaSample *pSample);
 
     // do something with these media samples
-    HRESULT ReceiveMultiple (
-        __in_ecount(nSamples) IMediaSample **pSamples,
-        long nSamples,
-        __out long *nSamplesProcessed);
+    HRESULT ReceiveMultiple(
+            __in_ecount(nSamples) IMediaSample **pSamples,
+            long nSamples,
+            __out long *nSamplesProcessed);
 
     void Reset();           // Reset m_hr ready for more data
 
@@ -64,18 +64,18 @@ public:
 
 protected:
     static DWORD WINAPI InitialThreadProc(__in LPVOID pv);
+
     DWORD ThreadProc();
-    BOOL  IsQueued()
-    {
+
+    BOOL IsQueued() {
         return m_List != NULL;
     };
 
     //  The critical section MUST be held when this is called
     void QueueSample(IMediaSample *pSample);
 
-    BOOL IsSpecialSample(IMediaSample *pSample)
-    {
-        return (DWORD_PTR)pSample > (DWORD_PTR)(LONG_PTR)(-16);
+    BOOL IsSpecialSample(IMediaSample *pSample) {
+        return (DWORD_PTR) pSample > (DWORD_PTR) (LONG_PTR) (-16);
     };
 
     //  Remove and Release() batched and queued samples
@@ -87,10 +87,10 @@ protected:
 
 protected:
     //  Queue 'messages'
-    #define SEND_PACKET      ((IMediaSample *)(LONG_PTR)(-2))  // Send batch
-    #define EOS_PACKET       ((IMediaSample *)(LONG_PTR)(-3))  // End of stream
-    #define RESET_PACKET     ((IMediaSample *)(LONG_PTR)(-4))  // Reset m_hr
-    #define NEW_SEGMENT      ((IMediaSample *)(LONG_PTR)(-5))  // send NewSegment
+#define SEND_PACKET      ((IMediaSample *)(LONG_PTR)(-2))  // Send batch
+#define EOS_PACKET       ((IMediaSample *)(LONG_PTR)(-3))  // End of stream
+#define RESET_PACKET     ((IMediaSample *)(LONG_PTR)(-4))  // Reset m_hr
+#define NEW_SEGMENT      ((IMediaSample *)(LONG_PTR)(-5))  // send NewSegment
 
     // new segment packet is always followed by one of these
     struct NewSegmentPacket {
@@ -100,36 +100,36 @@ protected:
     };
 
     // Remember input stuff
-    IPin          * const m_pPin;
-    IMemInputPin  *       m_pInputPin;
-    BOOL            const m_bBatchExact;
-    LONG            const m_lBatchSize;
+    IPin *const m_pPin;
+    IMemInputPin *m_pInputPin;
+    BOOL const m_bBatchExact;
+    LONG const m_lBatchSize;
 
-    CSampleList   *       m_List;
-    HANDLE                m_hSem;
-    CAMEvent                m_evFlushComplete;
-    HANDLE                m_hThread;
-    __field_ecount_opt(m_lBatchSize) IMediaSample  **      m_ppSamples;
-    __range(0, m_lBatchSize)         LONG                  m_nBatched;
+    CSampleList *m_List;
+    HANDLE m_hSem;
+    CAMEvent m_evFlushComplete;
+    HANDLE m_hThread;
+    __field_ecount_opt(m_lBatchSize) IMediaSample **m_ppSamples;
+    __range(0, m_lBatchSize)         LONG m_nBatched;
 
     //  Wait optimization
-    LONG                  m_lWaiting;
+    LONG m_lWaiting;
     //  Flush synchronization
-    BOOL                  m_bFlushing;
+    BOOL m_bFlushing;
 
     // flushing optimization. some downstream filters have trouble
     // with the queue's flushing optimization. other rely on it
-    BOOL                  m_bFlushed;
-    bool                  m_bFlushingOpt;
+    BOOL m_bFlushed;
+    bool m_bFlushingOpt;
 
     //  Terminate now
-    BOOL                  m_bTerminate;
+    BOOL m_bTerminate;
 
     //  Send anyway flag for batching
-    BOOL                  m_bSendAnyway;
+    BOOL m_bSendAnyway;
 
     //  Deferred 'return code'
-    HRESULT volatile         m_hr;
+    HRESULT volatile m_hr;
 
     // an event that can be fired after every deliver
     HANDLE m_hEventPop;

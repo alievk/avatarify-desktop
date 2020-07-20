@@ -18,10 +18,10 @@ public:
     CAMEvent *pEvent;
 
     CMsg(UINT u, DWORD dw, __inout_opt LPVOID lp, __in_opt CAMEvent *pEvnt)
-        : uMsg(u), dwFlags(dw), lpParam(lp), pEvent(pEvnt) {}
+            : uMsg(u), dwFlags(dw), lpParam(lp), pEvent(pEvnt) {}
 
     CMsg()
-        : uMsg(0), dwFlags(0L), lpParam(NULL), pEvent(NULL) {}
+            : uMsg(0), dwFlags(0L), lpParam(NULL), pEvent(NULL) {}
 };
 
 // This is the actual thread class.  It exports all the usual thread control
@@ -32,30 +32,31 @@ public:
 class AM_NOVTABLE CMsgThread {
 private:
     static DWORD WINAPI DefaultThreadProc(__inout LPVOID lpParam);
-    DWORD               m_ThreadId;
-    HANDLE              m_hThread;
+
+    DWORD m_ThreadId;
+    HANDLE m_hThread;
 
 protected:
 
     // if you want to override GetThreadMsg to block on other things
     // as well as this queue, you need access to this
-    CGenericList<CMsg>        m_ThreadQueue;
-    CCritSec                  m_Lock;
-    HANDLE                    m_hSem;
-    LONG                      m_lWaiting;
+    CGenericList<CMsg> m_ThreadQueue;
+    CCritSec m_Lock;
+    HANDLE m_hSem;
+    LONG m_lWaiting;
 
 public:
     CMsgThread()
-        : m_ThreadId(0),
-        m_hThread(NULL),
-        m_lWaiting(0),
-        m_hSem(NULL),
-        // make a list with a cache of 5 items
-        m_ThreadQueue(NAME("MsgThread list"), 5)
-        {
-        }
+            : m_ThreadId(0),
+              m_hThread(NULL),
+              m_lWaiting(0),
+              m_hSem(NULL),
+            // make a list with a cache of 5 items
+              m_ThreadQueue(NAME("MsgThread list"), 5) {
+    }
 
     ~CMsgThread();
+
     // override this if you want to block on other things as well
     // as the message loop
     void virtual GetThreadMsg(__out CMsg *msg);
@@ -102,7 +103,7 @@ public:
     void PutThreadMsg(UINT uMsg, DWORD dwMsgFlags,
                       __in_opt LPVOID lpMsgParam, __in_opt CAMEvent *pEvent = NULL) {
         CAutoLock lck(&m_Lock);
-        CMsg* pMsg = new CMsg(uMsg, dwMsgFlags, lpMsgParam, pEvent);
+        CMsg *pMsg = new CMsg(uMsg, dwMsgFlags, lpMsgParam, pEvent);
         m_ThreadQueue.AddTail(pMsg);
         if (m_lWaiting != 0) {
             ReleaseSemaphore(m_hSem, m_lWaiting, 0);
@@ -115,6 +116,6 @@ public:
     // the creator thread.
     //
     virtual LRESULT ThreadMessageProc(
-        UINT uMsg, DWORD dwFlags, __inout_opt LPVOID lpParam, __in_opt CAMEvent *pEvent) = 0;
+            UINT uMsg, DWORD dwFlags, __inout_opt LPVOID lpParam, __in_opt CAMEvent *pEvent) = 0;
 };
 

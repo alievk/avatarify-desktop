@@ -1,4 +1,5 @@
 #include "CVCamOutStream.h"
+#include "Log.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -7,8 +8,8 @@
 //////////////////////////////////////////////////////////////////////////
 CVCamOutStream::CVCamOutStream(HRESULT *phr, CVCamFilter *pParent, LPCWSTR pPinName) :
         CSourceStream(NAME("Capture"), phr, pParent, pPinName), m_pParent(pParent) {
-    // Set the default media type as 640x480x24@30
-    GetMediaType(8, &m_mt);
+    GetMediaType(8, &m_mt);  // Set the default media type as 640x480x24@30
+    shm = shared_memory_object(open_or_create, "afy_shm", read_only);
 }
 
 CVCamOutStream::~CVCamOutStream() = default;
@@ -18,12 +19,10 @@ ULONG CVCamOutStream::Release() {
 }
 
 ULONG CVCamOutStream::AddRef() {
-
     return GetOwner()->AddRef();
 }
 
 HRESULT CVCamOutStream::QueryInterface(REFIID riid, void **ppv) {
-
     // Standard OLE stuff
     if (riid == _uuidof(IAMStreamConfig))
         *ppv = (IAMStreamConfig *) this;
@@ -50,15 +49,23 @@ HRESULT CVCamOutStream::FillBuffer(IMediaSample *pms) {
 
     BYTE *pData;
     pms->GetPointer(&pData);
-    long lDataLen = pms->GetSize();
-    for (int i = 0; i < lDataLen; ++i)
-        pData[i] = rand();
 
+    //Map the whole shared memory in this process
+    mapped_region region(shm, read_only);
+//    L_(linfo) << "region.get_size()" << region.get_size();
+//    L_(linfo) << "pms->GetSize()" << pms->GetSize();
+//    if (region.get_size() == pms->GetSize()) {
+    auto *mem = static_cast<unsigned char *>(region.get_address());
+    std::copy(mem, mem + min(pms->GetSize(), region.get_size()), pData);
+//    } else {  // fallback
+//        long lDataLen = pms->GetSize();
+//        for (int i = 0; i < lDataLen; ++i)
+//            pData[i] = rand();
+//        L_(linfo) << "Fallback!";
+//    }
     return NOERROR;
-
 }
 
-//
 // Notify
 // Ignore quality management messages sent from the downstream filter
 STDMETHODIMP CVCamOutStream::Notify(IBaseFilter *pSender, Quality q) {
@@ -90,8 +97,8 @@ HRESULT CVCamOutStream::GetMediaType(int iPosition, CMediaType *pmt) {
     pvi->bmiHeader.biCompression = BI_RGB;
     pvi->bmiHeader.biBitCount = 24;
     pvi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    pvi->bmiHeader.biWidth = 80 * iPosition;
-    pvi->bmiHeader.biHeight = 60 * iPosition;
+    pvi->bmiHeader.biWidth = 640;
+    pvi->bmiHeader.biHeight = 480;
     pvi->bmiHeader.biPlanes = 1;
     pvi->bmiHeader.biSizeImage = GetBitmapSize(&pvi->bmiHeader);
     pvi->bmiHeader.biClrImportant = 0;
@@ -103,7 +110,7 @@ HRESULT CVCamOutStream::GetMediaType(int iPosition, CMediaType *pmt) {
 
     pmt->SetType(&MEDIATYPE_Video);
     pmt->SetFormatType(&FORMAT_VideoInfo);
-    pmt->SetTemporalCompression(FALSE);
+    pmt->SetTemporalCompression(TRUE);
 
     // Work out the GUID for the subtype from the header info.
     const GUID SubTypeGUID = GetBitmapSubtype(&pvi->bmiHeader);
@@ -155,7 +162,7 @@ HRESULT STDMETHODCALLTYPE CVCamOutStream::SetFormat(AM_MEDIA_TYPE *pmt) {
     IPin *pin;
     ConnectedTo(&pin);
     if (pin) {
-        IFilterGraph *pGraph = m_pParent->GetGraph();
+        IFilterGraph * pGraph = m_pParent->GetGraph();
         pGraph->Reconnect(this);
     }
     return S_OK;

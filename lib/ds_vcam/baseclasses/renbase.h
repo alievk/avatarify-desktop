@@ -14,13 +14,14 @@
 // Forward class declarations
 
 class CBaseRenderer;
+
 class CBaseVideoRenderer;
+
 class CRendererInputPin;
 
 // This is our input pin class that channels calls to the renderer
 
-class CRendererInputPin : public CBaseInputPin
-{
+class CRendererInputPin : public CBaseInputPin {
 protected:
 
     CBaseRenderer *m_pRenderer;
@@ -34,31 +35,38 @@ public:
     // Overriden from the base pin classes
 
     HRESULT BreakConnect();
+
     HRESULT CompleteConnect(IPin *pReceivePin);
+
     HRESULT SetMediaType(const CMediaType *pmt);
+
     HRESULT CheckMediaType(const CMediaType *pmt);
+
     HRESULT Active();
+
     HRESULT Inactive();
 
     // Add rendering behaviour to interface functions
 
     STDMETHODIMP QueryId(__deref_out LPWSTR *Id);
+
     STDMETHODIMP EndOfStream();
+
     STDMETHODIMP BeginFlush();
+
     STDMETHODIMP EndFlush();
+
     STDMETHODIMP Receive(IMediaSample *pMediaSample);
 
     // Helper
-    IMemAllocator inline *Allocator() const
-    {
+    IMemAllocator inline *Allocator() const {
         return m_pAllocator;
     }
 };
 
 // Main renderer class that handles synchronisation and state changes
 
-class CBaseRenderer : public CBaseFilter
-{
+class CBaseRenderer : public CBaseFilter {
 protected:
 
     friend class CRendererInputPin;
@@ -82,17 +90,17 @@ protected:
     CRendererInputPin *m_pInputPin;     // Our renderer input pin object
     CCritSec m_InterfaceLock;           // Critical section for interfaces
     CCritSec m_RendererLock;            // Controls access to internals
-    IQualityControl * m_pQSink;         // QualityControl sink
+    IQualityControl *m_pQSink;         // QualityControl sink
     BOOL m_bRepaintStatus;              // Can we signal an EC_REPAINT
     //  Avoid some deadlocks by tracking filter during stop
-    volatile BOOL  m_bInReceive;        // Inside Receive between PrepareReceive
-                                        // And actually processing the sample
+    volatile BOOL m_bInReceive;        // Inside Receive between PrepareReceive
+    // And actually processing the sample
     REFERENCE_TIME m_SignalTime;        // Time when we signal EC_COMPLETE
     UINT m_EndOfStreamTimer;            // Used to signal end of stream
     CCritSec m_ObjectCreationLock;      // This lock protects the creation and
-                                        // of m_pPosition and m_pInputPin.  It
-                                        // ensures that two threads cannot create
-                                        // either object simultaneously.
+    // of m_pPosition and m_pInputPin.  It
+    // ensures that two threads cannot create
+    // either object simultaneously.
 
 public:
 
@@ -106,6 +114,7 @@ public:
     // Overriden to say what interfaces we support and where
 
     virtual HRESULT GetMediaPositionInterface(REFIID riid, __deref_out void **ppv);
+
     STDMETHODIMP NonDelegatingQueryInterface(REFIID, __deref_out void **);
 
     virtual HRESULT SourceThreadCanWait(BOOL bCanWait);
@@ -114,49 +123,74 @@ public:
     // Debug only dump of the renderer state
     void DisplayRendererState();
 #endif
+
     virtual HRESULT WaitForRenderTime();
+
     virtual HRESULT CompleteStateChange(FILTER_STATE OldState);
 
     // Return internal information about this filter
 
     BOOL IsEndOfStream() { return m_bEOS; };
+
     BOOL IsEndOfStreamDelivered() { return m_bEOSDelivered; };
+
     BOOL IsStreaming() { return m_bStreaming; };
+
     void SetAbortSignal(BOOL bAbort) { m_bAbort = bAbort; };
-    virtual void OnReceiveFirstSample(IMediaSample *pMediaSample) { };
+
+    virtual void OnReceiveFirstSample(IMediaSample *pMediaSample) {};
+
     CAMEvent *GetRenderEvent() { return &m_RenderEvent; };
 
     // Permit access to the transition state
 
     void Ready() { m_evComplete.Set(); };
+
     void NotReady() { m_evComplete.Reset(); };
+
     BOOL CheckReady() { return m_evComplete.Check(); };
 
     virtual int GetPinCount();
+
     virtual CBasePin *GetPin(int n);
+
     FILTER_STATE GetRealState();
+
     void SendRepaint();
-    void SendNotifyWindow(IPin *pPin,HWND hwnd);
+
+    void SendNotifyWindow(IPin *pPin, HWND hwnd);
+
     BOOL OnDisplayChange();
+
     void SetRepaintStatus(BOOL bRepaint);
 
     // Override the filter and pin interface functions
 
     STDMETHODIMP Stop();
+
     STDMETHODIMP Pause();
+
     STDMETHODIMP Run(REFERENCE_TIME StartTime);
+
     STDMETHODIMP GetState(DWORD dwMSecs, __out FILTER_STATE *State);
+
     STDMETHODIMP FindPin(LPCWSTR Id, __deref_out IPin **ppPin);
 
     // These are available for a quality management implementation
 
     virtual void OnRenderStart(IMediaSample *pMediaSample);
+
     virtual void OnRenderEnd(IMediaSample *pMediaSample);
+
     virtual HRESULT OnStartStreaming() { return NOERROR; };
+
     virtual HRESULT OnStopStreaming() { return NOERROR; };
-    virtual void OnWaitStart() { };
-    virtual void OnWaitEnd() { };
-    virtual void PrepareRender() { };
+
+    virtual void OnWaitStart() {};
+
+    virtual void OnWaitEnd() {};
+
+    virtual void PrepareRender() {};
 
 #ifdef PERF
     REFERENCE_TIME m_trRenderStart; // Just before we started drawing
@@ -169,6 +203,7 @@ public:
     // Quality management implementation for scheduling rendering
 
     virtual BOOL ScheduleSample(IMediaSample *pMediaSample);
+
     virtual HRESULT GetSampleTimes(IMediaSample *pMediaSample,
                                    __out REFERENCE_TIME *pStartTime,
                                    __out REFERENCE_TIME *pEndTime);
@@ -180,43 +215,62 @@ public:
     // Lots of end of stream complexities
 
     void TimerCallback();
+
     void ResetEndOfStreamTimer();
+
     HRESULT NotifyEndOfStream();
+
     virtual HRESULT SendEndOfStream();
+
     virtual HRESULT ResetEndOfStream();
+
     virtual HRESULT EndOfStream();
 
     // Rendering is based around the clock
 
     void SignalTimerFired();
+
     virtual HRESULT CancelNotification();
+
     virtual HRESULT ClearPendingSample();
 
     // Called when the filter changes state
 
     virtual HRESULT Active();
+
     virtual HRESULT Inactive();
+
     virtual HRESULT StartStreaming();
+
     virtual HRESULT StopStreaming();
+
     virtual HRESULT BeginFlush();
+
     virtual HRESULT EndFlush();
 
     // Deal with connections and type changes
 
     virtual HRESULT BreakConnect();
+
     virtual HRESULT SetMediaType(const CMediaType *pmt);
+
     virtual HRESULT CompleteConnect(IPin *pReceivePin);
 
     // These look after the handling of data samples
 
     virtual HRESULT PrepareReceive(IMediaSample *pMediaSample);
+
     virtual HRESULT Receive(IMediaSample *pMediaSample);
+
     virtual BOOL HaveCurrentSample();
+
     virtual IMediaSample *GetCurrentSample();
+
     virtual HRESULT Render(IMediaSample *pMediaSample);
 
     // Derived classes MUST override these
     virtual HRESULT DoRenderSample(IMediaSample *pMediaSample) PURE;
+
     virtual HRESULT CheckMediaType(const CMediaType *) PURE;
 
     // Helper
@@ -244,7 +298,7 @@ public:
 // the number of frames that the sliding averages are averaged over.
 // the rule is (1024*NewObservation + (AVGPERIOD-1) * PreviousAverage)/AVGPERIOD
 #define AVGPERIOD 4
-#define DO_MOVING_AVG(avg,obs) (avg = (1024*obs + (AVGPERIOD-1)*avg)/AVGPERIOD)
+#define DO_MOVING_AVG(avg, obs) (avg = (1024*obs + (AVGPERIOD-1)*avg)/AVGPERIOD)
 // Spot the bug in this macro - I can't. but it doesn't work!
 
 class CBaseVideoRenderer : public CBaseRenderer,    // Base renderer class
@@ -271,8 +325,8 @@ protected:
     // We therefore need to know whether we are playing frames early or not.
 
     int m_nNormal;                  // The number of consecutive frames
-                                    // drawn at their normal time (not early)
-                                    // -1 means we just dropped a frame.
+    // drawn at their normal time (not early)
+    // -1 means we just dropped a frame.
 
 #ifdef PERF
     BOOL m_bDrawLateFrames;         // Don't drop any frames (debug and I'm
@@ -280,10 +334,10 @@ protected:
 #endif
 
     BOOL m_bSupplierHandlingQuality;// The response to Quality messages says
-                                    // our supplier is handling things.
-                                    // We will allow things to go extra late
-                                    // before dropping frames.  We will play
-                                    // very early after he has dropped one.
+    // our supplier is handling things.
+    // We will allow things to go extra late
+    // before dropping frames.  We will play
+    // very early after he has dropped one.
 
     // Control of scheduling, frame dropping etc.
     // We need to know where the time is being spent so as to tell whether
@@ -313,7 +367,7 @@ protected:
     int m_trRenderAvg;              // Time frames are taking to blt
     int m_trRenderLast;             // Time for last frame blt
     int m_tRenderStart;             // Just before we started drawing (mSec)
-                                    // derived from timeGetTime.
+    // derived from timeGetTime.
 
     // When frames are dropped we will play the next frame as early as we can.
     // If it was a false alarm and the machine is fast we slide gently back to
@@ -335,8 +389,8 @@ protected:
     // controls whether we bother to drop a frame or whether we reckon that
     // we're doing well enough that we can stand a one-frame glitch.
     int m_trWaitAvg;                // Average of last few wait times
-                                    // (actually we just average how early
-                                    // we were).  Negative here means LATE.
+    // (actually we just average how early
+    // we were).  Negative here means LATE.
 
     // The average inter-frame time.
     // This is used to calculate the proportion of the time used by the
@@ -363,7 +417,7 @@ protected:
     //int m_idSendQuality;          // MSR_id for timing the notifications per se
 #endif // PERF
     REFERENCE_TIME m_trRememberStampForPerf;  // original time stamp of frame
-                                              // with no earliness fudges etc.
+    // with no earliness fudges etc.
 #ifdef PERF
     REFERENCE_TIME m_trRememberFrameForPerf;  // time when previous frame rendered
 
@@ -378,7 +432,7 @@ protected:
 
     int m_cFramesDropped;           // cumulative frames dropped IN THE RENDERER
     int m_cFramesDrawn;             // Frames since streaming started seen BY THE
-                                    // RENDERER (some may be dropped upstream)
+    // RENDERER (some may be dropped upstream)
 
     // Next two support average sync offset and standard deviation of sync offset.
     LONGLONG m_iTotAcc;                  // Sum of accuracies in mSec
@@ -398,8 +452,8 @@ protected:
     int m_trFrame;                  // hold onto inter-frame time
 
     int m_tStreamingStart;          // if streaming then time streaming started
-                                    // else time of last streaming session
-                                    // used for property page statistics
+    // else time of last streaming session
+    // used for property page statistics
 #ifdef PERF
     LONGLONG m_llTimeOffset;        // timeGetTime()*10000+m_llTimeOffset==ref time
 #endif
@@ -416,32 +470,45 @@ public:
 
     // IQualityControl methods - Notify allows audio-video throttling
 
-    STDMETHODIMP SetSink( IQualityControl * piqc);
-    STDMETHODIMP Notify( IBaseFilter * pSelf, Quality q);
+    STDMETHODIMP SetSink(IQualityControl *piqc);
+
+    STDMETHODIMP Notify(IBaseFilter *pSelf, Quality q);
 
     // These provide a full video quality management implementation
 
     void OnRenderStart(IMediaSample *pMediaSample);
+
     void OnRenderEnd(IMediaSample *pMediaSample);
+
     void OnWaitStart();
+
     void OnWaitEnd();
+
     HRESULT OnStartStreaming();
+
     HRESULT OnStopStreaming();
+
     void ThrottleWait();
 
     // Handle the statistics gathering for our quality management
 
     void PreparePerformanceData(int trLate, int trFrame);
+
     virtual void RecordFrameLateness(int trLate, int trFrame);
+
     virtual void OnDirectRender(IMediaSample *pMediaSample);
+
     virtual HRESULT ResetStreamingTimes();
+
     BOOL ScheduleSample(IMediaSample *pMediaSample);
+
     HRESULT ShouldDrawSampleNow(IMediaSample *pMediaSample,
                                 __inout REFERENCE_TIME *ptrStart,
                                 __inout REFERENCE_TIME *ptrEnd);
 
     virtual HRESULT SendQuality(REFERENCE_TIME trLate, REFERENCE_TIME trRealStream);
-    STDMETHODIMP JoinFilterGraph(__inout_opt IFilterGraph * pGraph, __in_opt LPCWSTR pName);
+
+    STDMETHODIMP JoinFilterGraph(__inout_opt IFilterGraph *pGraph, __in_opt LPCWSTR pName);
 
     //
     //  Do estimates for standard deviations for per-frame
@@ -452,26 +519,33 @@ public:
     //  or 0 if m_cFramesDrawn <= 3
     //
     HRESULT GetStdDev(
-        int nSamples,
-        __out int *piResult,
-        LONGLONG llSumSq,
-        LONGLONG iTot
+            int nSamples,
+            __out int *piResult,
+            LONGLONG llSumSq,
+            LONGLONG iTot
     );
+
 public:
 
     // IQualProp property page support
 
     STDMETHODIMP get_FramesDroppedInRenderer(__out int *cFramesDropped);
+
     STDMETHODIMP get_FramesDrawn(__out int *pcFramesDrawn);
+
     STDMETHODIMP get_AvgFrameRate(__out int *piAvgFrameRate);
+
     STDMETHODIMP get_Jitter(__out int *piJitter);
+
     STDMETHODIMP get_AvgSyncOffset(__out int *piAvg);
+
     STDMETHODIMP get_DevSyncOffset(__out int *piDev);
 
     // Implement an IUnknown interface and expose IQualProp
 
     DECLARE_IUNKNOWN
-    STDMETHODIMP NonDelegatingQueryInterface(REFIID riid,__deref_out VOID **ppv);
+
+    STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, __deref_out VOID **ppv);
 };
 
 #endif // __RENBASE__

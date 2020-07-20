@@ -1,44 +1,19 @@
-#include <winnt.h>
-#include <strmif.h>
 #include "DirectShowVCam.h"
+#include <QDebug>
 
 DirectShowVCam::DirectShowVCam() {
-//    CoGetClassObject(rclsid, dwClsContext, NULL, IID_IClassFactory, &pCF);
-//    hresult = pCF->CreateInstance(pUnkOuter, riid, ppvObj)
-//    pCF->Release();
+    shm = shared_memory_object(open_or_create, "afy_shm", read_write);
+    shm.truncate(640 * 480 * 3);
 }
 
+void DirectShowVCam::present(const QImage &frame) {
+    qDebug() << "DirectShowVCam::present" << frame.width() << "x" << frame.height() << "@" << frame.depth();
+    qDebug() << frame.format();
 
-void DirectShowVCam::present(const QImage &generatedFrame) {
+    QImage mirorredFrame = frame.mirrored();
+    const uchar *bits = mirorredFrame.constBits();
 
-}
-
-HRESULT DirectShowVCam::OpenFile(PCWSTR pszFileName)
-{
-    IBaseFilter *pSource = NULL;
-
-    // Create a new filter graph. (This also closes the old one, if any.)
-    HRESULT hr = InitializeGraph();
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    // Add the source filter to the graph.
-    hr = m_pGraph->AddSourceFilter(pszFileName, NULL, &pSource);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    // Try to render the streams.
-    hr = RenderStreams(pSource);
-
-    done:
-    if (FAILED(hr))
-    {
-        TearDownGraph();
-    }
-    SafeRelease(&pSource);
-    return hr;
+    mapped_region region(shm, read_write);
+    auto *mem = static_cast<unsigned char *>(region.get_address());
+    std::copy(bits, bits + frame.sizeInBytes(), mem);
 }

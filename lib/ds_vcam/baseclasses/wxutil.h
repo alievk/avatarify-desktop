@@ -20,20 +20,21 @@ class CCritSec {
     // make copy constructor and assignment operator inaccessible
 
     CCritSec(const CCritSec &refCritSec);
+
     CCritSec &operator=(const CCritSec &refCritSec);
 
     CRITICAL_SECTION m_CritSec;
 
 #ifdef DEBUG
-public:
-    DWORD   m_currentOwner;
-    DWORD   m_lockCount;
-    BOOL    m_fTrace;        // Trace this one
-public:
-    CCritSec();
-    ~CCritSec();
-    void Lock();
-    void Unlock();
+    public:
+        DWORD   m_currentOwner;
+        DWORD   m_lockCount;
+        BOOL    m_fTrace;        // Trace this one
+    public:
+        CCritSec();
+        ~CCritSec();
+        void Lock();
+        void Unlock();
 #else
 
 public:
@@ -66,15 +67,15 @@ public:
 //
 
 #ifdef DEBUG
-    BOOL WINAPI CritCheckIn(CCritSec * pcCrit);
-    BOOL WINAPI CritCheckIn(const CCritSec * pcCrit);
-    BOOL WINAPI CritCheckOut(CCritSec * pcCrit);
-    BOOL WINAPI CritCheckOut(const CCritSec * pcCrit);
-    void WINAPI DbgLockTrace(CCritSec * pcCrit, BOOL fTrace);
+BOOL WINAPI CritCheckIn(CCritSec * pcCrit);
+BOOL WINAPI CritCheckIn(const CCritSec * pcCrit);
+BOOL WINAPI CritCheckOut(CCritSec * pcCrit);
+BOOL WINAPI CritCheckOut(const CCritSec * pcCrit);
+void WINAPI DbgLockTrace(CCritSec * pcCrit, BOOL fTrace);
 #else
-    #define CritCheckIn(x) TRUE
-    #define CritCheckOut(x) TRUE
-    #define DbgLockTrace(pc, fT)
+#define CritCheckIn(x) TRUE
+#define CritCheckOut(x) TRUE
+#define DbgLockTrace(pc, fT)
 #endif
 
 
@@ -85,14 +86,14 @@ class CAutoLock {
     // make copy constructor and assignment operator inaccessible
 
     CAutoLock(const CAutoLock &refAutoLock);
+
     CAutoLock &operator=(const CAutoLock &refAutoLock);
 
 protected:
-    CCritSec * m_pLock;
+    CCritSec *m_pLock;
 
 public:
-    CAutoLock(CCritSec * plock)
-    {
+    CAutoLock(CCritSec *plock) {
         m_pLock = plock;
         m_pLock->Lock();
     };
@@ -103,31 +104,35 @@ public:
 };
 
 
-
 // wrapper for event objects
-class CAMEvent
-{
+class CAMEvent {
 
     // make copy constructor and assignment operator inaccessible
 
     CAMEvent(const CAMEvent &refEvent);
+
     CAMEvent &operator=(const CAMEvent &refEvent);
 
 protected:
     HANDLE m_hEvent;
 public:
     CAMEvent(BOOL fManualReset = FALSE, __inout_opt HRESULT *phr = NULL);
+
     CAMEvent(__inout_opt HRESULT *phr);
+
     ~CAMEvent();
 
     // Cast to HANDLE - we don't support this as an lvalue
-    operator HANDLE () const { return m_hEvent; };
+    operator HANDLE() const { return m_hEvent; };
 
-    void Set() {EXECUTE_ASSERT(SetEvent(m_hEvent));};
+    void Set() { EXECUTE_ASSERT(SetEvent(m_hEvent)); };
+
     BOOL Wait(DWORD dwTimeout = INFINITE) {
-	return (WaitForSingleObject(m_hEvent, dwTimeout) == WAIT_OBJECT_0);
+        return (WaitForSingleObject(m_hEvent, dwTimeout) == WAIT_OBJECT_0);
     };
+
     void Reset() { ResetEvent(m_hEvent); };
+
     BOOL Check() { return Wait(0); };
 };
 
@@ -136,8 +141,7 @@ public:
 // This adds ONE method to the CAMEvent object to allow sent
 // messages to be processed while waiting
 
-class CAMMsgEvent : public CAMEvent
-{
+class CAMMsgEvent : public CAMEvent {
 
 public:
 
@@ -153,6 +157,7 @@ public:
 // support for a worker thread
 
 #ifdef AM_NOVTABLE
+
 // simple thread class supports creation of worker thread, synchronization
 // and communication. Can be derived to simplify parameter passing
 class AM_NOVTABLE CAMThread {
@@ -160,6 +165,7 @@ class AM_NOVTABLE CAMThread {
     // make copy constructor and assignment operator inaccessible
 
     CAMThread(const CAMThread &refThread);
+
     CAMThread &operator=(const CAMThread &refThread);
 
     CAMEvent m_EventSend;
@@ -177,10 +183,11 @@ protected:
 
 public:
     CAMThread(__inout_opt HRESULT *phr = NULL);
+
     virtual ~CAMThread();
 
-    CCritSec m_AccessLock;	// locks access by client threads
-    CCritSec m_WorkerLock;	// locks access to shared objects
+    CCritSec m_AccessLock;    // locks access by client threads
+    CCritSec m_WorkerLock;    // locks access to shared objects
 
     // thread initially runs this. param is actually 'this'. function
     // just gets this and calls ThreadProc
@@ -200,7 +207,7 @@ public:
         // Disable warning: Conversion from LONG to PVOID of greater size
 #pragma warning(push)
 #pragma warning(disable: 4312)
-        HANDLE hThread = (HANDLE)InterlockedExchangePointer(&m_hThread, 0);
+        HANDLE hThread = (HANDLE) InterlockedExchangePointer(&m_hThread, 0);
 #pragma warning(pop)
 
         if (hThread) {
@@ -211,8 +218,7 @@ public:
 
     // ThreadExists
     // Return TRUE if the thread exists. FALSE otherwise
-    BOOL ThreadExists(void) const
-    {
+    BOOL ThreadExists(void) const {
         if (m_hThread == 0) {
             return FALSE;
         } else {
@@ -224,7 +230,7 @@ public:
     DWORD GetRequest();
 
     // is there a request?
-    BOOL CheckRequest(__out_opt DWORD * pParam);
+    BOOL CheckRequest(__out_opt DWORD *pParam);
 
     // reply to the request
     void Reply(DWORD);
@@ -240,6 +246,7 @@ public:
     // available. S_FALSE means it's not available.
     static HRESULT CoInitializeHelper();
 };
+
 #endif // AM_NOVTABLE
 
 
@@ -258,15 +265,16 @@ public:
 
 #define DEFAULT_QUEUESIZE   2
 
-template <class T> class CQueue {
+template<class T>
+class CQueue {
 private:
-    HANDLE          hSemPut;        // Semaphore controlling queue "putting"
-    HANDLE          hSemGet;        // Semaphore controlling queue "getting"
+    HANDLE hSemPut;        // Semaphore controlling queue "putting"
+    HANDLE hSemGet;        // Semaphore controlling queue "getting"
     CRITICAL_SECTION CritSect;      // Thread seriallization
-    int             nMax;           // Max objects allowed in queue
-    int             iNextPut;       // Array index of next "PutMsg"
-    int             iNextGet;       // Array index of next "GetMsg"
-    T              *QueueObjects;   // Array of objects (ptr's to void)
+    int nMax;           // Max objects allowed in queue
+    int iNextPut;       // Array index of next "PutMsg"
+    int iNextGet;       // Array index of next "GetMsg"
+    T *QueueObjects;   // Array of objects (ptr's to void)
 
     void Initialize(int n) {
         iNextPut = iNextGet = 0;
@@ -288,7 +296,7 @@ public:
     }
 
     ~CQueue() {
-        delete [] QueueObjects;
+        delete[] QueueObjects;
         DeleteCriticalSection(&CritSect);
         CloseHandle(hSemPut);
         CloseHandle(hSemGet);
@@ -351,19 +359,18 @@ public:
 //    S_OK          - no error
 //    E_INVALIDARG  - values passed would lead to overrun
 HRESULT AMSafeMemMoveOffset(
-    __in_bcount(dst_size) void * dst,
-    __in size_t dst_size,
-    __in DWORD cb_dst_offset,
-    __in_bcount(src_size) const void * src,
-    __in size_t src_size,
-    __in DWORD cb_src_offset,
-    __in size_t count);
+        __in_bcount(dst_size) void *dst,
+        __in size_t dst_size,
+        __in DWORD cb_dst_offset,
+        __in_bcount(src_size) const void *src,
+        __in size_t src_size,
+        __in DWORD cb_src_offset,
+        __in size_t count);
 
 extern "C"
-void * __stdcall memmoveInternal(void *, const void *, size_t);
+void *__stdcall memmoveInternal(void *, const void *, size_t);
 
-inline void * __cdecl memchrInternal(const void *buf, int chr, size_t cnt)
-{
+inline void *__cdecl memchrInternal(const void *buf, int chr, size_t cnt) {
 #ifdef _X86_
     void *pRet = NULL;
 
@@ -382,12 +389,12 @@ exit_memchr:
     return pRet;
 
 #else
-    while ( cnt && (*(unsigned char *)buf != (unsigned char)chr) ) {
-        buf = (unsigned char *)buf + 1;
+    while (cnt && (*(unsigned char *) buf != (unsigned char) chr)) {
+        buf = (unsigned char *) buf + 1;
         cnt--;
     }
 
-    return(cnt ? (void *)buf : NULL);
+    return (cnt ? (void *) buf : NULL);
 #endif
 }
 
@@ -443,12 +450,13 @@ BOOL WINAPI IsEqualObject(IUnknown *pFirst, IUnknown *pSecond);
 
 // Compute (a * b + rnd) / c
 LONGLONG WINAPI llMulDiv(LONGLONG a, LONGLONG b, LONGLONG c, LONGLONG rnd);
+
 LONGLONG WINAPI Int64x32Div32(LONGLONG a, LONG b, LONG c, LONG rnd);
 
 
 // Avoids us dyna-linking to SysAllocString to copy BSTR strings
-STDAPI WriteBSTR(__deref_out BSTR * pstrDest, LPCWSTR szSrc);
-STDAPI FreeBSTR(__deref_in BSTR* pstr);
+STDAPI WriteBSTR(__deref_out BSTR *pstrDest, LPCWSTR szSrc);
+STDAPI FreeBSTR(__deref_in BSTR *pstr);
 
 // Return a wide string - allocating memory for it
 // Returns:
@@ -459,11 +467,11 @@ STDAPI AMGetWideString(LPCWSTR pszString, __deref_out LPWSTR *ppszReturn);
 
 // Special wait for objects owning windows
 DWORD WINAPI WaitDispatchingMessages(
-    HANDLE hObject,
-    DWORD dwWait,
-    HWND hwnd = NULL,
-    UINT uMsg = 0,
-    HANDLE hEvent = NULL);
+        HANDLE hObject,
+        DWORD dwWait,
+        HWND hwnd = NULL,
+        UINT uMsg = 0,
+        HANDLE hEvent = NULL);
 
 // HRESULT_FROM_WIN32 converts ERROR_SUCCESS to a success code, but in
 // our use of HRESULT_FROM_WIN32, it typically means a function failed
@@ -477,56 +485,79 @@ HRESULT AmGetLastErrorToHResult(void);
 
 // duplicate of ATL's CComPtr to avoid linker conflicts.
 
-IUnknown* QzAtlComPtrAssign(__deref_inout_opt IUnknown** pp, __in_opt IUnknown* lp);
+IUnknown *QzAtlComPtrAssign(__deref_inout_opt IUnknown **pp, __in_opt IUnknown *lp);
 
-template <class T>
-class QzCComPtr
-{
+template<class T>
+class QzCComPtr {
 public:
-	typedef T _PtrClass;
-	QzCComPtr() {p=NULL;}
-	QzCComPtr(T* lp)
-	{
-		if ((p = lp) != NULL)
-			p->AddRef();
-	}
-	QzCComPtr(const QzCComPtr<T>& lp)
-	{
-		if ((p = lp.p) != NULL)
-			p->AddRef();
-	}
-	~QzCComPtr() {if (p) p->Release();}
-	void Release() {if (p) p->Release(); p=NULL;}
-	operator T*() {return (T*)p;}
-	T& operator*() {ASSERT(p!=NULL); return *p; }
-	//The assert on operator& usually indicates a bug.  If this is really
-	//what is needed, however, take the address of the p member explicitly.
-	T** operator&() { ASSERT(p==NULL); return &p; }
-	T* operator->() { ASSERT(p!=NULL); return p; }
-	T* operator=(T* lp){return (T*)QzAtlComPtrAssign((IUnknown**)&p, lp);}
-	T* operator=(const QzCComPtr<T>& lp)
-	{
-		return (T*)QzAtlComPtrAssign((IUnknown**)&p, lp.p);
-	}
-#if _MSC_VER>1020
-	bool operator!(){return (p == NULL);}
+    typedef T _PtrClass;
+
+    QzCComPtr() { p = NULL; }
+
+    QzCComPtr(T *lp) {
+        if ((p = lp) != NULL)
+            p->AddRef();
+    }
+
+    QzCComPtr(const QzCComPtr<T> &lp) {
+        if ((p = lp.p) != NULL)
+            p->AddRef();
+    }
+
+    ~QzCComPtr() { if (p) p->Release(); }
+
+    void Release() {
+        if (p) p->Release();
+        p = NULL;
+    }
+
+    operator T *() { return (T *) p; }
+
+    T &operator*() {
+        ASSERT(p != NULL);
+        return *p;
+    }
+
+    //The assert on operator& usually indicates a bug.  If this is really
+    //what is needed, however, take the address of the p member explicitly.
+    T **operator&() {
+        ASSERT(p == NULL);
+        return &p;
+    }
+
+    T *operator->() {
+        ASSERT(p != NULL);
+        return p;
+    }
+
+    T *operator=(T *lp) { return (T *) QzAtlComPtrAssign((IUnknown **) &p, lp); }
+
+    T *operator=(const QzCComPtr<T> &lp) {
+        return (T *) QzAtlComPtrAssign((IUnknown **) &p, lp.p);
+    }
+
+#if _MSC_VER > 1020
+
+    bool operator!() { return (p == NULL); }
+
 #else
-	BOOL operator!(){return (p == NULL) ? TRUE : FALSE;}
+    BOOL operator!(){return (p == NULL) ? TRUE : FALSE;}
 #endif
-	T* p;
+    T *p;
 };
 
-MMRESULT CompatibleTimeSetEvent( UINT uDelay, UINT uResolution, __in LPTIMECALLBACK lpTimeProc, DWORD_PTR dwUser, UINT fuEvent );
-bool TimeKillSynchronousFlagAvailable( void );
+MMRESULT
+CompatibleTimeSetEvent(UINT uDelay, UINT uResolution, __in LPTIMECALLBACK lpTimeProc, DWORD_PTR dwUser, UINT fuEvent);
+
+bool TimeKillSynchronousFlagAvailable(void);
 
 //  Helper to replace lstrcpmi
-__inline int lstrcmpiLocaleIndependentW(LPCWSTR lpsz1, LPCWSTR lpsz2)
-{
-    return  CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, lpsz1, -1, lpsz2, -1) - CSTR_EQUAL;
+__inline int lstrcmpiLocaleIndependentW(LPCWSTR lpsz1, LPCWSTR lpsz2) {
+    return CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, lpsz1, -1, lpsz2, -1) - CSTR_EQUAL;
 }
-__inline int lstrcmpiLocaleIndependentA(LPCSTR lpsz1, LPCSTR lpsz2)
-{
-    return  CompareStringA(LOCALE_INVARIANT, NORM_IGNORECASE, lpsz1, -1, lpsz2, -1) - CSTR_EQUAL;
+
+__inline int lstrcmpiLocaleIndependentA(LPCSTR lpsz1, LPCSTR lpsz2) {
+    return CompareStringA(LOCALE_INVARIANT, NORM_IGNORECASE, lpsz1, -1, lpsz2, -1) - CSTR_EQUAL;
 }
 
 #endif /* __WXUTIL__ */

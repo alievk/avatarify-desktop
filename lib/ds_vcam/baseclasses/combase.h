@@ -108,20 +108,19 @@ inheritance and some via nested classes
 // Filter Setup data structures no defined in axextend.idl
 
 typedef REGPINTYPES
-AMOVIESETUP_MEDIATYPE, * PAMOVIESETUP_MEDIATYPE, * FAR LPAMOVIESETUP_MEDIATYPE;
+        AMOVIESETUP_MEDIATYPE, *PAMOVIESETUP_MEDIATYPE, *FAR LPAMOVIESETUP_MEDIATYPE;
 
 typedef REGFILTERPINS
-AMOVIESETUP_PIN, * PAMOVIESETUP_PIN, * FAR LPAMOVIESETUP_PIN;
+        AMOVIESETUP_PIN, *PAMOVIESETUP_PIN, *FAR LPAMOVIESETUP_PIN;
 
-typedef struct _AMOVIESETUP_FILTER
-{
-  const CLSID * clsID;
-  const WCHAR * strName;
-  DWORD      dwMerit;
-  UINT       nPins;
-  const AMOVIESETUP_PIN * lpPin;
+typedef struct _AMOVIESETUP_FILTER {
+    const CLSID *clsID;
+    const WCHAR *strName;
+    DWORD dwMerit;
+    UINT nPins;
+    const AMOVIESETUP_PIN *lpPin;
 }
-AMOVIESETUP_FILTER, * PAMOVIESETUP_FILTER, * FAR LPAMOVIESETUP_FILTER;
+        AMOVIESETUP_FILTER, *PAMOVIESETUP_FILTER, *FAR LPAMOVIESETUP_FILTER;
 
 /* The DLLENTRY module initialises the module handle on loading */
 
@@ -136,12 +135,15 @@ extern OSVERSIONINFO g_osInfo;     // Filled in by GetVersionEx
    non delegating and delegating IUnknowns in the same COM object */
 
 #ifndef INONDELEGATINGUNKNOWN_DEFINED
-DECLARE_INTERFACE(INonDelegatingUnknown)
-{
-    STDMETHOD(NonDelegatingQueryInterface) (THIS_ REFIID, LPVOID *) PURE;
+
+DECLARE_INTERFACE(INonDelegatingUnknown) {
+    STDMETHOD(NonDelegatingQueryInterface)(THIS_ REFIID, LPVOID *) PURE;
+
     STDMETHOD_(ULONG, NonDelegatingAddRef)(THIS) PURE;
+
     STDMETHOD_(ULONG, NonDelegatingRelease)(THIS) PURE;
 };
+
 #define INONDELEGATINGUNKNOWN_DEFINED
 #endif
 
@@ -155,16 +157,15 @@ typedef INonDelegatingUnknown *PNDUNKNOWN;
    in the constructor. The downside of all this is that every single object
    constructor has to take an object name parameter that describes it */
 
-class CBaseObject
-{
+class CBaseObject {
 
 private:
 
     // Disable the copy constructor and assignment by default so you will get
     //   compiler errors instead of unexpected behaviour if you pass objects
     //   by value or assign objects.
-    CBaseObject(const CBaseObject& objectSrc);          // no implementation
-    void operator=(const CBaseObject& objectSrc);       // no implementation
+    CBaseObject(const CBaseObject &objectSrc);          // no implementation
+    void operator=(const CBaseObject &objectSrc);       // no implementation
 
 private:
     static LONG m_cObjects;     /* Total number of objects active */
@@ -180,9 +181,11 @@ public:
     /* These increment and decrement the number of active objects */
 
     CBaseObject(__in_opt LPCTSTR pName);
+
 #ifdef UNICODE
     CBaseObject(__in_opt LPCSTR pName);
 #endif
+
     ~CBaseObject();
 
     /* Call this to find if there are any CUnknown derived objects active */
@@ -198,8 +201,7 @@ public:
    support, and an implementation of the core non delegating IUnknown */
 
 class AM_NOVTABLE CUnknown : public INonDelegatingUnknown,
-                 public CBaseObject
-{
+                             public CBaseObject {
 private:
     const LPUNKNOWN m_pUnknown; /* Owner of this object */
 
@@ -209,11 +211,13 @@ protected:                      /* So we can override NonDelegatingRelease() */
 public:
 
     CUnknown(__in_opt LPCTSTR pName, __in_opt LPUNKNOWN pUnk);
+
     virtual ~CUnknown() {};
 
     // This is redundant, just use the other constructor
     //   as we never touch the HRESULT in this anyway
     CUnknown(__in_opt LPCTSTR Name, __in_opt LPUNKNOWN pUnk, __inout_opt HRESULT *phr);
+
 #ifdef UNICODE
     CUnknown(__in_opt LPCSTR pName, __in_opt LPUNKNOWN pUnk);
     CUnknown(__in_opt LPCSTR pName, __in_opt LPUNKNOWN pUnk,__inout_opt HRESULT *phr);
@@ -233,7 +237,9 @@ public:
     /* Non delegating unknown implementation */
 
     STDMETHODIMP NonDelegatingQueryInterface(REFIID, __deref_out void **);
+
     STDMETHODIMP_(ULONG) NonDelegatingAddRef();
+
     STDMETHODIMP_(ULONG) NonDelegatingRelease();
 };
 
@@ -261,18 +267,18 @@ class CFactoryTemplate {
 
 public:
 
-    const WCHAR *              m_Name;
-    const CLSID *              m_ClsID;
-    LPFNNewCOMObject           m_lpfnNew;
-    LPFNInitRoutine            m_lpfnInit;
-    const AMOVIESETUP_FILTER * m_pAMovieSetup_Filter;
+    const WCHAR *m_Name;
+    const CLSID *m_ClsID;
+    LPFNNewCOMObject m_lpfnNew;
+    LPFNInitRoutine m_lpfnInit;
+    const AMOVIESETUP_FILTER *m_pAMovieSetup_Filter;
 
     BOOL IsClassID(REFCLSID rclsid) const {
-        return (IsEqualCLSID(*m_ClsID,rclsid));
+        return (IsEqualCLSID(*m_ClsID, rclsid));
     };
 
     CUnknown *CreateInstance(__inout_opt LPUNKNOWN pUnk, __inout_opt HRESULT *phr) const {
-        CheckPointer(phr,NULL);
+        CheckPointer(phr, NULL);
         return m_lpfnNew(pUnk, phr);
     };
 };
@@ -294,8 +300,7 @@ public:
     };
 
 
-
-HINSTANCE	LoadOLEAut32();
+HINSTANCE LoadOLEAut32();
 
 
 #endif /* __COMBASE__ */

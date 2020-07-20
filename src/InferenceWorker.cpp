@@ -4,14 +4,13 @@
 #include <utility>
 #include "InferenceWorker.h"
 
-InferenceWorker::InferenceWorker(AsyncCameraCapture *camera) {
-    m_camera = camera;
+InferenceWorker::InferenceWorker(AsyncCameraCapture *camera) : m_camera(camera) {
 }
 
 void InferenceWorker::setAvatarPath(QString avatarPath) {
     m_avatarPath = std::move(avatarPath);
     if (m_avatarPath != "none") {
-        libtorchPredictor.setSourceImage(m_avatarPath);
+        m_fommPredictor.setSourceImage(m_avatarPath);
     }
 }
 
@@ -35,11 +34,9 @@ void InferenceWorker::inference() {
     QImage drivingFrame = m_camera->frame();
     QImage generatedFrame;
     if (m_avatarPath != "none") {
-        generatedFrame = libtorchPredictor.predict(drivingFrame);
+        generatedFrame = m_fommPredictor.predict(drivingFrame);
     } else {
-        generatedFrame = identityPredictor.predict(drivingFrame);
+        generatedFrame = m_identityPredictor.predict(drivingFrame);
     }
-
-    presentPreview(generatedFrame);
-    // TODO: virtual camera
+    present(generatedFrame);
 }

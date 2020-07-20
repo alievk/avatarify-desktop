@@ -62,7 +62,13 @@ QString InferenceManager::avatarPath() const {
 void InferenceManager::setAvatarPath(const QString &avatarFilename) {
     qDebug() << "InferenceManager::setAvatarPath " << avatarFilename;
 
-    QString avatarPath = ROOT_FOLDER + "/.avatarify/avatars/" + avatarFilename;
+    QString avatarPath;
+    if (avatarFilename != "none") {
+        avatarPath = ROOT_FOLDER + "/.avatarify/avatars/" + avatarFilename;
+    } else {
+        avatarPath = avatarFilename;
+    }
+
     if (m_avatarPath == avatarPath)
         return;
 
@@ -81,7 +87,7 @@ void InferenceManager::startWorkerIfReady() {
             m_videoSurface->start(format);
 
             worker.reset(new InferenceWorker(m_camera));
-            connect(worker.data(), &InferenceWorker::presentPreview, this, &InferenceManager::presentPreviewFrame);
+            connect(worker.data(), &InferenceWorker::present, this, &InferenceManager::presentFrame);
             connect(worker.data(), &QThread::finished, worker.data(), &QObject::deleteLater);
             worker->start();
         } else {
@@ -92,7 +98,11 @@ void InferenceManager::startWorkerIfReady() {
     }
 }
 
-void InferenceManager::presentPreviewFrame(const QImage &generatedFrame) {
+void InferenceManager::presentFrame(const QImage &generatedFrame) {
+    // vcam
+    m_virtualCamera->present(generatedFrame);
+
+    // preview
     QImage generatedFrameRGBA = generatedFrame.convertToFormat(QImage::Format_ARGB32);
     QVideoFrame previewFrame(m_mirror ? generatedFrameRGBA.mirrored(true, false) : generatedFrameRGBA);
     m_videoSurface->present(previewFrame);

@@ -47,18 +47,12 @@ torch::Tensor LibtorchFOMM::predictInternal(torch::Tensor &drivingImage) {
 
 torch::Tensor LibtorchFOMM::FOMMEncoder(const torch::Tensor &image) {
 //    qDebug() << "LibtorchPredictor::FOMMEncoder";
-
-    std::vector<torch::jit::IValue> inputs;
-    inputs.emplace_back(image);
-    return FOMMEncoderModule.forward(inputs).toTensor();
+    return FOMMEncoderModule.forward({image}).toTensor();
 }
 
 std::pair<torch::Tensor, torch::Tensor> LibtorchFOMM::KPDetector(const torch::Tensor &image) {
 //    qDebug() << "LibtorchPredictor::KPDetector";
-
-    std::vector<torch::jit::IValue> inputs;
-    inputs.emplace_back(image);
-    auto outputs = KPDetectorModule.forward(inputs).toTuple();
+    auto outputs = KPDetectorModule.forward({image}).toTuple();
     return std::pair<torch::Tensor, torch::Tensor>(outputs->elements()[0].toTensor(),
                                                    outputs->elements()[1].toTensor());
 }
@@ -66,16 +60,16 @@ std::pair<torch::Tensor, torch::Tensor> LibtorchFOMM::KPDetector(const torch::Te
 torch::Tensor LibtorchFOMM::FOMMNoEncoderNoKPDetector(const torch::Tensor &kpDriving,
                                                       const torch::Tensor &kpDrivingJacobian) {
 //    qDebug() << "LibtorchPredictor::FOMMNoEncoderNoKPDetector";
-
-    std::vector<torch::jit::IValue> inputs;
-    inputs.emplace_back(sourceImage);
-    inputs.emplace_back(sourceEncoded);
-    inputs.emplace_back(kpDriving);
-    inputs.emplace_back(kpDrivingJacobian);
-    inputs.emplace_back(kpSource);
-    inputs.emplace_back(kpSourceJacobian);
-    inputs.emplace_back(kpInitial);
-    inputs.emplace_back(kpInitialJacobian);
+    std::vector<torch::jit::IValue> inputs = {
+            sourceImage,
+            sourceEncoded,
+            kpDriving,
+            kpDrivingJacobian,
+            kpSource,
+            kpSourceJacobian,
+            kpInitial,
+            kpInitialJacobian
+    };
     return FOMMNoEncoderNoKPDetectorModule.forward(inputs).toTensor();
 }
 

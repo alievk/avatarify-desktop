@@ -20,51 +20,72 @@ class CMediaType : public _AMMediaType {
 public:
 
     ~CMediaType();
+
     CMediaType();
-    CMediaType(const GUID * majortype);
-    CMediaType(const AM_MEDIA_TYPE&, __out_opt HRESULT* phr = NULL);
-    CMediaType(const CMediaType&, __out_opt HRESULT* phr = NULL);
 
-    CMediaType& operator=(const CMediaType&);
-    CMediaType& operator=(const AM_MEDIA_TYPE&);
+    CMediaType(const GUID *majortype);
 
-    BOOL operator == (const CMediaType&) const;
-    BOOL operator != (const CMediaType&) const;
+    CMediaType(const AM_MEDIA_TYPE &, __out_opt HRESULT *phr = NULL);
 
-    HRESULT Set(const CMediaType& rt);
-    HRESULT Set(const AM_MEDIA_TYPE& rt);
+    CMediaType(const CMediaType &, __out_opt HRESULT *phr = NULL);
+
+    CMediaType &operator=(const CMediaType &);
+
+    CMediaType &operator=(const AM_MEDIA_TYPE &);
+
+    BOOL operator==(const CMediaType &) const;
+
+    BOOL operator!=(const CMediaType &) const;
+
+    HRESULT Set(const CMediaType &rt);
+
+    HRESULT Set(const AM_MEDIA_TYPE &rt);
 
     BOOL IsValid() const;
 
-    const GUID *Type() const { return &majortype;} ;
+    const GUID *Type() const { return &majortype; };
+
     void SetType(const GUID *);
-    const GUID *Subtype() const { return &subtype;} ;
+
+    const GUID *Subtype() const { return &subtype; };
+
     void SetSubtype(const GUID *);
 
-    BOOL IsFixedSize() const {return bFixedSizeSamples; };
-    BOOL IsTemporalCompressed() const {return bTemporalCompression; };
+    BOOL IsFixedSize() const { return bFixedSizeSamples; };
+
+    BOOL IsTemporalCompressed() const { return bTemporalCompression; };
+
     ULONG GetSampleSize() const;
 
     void SetSampleSize(ULONG sz);
+
     void SetVariableSize();
+
     void SetTemporalCompression(BOOL bCompressed);
 
     // read/write pointer to format - can't change length without
     // calling SetFormat, AllocFormatBuffer or ReallocFormatBuffer
 
-    BYTE*   Format() const {return pbFormat; };
-    ULONG   FormatLength() const { return cbFormat; };
+    BYTE *Format() const { return pbFormat; };
+
+    ULONG FormatLength() const { return cbFormat; };
 
     void SetFormatType(const GUID *);
-    const GUID *FormatType() const {return &formattype; };
+
+    const GUID *FormatType() const { return &formattype; };
+
     BOOL SetFormat(__in_bcount(length) BYTE *pFormat, ULONG length);
+
     void ResetFormatBuffer();
-    BYTE* AllocFormatBuffer(ULONG length);
-    BYTE* ReallocFormatBuffer(ULONG length);
+
+    BYTE *AllocFormatBuffer(ULONG length);
+
+    BYTE *ReallocFormatBuffer(ULONG length);
 
     void InitMediaType();
 
-    BOOL MatchesPartial(const CMediaType* ppartial) const;
+    BOOL MatchesPartial(const CMediaType *ppartial) const;
+
     BOOL IsPartiallySpecified(void) const;
 };
 
@@ -74,16 +95,19 @@ public:
    the implementation allocates the structures which you must later delete */
 
 void WINAPI DeleteMediaType(__inout_opt AM_MEDIA_TYPE *pmt);
-AM_MEDIA_TYPE * WINAPI CreateMediaType(AM_MEDIA_TYPE const *pSrc);
+
+AM_MEDIA_TYPE *WINAPI CreateMediaType(AM_MEDIA_TYPE const *pSrc);
+
 HRESULT WINAPI CopyMediaType(__out AM_MEDIA_TYPE *pmtTarget, const AM_MEDIA_TYPE *pmtSource);
-void WINAPI FreeMediaType(__inout AM_MEDIA_TYPE& mt);
+
+void WINAPI FreeMediaType(__inout AM_MEDIA_TYPE &mt);
 
 //  Initialize a media type from a WAVEFORMATEX
 
 STDAPI CreateAudioMediaType(
-    const WAVEFORMATEX *pwfx,
-    __out AM_MEDIA_TYPE *pmt,
-    BOOL bSetFormat);
+        const WAVEFORMATEX *pwfx,
+        __out AM_MEDIA_TYPE *pmt,
+        BOOL bSetFormat);
 
 #endif /* __MTYPE__ */
 

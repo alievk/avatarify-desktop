@@ -45,7 +45,7 @@ public:
 
 public Q_SLOTS:
 
-    void presentPreviewFrame(const QImage &generatedFrame);
+    void presentFrame(const QImage &generatedFrame);
 
 private:
     const QString ROOT_FOLDER = QDir::homePath();

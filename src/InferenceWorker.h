@@ -4,6 +4,7 @@
 #include <QThread>
 #include "camera/AsyncCameraCapture.h"
 #include "predictors/IdentityPredictor.h"
+#include "predictors/LibtorchIdentityPredictor.h"
 #include "predictors/LibtorchFOMM.h"
 
 class InferenceWorker : public QThread {
@@ -13,7 +14,7 @@ public:
     explicit InferenceWorker(AsyncCameraCapture *camera);
 
 Q_SIGNALS:
-    void presentPreview(QImage generatedFrame);
+    void present(QImage generatedFrame);
 
 public Q_SLOTS:
 
@@ -29,8 +30,8 @@ private:
     const int fpsLimit = 25;
 
     AsyncCameraCapture *m_camera;
-    IdentityPredictor identityPredictor;
-    LibtorchFOMM libtorchPredictor;
+    IdentityPredictor m_identityPredictor;
+    LibtorchFOMM m_fommPredictor;
     QString m_avatarPath = "none";
     bool isAlive = true;
 };

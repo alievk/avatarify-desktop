@@ -11,12 +11,13 @@
 // the requirements of video quality control by frame dropping.
 // This is a non-in-place transform, (i.e. it copies the data) such as a decoder.
 
-class CVideoTransformFilter : public CTransformFilter
-{
-  public:
+class CVideoTransformFilter : public CTransformFilter {
+public:
 
     CVideoTransformFilter(__in_opt LPCTSTR, __inout_opt LPUNKNOWN, REFCLSID clsid);
+
     ~CVideoTransformFilter();
+
     HRESULT EndFlush();
 
     // =================================================================
@@ -62,7 +63,7 @@ class CVideoTransformFilter : public CTransformFilter
     }
 #endif
 
-  protected:
+protected:
 
     // =========== QUALITY MANAGEMENT IMPLEMENTATION ========================
     // Frames are assumed to come in three types:
@@ -101,10 +102,10 @@ class CVideoTransformFilter : public CTransformFilter
     // the quality management here if you have B-frames.
 
     int m_nKeyFramePeriod; // the largest observed interval between type 1 frames
-                           // 1 means every frame is type 1, 2 means every other.
+    // 1 means every frame is type 1, 2 means every other.
 
     int m_nFramesSinceKeyFrame; // Used to count frames since the last type 1.
-                                // becomes the new m_nKeyFramePeriod if greater.
+    // becomes the new m_nKeyFramePeriod if greater.
 
     BOOL m_bSkipping;           // we are skipping to the next type 1 frame
 
@@ -117,16 +118,16 @@ class CVideoTransformFilter : public CTransformFilter
 
     virtual HRESULT StartStreaming();
 
-    HRESULT AbortPlayback(HRESULT hr);	// if something bad happens
+    HRESULT AbortPlayback(HRESULT hr);    // if something bad happens
 
     HRESULT Receive(IMediaSample *pSample);
 
     HRESULT AlterQuality(Quality q);
 
-    BOOL ShouldSkipFrame(IMediaSample * pIn);
+    BOOL ShouldSkipFrame(IMediaSample *pIn);
 
     int m_itrLate;              // lateness from last Quality message
-                                // (this overflows at 214 secs late).
+    // (this overflows at 214 secs late).
     int m_tDecodeStart;         // timeGetTime when decode started.
     int m_itrAvgDecode;         // Average decode time in reference units.
 

@@ -30,8 +30,7 @@
 // OnReceiveMessage. We have a static dialog procedure that calls the method
 // so that derived classes don't have to fiddle around with the this pointer
 
-class AM_NOVTABLE CBasePropertyPage : public IPropertyPage, public CUnknown
-{
+class AM_NOVTABLE CBasePropertyPage : public IPropertyPage, public CUnknown {
 protected:
 
     LPPROPERTYPAGESITE m_pPageSite;       // Details for our property site
@@ -47,7 +46,7 @@ protected:
                                        LPARAM lParam);
 
 private:
-    BOOL m_bObjectSet ;                  // SetObject has been called or not.
+    BOOL m_bObjectSet;                  // SetObject has been called or not.
 public:
 
     CBasePropertyPage(__in_opt LPCTSTR pName,      // Debug only name
@@ -61,33 +60,53 @@ public:
                       int DialogId,  
                       int TitleId);
 #endif
-    virtual ~CBasePropertyPage() { };
+
+    virtual ~CBasePropertyPage() {};
+
     DECLARE_IUNKNOWN
 
     // Override these virtual methods
 
     virtual HRESULT OnConnect(IUnknown *pUnknown) { return NOERROR; };
+
     virtual HRESULT OnDisconnect() { return NOERROR; };
+
     virtual HRESULT OnActivate() { return NOERROR; };
+
     virtual HRESULT OnDeactivate() { return NOERROR; };
+
     virtual HRESULT OnApplyChanges() { return NOERROR; };
-    virtual INT_PTR OnReceiveMessage(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
+    virtual INT_PTR OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     // These implement an IPropertyPage interface
 
     STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, __deref_out void **ppv);
+
     STDMETHODIMP_(ULONG) NonDelegatingRelease();
+
     STDMETHODIMP_(ULONG) NonDelegatingAddRef();
+
     STDMETHODIMP SetPageSite(__in_opt LPPROPERTYPAGESITE pPageSite);
-    STDMETHODIMP Activate(HWND hwndParent, LPCRECT prect,BOOL fModal);
+
+    STDMETHODIMP Activate(HWND hwndParent, LPCRECT prect, BOOL fModal);
+
     STDMETHODIMP Deactivate(void);
+
     STDMETHODIMP GetPageInfo(__out LPPROPPAGEINFO pPageInfo);
+
     STDMETHODIMP SetObjects(ULONG cObjects, __in_ecount_opt(cObjects) LPUNKNOWN *ppUnk);
+
     STDMETHODIMP Show(UINT nCmdShow);
+
     STDMETHODIMP Move(LPCRECT prect);
+
     STDMETHODIMP IsPageDirty(void) { return m_bDirty ? S_OK : S_FALSE; }
+
     STDMETHODIMP Apply(void);
+
     STDMETHODIMP Help(LPCWSTR lpszHelpDir) { return E_NOTIMPL; }
+
     STDMETHODIMP TranslateAccelerator(__inout LPMSG lpMsg) { return E_NOTIMPL; }
 };
 
