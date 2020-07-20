@@ -41,7 +41,6 @@ HRESULT CVCamOutStream::QueryInterface(REFIID riid, void **ppv) {
 ///////////////////////////////////////////////////////////
 HRESULT CVCamOutStream::FillBuffer(IMediaSample *pms) {
     REFERENCE_TIME rtNow;
-
     REFERENCE_TIME avgFrameTime = ((VIDEOINFOHEADER *) m_mt.pbFormat)->AvgTimePerFrame;
 
     rtNow = m_rtLastTime;
@@ -50,9 +49,8 @@ HRESULT CVCamOutStream::FillBuffer(IMediaSample *pms) {
     pms->SetSyncPoint(TRUE);
 
     BYTE *pData;
-    long lDataLen;
     pms->GetPointer(&pData);
-    lDataLen = pms->GetSize();
+    long lDataLen = pms->GetSize();
     for (int i = 0; i < lDataLen; ++i)
         pData[i] = rand();
 
@@ -72,7 +70,6 @@ STDMETHODIMP CVCamOutStream::Notify(IBaseFilter *pSender, Quality q) {
 // This is called when the output format has been negotiated
 //////////////////////////////////////////////////////////////////////////
 HRESULT CVCamOutStream::SetMediaType(const CMediaType *pmt) {
-    DECLARE_PTR(VIDEOINFOHEADER, pvi, pmt->Format());
     HRESULT hr = CSourceStream::SetMediaType(pmt);
     return hr;
 }
@@ -87,7 +84,7 @@ HRESULT CVCamOutStream::GetMediaType(int iPosition, CMediaType *pmt) {
         return S_OK;
     }
 
-    DECLARE_PTR(VIDEOINFOHEADER, pvi, pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER)));
+    auto *pvi = (VIDEOINFOHEADER *) pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
     ZeroMemory(pvi, sizeof(VIDEOINFOHEADER));
 
     pvi->bmiHeader.biCompression = BI_RGB;
@@ -154,7 +151,6 @@ HRESULT CVCamOutStream::OnThreadCreate() {
 //////////////////////////////////////////////////////////////////////////
 
 HRESULT STDMETHODCALLTYPE CVCamOutStream::SetFormat(AM_MEDIA_TYPE *pmt) {
-    DECLARE_PTR(VIDEOINFOHEADER, pvi, m_mt.pbFormat);
     m_mt = *pmt;
     IPin *pin;
     ConnectedTo(&pin);
@@ -178,10 +174,10 @@ HRESULT STDMETHODCALLTYPE CVCamOutStream::GetNumberOfCapabilities(int *piCount, 
 
 HRESULT STDMETHODCALLTYPE CVCamOutStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) {
     *pmt = CreateMediaType(&m_mt);
-    DECLARE_PTR(VIDEOINFOHEADER, pvi, (*pmt)->pbFormat);
 
     if (iIndex == 0) iIndex = 4;
 
+    auto *pvi = (VIDEOINFOHEADER *) (*pmt)->pbFormat;
     pvi->bmiHeader.biCompression = BI_RGB;
     pvi->bmiHeader.biBitCount = 24;
     pvi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -202,8 +198,7 @@ HRESULT STDMETHODCALLTYPE CVCamOutStream::GetStreamCaps(int iIndex, AM_MEDIA_TYP
     (*pmt)->lSampleSize = pvi->bmiHeader.biSizeImage;
     (*pmt)->cbFormat = sizeof(VIDEOINFOHEADER);
 
-    DECLARE_PTR(VIDEO_STREAM_CONFIG_CAPS, pvscc, pSCC);
-
+    auto *pvscc = (VIDEO_STREAM_CONFIG_CAPS *) pSCC;
     pvscc->guid = FORMAT_VideoInfo;
     pvscc->VideoStandard = AnalogVideo_None;
     pvscc->InputSize.cx = 640;

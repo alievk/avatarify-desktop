@@ -4,9 +4,6 @@
 
 #include "stdafx.h"
 
-#define DECLARE_PTR(type, ptr, expr) type* ptr = (type*)(expr);
-
-
 EXTERN_C const GUID CLSID_VCamFilter;
 
 
@@ -30,7 +27,6 @@ private:
 
     // It is only allowed to to create these objects with CreateInstance
     CVCamFilter(LPUNKNOWN lpunk, HRESULT *phr);
-
 };
 
 #endif // SVCAM_VCAMFILTER_H

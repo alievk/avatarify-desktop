@@ -14,9 +14,7 @@ set(SOURCES
         CVCamOutStream.h
         dllmain.cpp
         DSVCam.def
-        stdafx.cpp
         stdafx.h
-        targetver.h
         )
 
 set(CMAKE_ENABLE_EXPORTS TRUE)

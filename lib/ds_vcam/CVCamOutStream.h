@@ -6,14 +6,13 @@
 
 
 //------------------------------------------------------------------------------
-// Class CBallStream
+// Class CVCamOutStream
 //
 // This class implements the stream which is used to output the bouncing ball
 // data from the source filter. It inherits from DirectShows's base
 // CSourceStream class.
 //------------------------------------------------------------------------------
 class CVCamOutStream : public CSourceStream, public IAMStreamConfig, public IKsPropertySet, public IAMFilterMiscFlags {
-
 public:
 
     //////////////////////////////////////////////////////////////////////////
@@ -21,13 +20,9 @@ public:
     //////////////////////////////////////////////////////////////////////////
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv) override;
 
-    STDMETHODIMP_(ULONG)
+    STDMETHODIMP_(ULONG) AddRef() override;
 
-    AddRef() override;
-
-    STDMETHODIMP_(ULONG)
-
-    Release() override;
+    STDMETHODIMP_(ULONG) Release() override;
 
     //////////////////////////////////////////////////////////////////////////
     //  IQualityControl
@@ -37,56 +32,31 @@ public:
     //////////////////////////////////////////////////////////////////////////
     //  IAMStreamConfig
     //////////////////////////////////////////////////////////////////////////
-    HRESULT STDMETHODCALLTYPE
-    SetFormat(AM_MEDIA_TYPE *pmt) override;
+    HRESULT STDMETHODCALLTYPE SetFormat(AM_MEDIA_TYPE *pmt) override;
 
-    HRESULT STDMETHODCALLTYPE
-    GetFormat(AM_MEDIA_TYPE **ppmt) override;
+    HRESULT STDMETHODCALLTYPE GetFormat(AM_MEDIA_TYPE **ppmt) override;
 
-    HRESULT STDMETHODCALLTYPE
+    HRESULT STDMETHODCALLTYPE GetNumberOfCapabilities(int *piCount, int *piSize) override;
 
-    GetNumberOfCapabilities(int *piCount, int *piSize) override;
-
-    HRESULT STDMETHODCALLTYPE
-
-    GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) override;
+    HRESULT STDMETHODCALLTYPE GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) override;
 
     //////////////////////////////////////////////////////////////////////////
     //  IKsPropertySet
     //////////////////////////////////////////////////////////////////////////
     HRESULT
-    STDMETHODCALLTYPE
-    Set(REFGUID
-        guidPropSet,
-        DWORD dwID,
-        void *pInstanceData, DWORD
-        cbInstanceData,
-        void *pPropData,
-        DWORD
-        cbPropData
-    ) override;
+    STDMETHODCALLTYPE Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData, DWORD cbInstanceData, void *pPropData,
+                          DWORD cbPropData) override;
 
-    HRESULT STDMETHODCALLTYPE
-    Get(REFGUID
-        guidPropSet,
-        DWORD dwPropID,
-        void *pInstanceData, DWORD
-        cbInstanceData,
-        void *pPropData, DWORD
-        cbPropData,
-        DWORD *pcbReturned
-    ) override;
+    HRESULT STDMETHODCALLTYPE Get(REFGUID guidPropSet, DWORD dwPropID, void *pInstanceData, DWORD cbInstanceData,
+                                  void *pPropData, DWORD cbPropData, DWORD *pcbReturned) override;
 
-    HRESULT STDMETHODCALLTYPE
-    QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport) override;
+    HRESULT STDMETHODCALLTYPE QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport) override;
 
     //////////////////////////////////////////////////////////////////////////
     //  IAMFilterMiscFlags
     //////////////////////////////////////////////////////////////////////////
 
-    ULONG STDMETHODCALLTYPE
-
-    GetMiscFlags() override;
+    ULONG STDMETHODCALLTYPE GetMiscFlags() override;
 
     //////////////////////////////////////////////////////////////////////////
     //  CSourceStream
@@ -109,8 +79,7 @@ public:
 
 private:
     CVCamFilter *m_pParent;
-    REFERENCE_TIME m_rtLastTime;
-    IReferenceClock *m_pClock;
+    REFERENCE_TIME m_rtLastTime = 0;
 };
 
 #endif

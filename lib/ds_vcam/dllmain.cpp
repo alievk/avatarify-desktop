@@ -16,7 +16,6 @@
 #pragma comment(lib, "strmbase")
 #endif
 
-
 #include "stdafx.h"
 #include "CVCamFilter.h"
 
@@ -48,7 +47,7 @@ const AMOVIESETUP_PIN sudOpPin[] = { // TODO Maybe the array is not a good idea?
                 FALSE,                  // Can we have none
                 FALSE,                  // Can we have many
                 &CLSID_NULL,            // Connects to filter
-                NULL,                   // Connects to pin
+                nullptr,                   // Connects to pin
                 1,                      // Number of types
                 &sudOpPinTypes
         }        // Pin details
@@ -56,7 +55,7 @@ const AMOVIESETUP_PIN sudOpPin[] = { // TODO Maybe the array is not a good idea?
 
 const AMOVIESETUP_FILTER sudSVCFilterAx = {
         &CLSID_VCamFilter,    // Filter CLSID
-        L"Simple Virtual Cam",       // String name
+        L"Avatarify Camera",       // String name
         MERIT_NORMAL,       // Filter merit
         1,                      // Number pins
         &sudOpPin[0]               // Pin details
@@ -66,10 +65,10 @@ const AMOVIESETUP_FILTER sudSVCFilterAx = {
 
 CFactoryTemplate g_Templates[] = {
         {
-                L"Simple Virtual Cam",
+                L"Avatarify Camera",
                 &CLSID_VCamFilter,
                 CVCamFilter::CreateInstance,
-                NULL,
+                nullptr,
                 &sudSVCFilterAx
         }
 };
@@ -99,13 +98,13 @@ REGFILTER2 rf2FilterReg = {
 //
 STDAPI DllRegisterServer() {
     HRESULT hr;
-    IFilterMapper2 *pFM2 = NULL;
+    IFilterMapper2 *pFM2 = nullptr;
 
     hr = AMovieDllRegisterServer2(TRUE);
     if (FAILED(hr))
         return hr;
 
-    hr = CoCreateInstance(CLSID_FilterMapper2, NULL, CLSCTX_INPROC_SERVER,
+    hr = CoCreateInstance(CLSID_FilterMapper2, nullptr, CLSCTX_INPROC_SERVER,
                           IID_IFilterMapper2, (void **) &pFM2);
 
     if (FAILED(hr))
@@ -113,10 +112,10 @@ STDAPI DllRegisterServer() {
 
     hr = pFM2->RegisterFilter(
             CLSID_VCamFilter,                // Filter CLSID.
-            L"Simple Virtual Cam",                       // Filter name.
-            NULL,                            // Device moniker.
+            L"Avatarify Camera",                       // Filter name.
+            nullptr,                            // Device moniker.
             &CLSID_VideoInputDeviceCategory,  // Video compressor category.
-            L"Simple Virtual Cam",                       // Instance data.
+            L"Avatarify Camera",                       // Instance data.
             &rf2FilterReg                    // Pointer to filter information.
     );
 
@@ -124,8 +123,7 @@ STDAPI DllRegisterServer() {
         pFM2->Release();
 
     return hr;
-
-} // DllRegisterServer
+}
 
 
 //
@@ -134,25 +132,23 @@ STDAPI DllRegisterServer() {
 
 STDAPI DllUnregisterServer() {
     HRESULT hr;
-    IFilterMapper2 *pFM2 = NULL;
+    IFilterMapper2 *pFM2 = nullptr;
 
     hr = AMovieDllRegisterServer2(FALSE);
     if (FAILED(hr))
         return hr;
 
-    hr = CoCreateInstance(CLSID_FilterMapper2, NULL, CLSCTX_INPROC_SERVER,
+    hr = CoCreateInstance(CLSID_FilterMapper2, nullptr, CLSCTX_INPROC_SERVER,
                           IID_IFilterMapper2, (void **) &pFM2);
 
     if (FAILED(hr))
         return hr;
 
-    hr = pFM2->UnregisterFilter(&CLSID_VideoInputDeviceCategory,
-                                L"Simple Virtual Cam", CLSID_VCamFilter);
+    hr = pFM2->UnregisterFilter(&CLSID_VideoInputDeviceCategory, L"Simple Virtual Cam", CLSID_VCamFilter);
 
     pFM2->Release();
     return hr;
-
-} // DllUnregisterServer
+}
 
 
 //
@@ -160,10 +156,7 @@ STDAPI DllUnregisterServer() {
 //
 extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
 
-BOOL APIENTRY DllMain(HMODULE hModule,
-                      DWORD ul_reason_for_call,
-                      LPVOID lpReserved
-) {
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     return DllEntryPoint((HINSTANCE) (hModule), ul_reason_for_call, lpReserved);
 }
 

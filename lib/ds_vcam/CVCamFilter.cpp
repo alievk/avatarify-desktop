@@ -11,13 +11,13 @@ CUnknown *WINAPI CVCamFilter::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr) {
     return punk;
 }
 
-CVCamFilter::CVCamFilter(LPUNKNOWN lpunk, HRESULT *phr) : CSource(NAME("Simple Virtual Cam"), lpunk, CLSID_VCamFilter) {
+CVCamFilter::CVCamFilter(LPUNKNOWN lpunk, HRESULT *phr) : CSource(NAME("Avatarify Camera"), lpunk, CLSID_VCamFilter) {
     ASSERT(phr);
     CAutoLock cAutoLock(&m_cStateLock);
 
     // Create the one and only output pin
     m_paStreams = (CSourceStream **) new CVCamOutStream *[1];
-    m_paStreams[0] = new CVCamOutStream(phr, this, L"Simple Virtual Cam");
+    m_paStreams[0] = new CVCamOutStream(phr, this, L"Capture");
 }
 
 HRESULT CVCamFilter::QueryInterface(REFIID riid, void **ppv) {

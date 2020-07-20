@@ -1,7 +1,7 @@
 # svcam
 This thing is a custom DirectShow filter.
 * https://docs.microsoft.com/en-us/windows/win32/directshow/how-to-create-a-dll
-* Good manual in README https://github.com/EnsignPayton/DshowTestFilters
+* https://microsoft.public.win32.programmer.directx.video.narkive.com/lIbYTBgZ/how-to-create-ksproxy-ax-capture-filters
 
 
 ### Register DLL (Needs administrator privileges)
