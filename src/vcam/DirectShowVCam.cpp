@@ -7,8 +7,8 @@ DirectShowVCam::DirectShowVCam() {
 }
 
 void DirectShowVCam::present(const QImage &frame) {
-    qDebug() << "DirectShowVCam::present" << frame.width() << "x" << frame.height() << "@" << frame.depth();
-    qDebug() << frame.format();
+//    qDebug() << "DirectShowVCam::present" << frame.width() << "x" << frame.height() << "@" << frame.depth();
+//    qDebug() << frame.format();
 
     QImage mirorredFrame = frame.mirrored();
     const uchar *bits = mirorredFrame.constBits();

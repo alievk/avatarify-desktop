@@ -5,9 +5,9 @@ project(${PROJECT})
 message("-- build ${PROJECT}")
 
 # virtual camera
-#if (MSVC)
-#    add_subdirectory(lib/ds_vcam)
-#endif ()
+if (MSVC)
+    add_subdirectory(lib/ds_vcam)
+endif ()
 
 
 # libraries paths

@@ -8,6 +8,7 @@
 //////////////////////////////////////////////////////////////////////////
 CVCamOutStream::CVCamOutStream(HRESULT *phr, CVCamFilter *pParent, LPCWSTR pPinName) :
         CSourceStream(NAME("Capture"), phr, pParent, pPinName), m_pParent(pParent) {
+    L_(linfo) << "CVCamOutStream::CVCamOutStream";
     GetMediaType(8, &m_mt);  // Set the default media type as 640x480x24@30
     shm = shared_memory_object(open_or_create, "afy_shm", read_only);
 }
@@ -15,14 +16,18 @@ CVCamOutStream::CVCamOutStream(HRESULT *phr, CVCamFilter *pParent, LPCWSTR pPinN
 CVCamOutStream::~CVCamOutStream() = default;
 
 ULONG CVCamOutStream::Release() {
+    L_(linfo) << "CVCamOutStream::Release";
     return GetOwner()->Release();
 }
 
 ULONG CVCamOutStream::AddRef() {
+    L_(linfo) << "CVCamOutStream::AddRef";
     return GetOwner()->AddRef();
 }
 
 HRESULT CVCamOutStream::QueryInterface(REFIID riid, void **ppv) {
+    L_(linfo) << "CVCamOutStream::QueryInterface";
+
     // Standard OLE stuff
     if (riid == _uuidof(IAMStreamConfig))
         *ppv = (IAMStreamConfig *) this;
@@ -69,6 +74,7 @@ HRESULT CVCamOutStream::FillBuffer(IMediaSample *pms) {
 // Notify
 // Ignore quality management messages sent from the downstream filter
 STDMETHODIMP CVCamOutStream::Notify(IBaseFilter *pSender, Quality q) {
+    L_(linfo) << "CVCamOutStream::Notify";
     return E_NOTIMPL;
 } // Notify
 
@@ -77,12 +83,15 @@ STDMETHODIMP CVCamOutStream::Notify(IBaseFilter *pSender, Quality q) {
 // This is called when the output format has been negotiated
 //////////////////////////////////////////////////////////////////////////
 HRESULT CVCamOutStream::SetMediaType(const CMediaType *pmt) {
+    L_(linfo) << "CVCamOutStream::SetMediaType, sampleSize: " << pmt->GetSampleSize();
     HRESULT hr = CSourceStream::SetMediaType(pmt);
     return hr;
 }
 
 // See Directshow help topic for IAMStreamConfig for details on this method
 HRESULT CVCamOutStream::GetMediaType(int iPosition, CMediaType *pmt) {
+    L_(linfo) << "CVCamOutStream::GetMediaType, iPosition: " << iPosition << ", sampleSize: " << pmt->GetSampleSize();
+
     if (iPosition < 0) return E_INVALIDARG;
     if (iPosition > 8) return VFW_S_NO_MORE_ITEMS;
 
@@ -97,8 +106,8 @@ HRESULT CVCamOutStream::GetMediaType(int iPosition, CMediaType *pmt) {
     pvi->bmiHeader.biCompression = BI_RGB;
     pvi->bmiHeader.biBitCount = 24;
     pvi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    pvi->bmiHeader.biWidth = 640;
-    pvi->bmiHeader.biHeight = 480;
+    pvi->bmiHeader.biWidth = 80 * iPosition;
+    pvi->bmiHeader.biHeight = 60 * iPosition;
     pvi->bmiHeader.biPlanes = 1;
     pvi->bmiHeader.biSizeImage = GetBitmapSize(&pvi->bmiHeader);
     pvi->bmiHeader.biClrImportant = 0;
@@ -124,13 +133,17 @@ HRESULT CVCamOutStream::GetMediaType(int iPosition, CMediaType *pmt) {
 
 // This method is called to see if a given output format is supported
 HRESULT CVCamOutStream::CheckMediaType(const CMediaType *pMediaType) {
-    if (*pMediaType != m_mt)
+    L_(linfo) << "CVCamOutStream::CheckMediaType, sampleSize:" << pMediaType->GetSampleSize();
+    if (*pMediaType != m_mt) {
+        L_(linfo) << "CVCamOutStream::CheckMediaType, returns E_INVALIDARG";
         return E_INVALIDARG;
+    }
     return S_OK;
 } // CheckMediaType
 
 // This method is called after the pins are connected to allocate buffers to stream data
 HRESULT CVCamOutStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProperties) {
+    L_(linfo) << "CVCamOutStream::DecideBufferSize";
     CAutoLock cAutoLock(m_pFilter->pStateLock());
     HRESULT hr = NOERROR;
 
@@ -149,6 +162,7 @@ HRESULT CVCamOutStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPER
 
 // Called when graph is run
 HRESULT CVCamOutStream::OnThreadCreate() {
+    L_(linfo) << "CVCamOutStream::OnThreadCreate";
     m_rtLastTime = 0;
     return NOERROR;
 } // OnThreadCreate
@@ -158,6 +172,7 @@ HRESULT CVCamOutStream::OnThreadCreate() {
 //////////////////////////////////////////////////////////////////////////
 
 HRESULT STDMETHODCALLTYPE CVCamOutStream::SetFormat(AM_MEDIA_TYPE *pmt) {
+    L_(linfo) << "CVCamOutStream::SetFormat";
     m_mt = *pmt;
     IPin *pin;
     ConnectedTo(&pin);
@@ -169,17 +184,20 @@ HRESULT STDMETHODCALLTYPE CVCamOutStream::SetFormat(AM_MEDIA_TYPE *pmt) {
 }
 
 HRESULT STDMETHODCALLTYPE CVCamOutStream::GetFormat(AM_MEDIA_TYPE **ppmt) {
+    L_(linfo) << "CVCamOutStream::GetFormat";
     *ppmt = CreateMediaType(&m_mt);
     return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE CVCamOutStream::GetNumberOfCapabilities(int *piCount, int *piSize) {
+    L_(linfo) << "CVCamOutStream::GetNumberOfCapabilities";
     *piCount = 8;
     *piSize = sizeof(VIDEO_STREAM_CONFIG_CAPS);
     return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE CVCamOutStream::GetStreamCaps(int iIndex, AM_MEDIA_TYPE **pmt, BYTE *pSCC) {
+    L_(linfo) << "CVCamOutStream::GetStreamCaps";
     *pmt = CreateMediaType(&m_mt);
 
     if (iIndex == 0) iIndex = 4;
@@ -245,6 +263,7 @@ HRESULT STDMETHODCALLTYPE CVCamOutStream::GetStreamCaps(int iIndex, AM_MEDIA_TYP
 HRESULT CVCamOutStream::Set(REFGUID guidPropSet, DWORD dwID, void *pInstanceData,
                             DWORD cbInstanceData, void *pPropData,
                             DWORD cbPropData) {// Set: Cannot set any properties.
+    L_(linfo) << "CVCamOutStream::Set";
     return E_NOTIMPL;
 }
 
@@ -258,6 +277,7 @@ HRESULT CVCamOutStream::Get(
         DWORD cbPropData,      // Size of the buffer.
         DWORD *pcbReturned     // Return the size of the property.
 ) {
+    L_(linfo) << "CVCamOutStream::Get";
     if (guidPropSet != AMPROPSETID_Pin) return E_PROP_SET_UNSUPPORTED;
     if (dwPropID != AMPROPERTY_PIN_CATEGORY) return E_PROP_ID_UNSUPPORTED;
     if (pPropData == nullptr && pcbReturned == nullptr) return E_POINTER;
@@ -272,6 +292,7 @@ HRESULT CVCamOutStream::Get(
 
 // QuerySupported: Query whether the pin supports the specified property.
 HRESULT CVCamOutStream::QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWORD *pTypeSupport) {
+    L_(linfo) << "CVCamOutStream::QuerySupported";
     if (guidPropSet != AMPROPSETID_Pin) return E_PROP_SET_UNSUPPORTED;
     if (dwPropID != AMPROPERTY_PIN_CATEGORY) return E_PROP_ID_UNSUPPORTED;
     // We support getting this property, but not setting it.
@@ -281,5 +302,6 @@ HRESULT CVCamOutStream::QuerySupported(REFGUID guidPropSet, DWORD dwPropID, DWOR
 
 // Set misc flag that this is truly a live source
 ULONG CVCamOutStream::GetMiscFlags() {
+    L_(linfo) << "CVCamOutStream::GetMiscFlags";
     return AM_FILTER_MISC_FLAGS_IS_SOURCE;
 }

@@ -28,9 +28,9 @@ STDAPI AMovieSetupRegisterServer(CLSID clsServer, LPCWSTR szDescription, LPCWSTR
 STDAPI AMovieSetupUnregisterServer(CLSID clsServer);
 
 
-// {D2205858-A855-4118-A724-A13AED4C61B2}
+// {D2205858-A855-4118-A724-A13AED4C61B3}
 DEFINE_GUID(CLSID_VCamFilter,
-            0xd2205858, 0xa855, 0x4118, 0xa7, 0x24, 0xa1, 0x3a, 0xed, 0x4c, 0x61, 0xb2);
+            0xd2205858, 0xa855, 0x4118, 0xa7, 0x24, 0xa1, 0x3a, 0xed, 0x4c, 0x61, 0xb3);
 
 
 // Setup data
@@ -56,7 +56,7 @@ const AMOVIESETUP_PIN sudOpPin[] = { // TODO Maybe the array is not a good idea?
 
 const AMOVIESETUP_FILTER sudSVCFilterAx = {
         &CLSID_VCamFilter,    // Filter CLSID
-        L"Avatarify Camera",       // String name
+        L"Avatarify Camera v0.1.2",       // String name
         MERIT_NORMAL,       // Filter merit
         1,                      // Number pins
         &sudOpPin[0]               // Pin details
@@ -66,7 +66,7 @@ const AMOVIESETUP_FILTER sudSVCFilterAx = {
 
 CFactoryTemplate g_Templates[] = {
         {
-                L"Avatarify Camera",
+                L"Avatarify Camera v0.1.2",
                 &CLSID_VCamFilter,
                 CVCamFilter::CreateInstance,
                 nullptr,
@@ -113,10 +113,10 @@ STDAPI DllRegisterServer() {
 
     hr = pFM2->RegisterFilter(
             CLSID_VCamFilter,                // Filter CLSID.
-            L"Avatarify Camera",                       // Filter name.
+            L"Avatarify Camera v0.1.2",                       // Filter name.
             nullptr,                            // Device moniker.
             &CLSID_VideoInputDeviceCategory,  // Video compressor category.
-            L"Avatarify Camera",                       // Instance data.
+            L"Avatarify Camera v0.1.2",                       // Instance data.
             &rf2FilterReg                    // Pointer to filter information.
     );
 
@@ -148,7 +148,7 @@ STDAPI DllUnregisterServer() {
     if (FAILED(hr))
         return hr;
 
-    hr = pFM2->UnregisterFilter(&CLSID_VideoInputDeviceCategory, L"Simple Virtual Cam", CLSID_VCamFilter);
+    hr = pFM2->UnregisterFilter(&CLSID_VideoInputDeviceCategory, L"Avatarify Camera v0.1.2", CLSID_VCamFilter);
 
     pFM2->Release();
 
