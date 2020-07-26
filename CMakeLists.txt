@@ -7,6 +7,7 @@ message("-- build ${PROJECT}")
 # virtual camera
 if (MSVC)
     add_subdirectory(lib/ds_vcam)
+    add_subdirectory(lib/vcam_src)
 endif ()
 
 

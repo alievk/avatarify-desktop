@@ -27,7 +27,10 @@ set(SOURCES
         dllmain.cpp
         DSVCam.def
         stdafx.h
-        Log.h)
+        Log.h
+        utils/base64.cpp
+        utils/base64.h
+        )
 
 set(CMAKE_ENABLE_EXPORTS TRUE)
 set(BUILD_SHARED_LIBS TRUE)
