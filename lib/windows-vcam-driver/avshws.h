@@ -1,18 +1,18 @@
+#ifndef _avshws_h_
+#define _avshws_h_
+
 /*************************************************
     Standard Includes
 *************************************************/
-
-#ifndef _avshws_h_
-#define _avshws_h_
 
 extern "C" {
 #include <wdm.h>
 }
 
 #include <windef.h>
-#include <cstdio>
+#include <stdio.h>
 #include <ntstrsafe.h>
-#include <cstdlib>
+#include <stdlib.h>
 #include <windef.h>
 
 #define NOBITMAP
@@ -62,17 +62,12 @@ const DebugLevel = DEBUGLVL_TERSE;
 #endif
 
 #define FOURCC_YUY2         mmioFOURCC('Y', 'U', 'Y', '2')
-// CAPTURE_PIN_DATA_RANGE_COUNT:
-// The number of ranges supported on the capture pin.
-#define CAPTURE_PIN_DATA_RANGE_COUNT 2
 
-// CAPTURE_FILTER_PIN_COUNT:
-// The number of pins on the capture filter.
-#define CAPTURE_FILTER_PIN_COUNT 1
+#define CAPTURE_PIN_DATA_RANGE_COUNT 2  // The number of ranges supported on the capture pin.
 
-// CAPTURE_FILTER_CATEGORIES_COUNT:
-// The number of categories for the capture filter.
-#define CAPTURE_FILTER_CATEGORIES_COUNT 3
+#define CAPTURE_FILTER_PIN_COUNT 1  // The number of pins on the capture filter.
+
+#define CAPTURE_FILTER_CATEGORIES_COUNT 3  // The number of categories for the capture filter.
 
 #define AVSHWS_POOLTAG 'hSVA'
 
@@ -109,7 +104,6 @@ typedef enum _HARDWARE_STATE {
     Class Definitions
 *************************************************/
 
-// IHardwareSink:
 // This interface is used by the hardware simulation to fake interrupt service routines. The Interrupt method is called
 // at DPC as a fake interrupt.
 class IHardwareSink {
@@ -117,7 +111,6 @@ public:
     virtual void Interrupt() = 0;
 };
 
-// ICaptureSink:
 // This is a capture sink interface. The device level calls back the CompleteMappings method passing the number of
 // completed mappings for the capture pin. This method is called during the device DPC.
 class ICaptureSink {
@@ -156,12 +149,9 @@ PVOID operator new(size_t iSize,
 Routine Description:
     Array new() operator for creating objects with a specified allocation tag.
 Arguments:
-    iSize -
-        The size of the entire allocation.
-    poolType -
-        The type of allocation.  Ex: PagedPool or NonPagedPoolNx
-    tag -
-        A 4-byte allocation identifier.
+    iSize - The size of the entire allocation.
+    poolType - The type of allocation.  Ex: PagedPool or NonPagedPoolNx
+    tag - A 4-byte allocation identifier.
 Return Value:
     None
 --*/
@@ -177,8 +167,7 @@ PVOID operator new[](size_t iSize,
 Routine Description:
     Array delete() operator.
 Arguments:
-    pVoid -
-        The memory to free.
+    pVoid - The memory to free.
 Return Value:
     None
 --*/
@@ -188,10 +177,8 @@ void __cdecl operator delete[](PVOID pVoid);
 Routine Description:
     Sized delete() operator.
 Arguments:
-    pVoid -
-        The memory to free.
-    size -
-        The size of the memory to free.
+    pVoid - The memory to free.
+    size - The size of the memory to free.
 Return Value:
     None
 --*/
@@ -201,10 +188,8 @@ void __cdecl operator delete(void *pVoid, size_t /*size*/);
 Routine Description:
     Sized delete[]() operator.
 Arguments:
-    pVoid -
-        The memory to free.
-    size -
-        The size of the memory to free.
+    pVoid - The memory to free.
+    size - The size of the memory to free.
 Return Value:
     None
 --*/

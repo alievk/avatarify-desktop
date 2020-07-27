@@ -44,7 +44,7 @@ private:
     // Maximum number of scatter / gather mappins in the s/g table of the fake hardware.
     ULONG m_ScatterGatherMappingsMax;
 
-    // Number of scatter / gather mappings that have been completed (total) since the start of the hardware or any reset.
+    // Number of scatter / gather mappings that have been completed (total) since the start of the hardware or any reset
     ULONG m_NumMappingsCompleted{};
 
     // Number of scatter / gather mappings that are queued for this hardware.

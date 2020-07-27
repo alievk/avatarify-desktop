@@ -15,8 +15,8 @@ private:
     // Pointer to the internal device object for our capture device. We access the "fake" hardware through this object.
     CCaptureDevice *m_Device;
 
-    // The state we've put the hardware into. This allows us to keep track
-    // of whether to do things like unpausing or restarting.
+    // The state we've put the hardware into. This allows us to keep track of whether to do things like unpausing
+    // or restarting.
     HARDWARE_STATE m_HardwareState;
 
     // The clock we've been assigned.  As with other capture filters, we do not expose a clock. If one has been

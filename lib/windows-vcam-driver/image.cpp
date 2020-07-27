@@ -265,8 +265,8 @@ UCHAR g_FontData[256][8] = {
         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 };
 
-// Standard definition of EIA-189-A color bars.  The actual color definitions
-// are either in CRGB24Synthesizer or CYUVSynthesizer.
+// Standard definition of EIA-189-A color bars.
+// The actual color definitions are either in CRGB24Synthesizer or CYUVSynthesizer.
 const COLOR g_ColorBars[] = {WHITE, YELLOW, CYAN, GREEN, MAGENTA, RED, BLUE, BLACK};
 
 const UCHAR CRGB24Synthesizer::Colors[MAX_COLOR][3] = {
@@ -347,20 +347,14 @@ void CImageSynthesizer::OverlayText(
         Overlay text onto the synthesized image. Clip to fit the image if the overlay does not fit.
         The image buffer used is the set synthesis buffer.
     Arguments:
-        LocX -
-            The X location on the image to begin the overlay. This MUST be inside the image.
+        LocX - The X location on the image to begin the overlay. This MUST be inside the image.
             POSITION_CENTER may be used to indicate horizontal centering.
-        LocY -
-            The Y location on the image to begin the overlay. This MUST be inside the image.
+        LocY - The Y location on the image to begin the overlay. This MUST be inside the image.
             POSITION_CENTER may be used to indicate vertical centering.
-        Scaling -
-            Normally, the overlay is done in 8x8 font. A scaling of 2 indicates 16x16, 3 indicates 24x24 and so forth.
-        Text -
-            A character string containing the information to overlay
-        BgColor -
-            The background color of the overlay window. For transparency, indicate TRANSPARENT here.
-        FgColor -
-            The foreground color for the text overlay.
+        Scaling - Normally, the overlay is done in 8x8 font. A scaling of 2 indicates 16x16, 3 indicates 24x24 and so forth.
+        Text - A character string containing the information to overlay
+        BgColor - The background color of the overlay window. For transparency, indicate TRANSPARENT here.
+        FgColor - The foreground color for the text overlay.
     Return Value:
         None
     --*/
@@ -375,9 +369,8 @@ void CImageSynthesizer::OverlayText(
     for (CurChar = Text; CurChar && *CurChar; CurChar++)
         StrLen++;
 
-    // Determine the physical size of the string plus border.  There is
-    // a definable NO_CHARACTER_SEPARATION.  If this is defined, there will
-    // be no added space between font characters.  Otherwise, one empty pixel
+    // Determine the physical size of the string plus border. There is a definable NO_CHARACTER_SEPARATION.
+    // If this is defined, there will be no added space between font characters. Otherwise, one empty pixel
     // column is added between characters.
 #ifndef NO_CHARACTER_SEPARATION
     ULONG LenX = (StrLen * (Scaling << 3)) + 1 + StrLen;
@@ -387,8 +380,7 @@ void CImageSynthesizer::OverlayText(
 
     ULONG LenY = 2 + (Scaling << 3);
 
-    // Adjust for center overlays.
-    // NOTE: If the overlay doesn't fit into the synthesis buffer, this
+    // Adjust for center overlays. NOTE: If the overlay doesn't fit into the synthesis buffer, this
     // merely left aligns the overlay and clips off the right side.
     if (LocX == POSITION_CENTER) {
         if (LenX >= m_Width) {

@@ -28,8 +28,7 @@ CHardwareSimulation::CHardwareSimulation(IN IHardwareSink *HardwareSink) :
     Routine Description:
         Construct a hardware simulation
     Arguments:
-        HardwareSink -
-            The hardware sink interface.  This is used to trigger fake interrupt service routines from.
+        HardwareSink - The hardware sink interface.  This is used to trigger fake interrupt service routines from.
     Return Value:
         Success / Failure
     --*/
@@ -51,8 +50,7 @@ CHardwareSimulation *CHardwareSimulation::Initialize(IN KSOBJECT_BAG Bag, IN IHa
     Routine Description:
         Initialize the hardware simulation
     Arguments:
-        HardwareSink -
-            The hardware sink interface. This is what ISR's will be triggered through.
+        HardwareSink - The hardware sink interface. This is what ISR's will be triggered through.
     Return Value:
         A fully initialized hardware simulation or NULL if the simulation could not be initialized.
     --*/
@@ -73,16 +71,11 @@ NTSTATUS CHardwareSimulation::Start(IN CImageSynthesizer *ImageSynth, IN LONGLON
         Start the hardware simulation.  This will kick the interrupts on, begin issuing DPC's, filling in capture
         information, etc... We keep track of starvation starting at this point.
     Arguments:
-        ImageSynth -
-            The image synthesizer to use to generate pictures to display on the capture buffer.
-        TimePerFrame -
-            The time per frame...  we issue interrupts this often.
-        Width -
-            The image width
-        Height -
-            The image height
-        ImageSize -
-            The size of the image.  We allocate a temporary scratch buffer based on this size to fake hardware.
+        ImageSynth - The image synthesizer to use to generate pictures to display on the capture buffer.
+        TimePerFrame - The time per frame...  we issue interrupts this often.
+        Width - The image width
+        Height - The image height
+        ImageSize - The size of the image.  We allocate a temporary scratch buffer based on this size to fake hardware.
     Return Value:
         Success / Failure (typical failure will be out of memory on the scratch buffer, etc...)
     --*/
@@ -144,16 +137,12 @@ NTSTATUS CHardwareSimulation::Start(IN CImageSynthesizer *ImageSynth, IN LONGLON
 NTSTATUS CHardwareSimulation::Pause(BOOLEAN Pausing) {
     /*++
     Routine Description:
-        Pause the hardware simulation...  When the hardware simulation is told
-        to pause, it stops issuing interrupts, etc...  but it does not reset
-        the counters
+        Pause the hardware simulation... When the hardware simulation is told to pause, it stops issuing interrupts,
+        etc... but it does not reset the counters
     Arguments:
-        Pausing -
-            Indicates whether the hardware is pausing or not.
-            TRUE -
-                Pause the hardware
-            FALSE -
-                Unpause the hardware from a previous pause
+        Pausing - Indicates whether the hardware is pausing or not.
+            TRUE - Pause the hardware
+            FALSE - Unpause the hardware from a previous pause
     Return Value:
         Success / Failure
     --*/
@@ -194,8 +183,7 @@ NTSTATUS CHardwareSimulation::Pause(BOOLEAN Pausing) {
 NTSTATUS CHardwareSimulation::Stop() {
     /*++
     Routine Description:
-        Stop the hardware simulation....  Wait until the hardware simulation
-        has successfully stopped and then return.
+        Stop the hardware simulation....  Wait until the hardware simulation has successfully stopped and then return.
     Arguments:
         None
     Return Value:
@@ -203,9 +191,8 @@ NTSTATUS CHardwareSimulation::Stop() {
     --*/
 
     KIRQL Irql;
-    // If the hardware is told to stop while it's running, we need to
-    // halt the interrupts first.  If we're already paused, this has
-    // already been done.
+    // If the hardware is told to stop while it's running, we need to halt the interrupts first. If we're already
+    // paused, this has already been done.
     if (m_HardwareState == HardwareRunning) {
         m_StopHardware = TRUE;
         KeWaitForSingleObject(&m_HardwareEvent, Suspended, KernelMode, FALSE, nullptr);
@@ -214,8 +201,8 @@ NTSTATUS CHardwareSimulation::Stop() {
 
     m_HardwareState = HardwareStopped;
 
-    // The image synthesizer may still be around.  Just for safety's
-    // sake, NULL out the image synthesis buffer and toast it.
+    // The image synthesizer may still be around. Just for safety's sake, NULL out the image synthesis buffer
+    // and toast it.
     m_ImageSynth->SetBuffer(nullptr);
 
     if (m_SynthesisBuffer) {
@@ -248,18 +235,16 @@ NTSTATUS CHardwareSimulation::Stop() {
 ULONG CHardwareSimulation::ReadNumberOfMappingsCompleted() const {
     /*++
     Routine Description:
-        Read the number of scatter / gather mappings which have been
-        completed (TOTAL NUMBER) since the last reset of the simulated
-        hardware
+        Read the number of scatter / gather mappings which have been completed (TOTAL NUMBER) since the last reset
+        of the simulated hardware
     Arguments:
         None
     Return Value:
         Total number of completed mappings.
     --*/
 
-    // Don't care if this is being updated this moment in the DPC...  I only
-    // need a number to return which isn't too great (too small is ok).
-    // In real hardware, this wouldn't be done this way anyway.
+    // Don't care if this is being updated this moment in the DPC... I only need a number to return which isn't too
+    // great (too small is ok). In real hardware, this wouldn't be done this way anyway.
     return m_NumMappingsCompleted;
 }
 
@@ -271,20 +256,14 @@ ULONG CHardwareSimulation::ProgramScatterGatherMappings(IN PKSSTREAM_POINTER Clo
                                                         IN ULONG MappingStride) {
     /*++
     Routine Description:
-        Program the scatter gather mapping list.  This shoves a bunch of
-        entries on a list for access during the fake interrupt.  Note that
-        we have physical addresses here only for simulation.  We really
-        access via the virtual address....  although we chunk it into multiple
-        buffers to more realistically simulate S/G
+        Program the scatter gather mapping list. This shoves a bunch of entries on a list for access during the fake
+        interrupt. Note that we have physical addresses here only for simulation. We really access via the virtual
+        address.... although we chunk it into multiple buffers to more realistically simulate S/G
     Arguments:
-        Buffer -
-            The virtual address of the buffer mapped by the mapping list
-        Mappings -
-            The KSMAPPINGS array corresponding to the buffer
-        MappingsCount -
-            The number of mappings in the mappings array
-        MappingStride -
-            The mapping stride used in initialization of AVStream DMA
+        Buffer - The virtual address of the buffer mapped by the mapping list
+        Mappings - The KSMAPPINGS array corresponding to the buffer
+        MappingsCount - The number of mappings in the mappings array
+        MappingStride - The mapping stride used in initialization of AVStream DMA
     Return Value:
         Number of mappings actually inserted.
     --*/
@@ -295,13 +274,10 @@ ULONG CHardwareSimulation::ProgramScatterGatherMappings(IN PKSSTREAM_POINTER Clo
     // Protect our S/G list with a spinlock.
     KeAcquireSpinLock (&m_ListLock, &Irql);
 
-    // Loop through the scatter / gather list and break the buffer up into
-    // chunks equal to the scatter / gather mappings.  Stuff the virtual
-    // addresses of these chunks on a list somewhere.  We update the buffer
-    // pointer the caller passes as a more convenient way of doing this.
-    //
-    // If I could just remap physical in the list to virtual easily here,
-    // I wouldn't need to do it.
+    // Loop through the scatter / gather list and break the buffer up into chunks equal to the scatter / gather
+    // mappings. Stuff the virtual addresses of these chunks on a list somewhere. We update the buffer pointer
+    // the caller passes as a more convenient way of doing this.
+    // If I could just remap physical in the list to virtual easily here, I wouldn't need to do it.
     do {
         auto Entry = reinterpret_cast <PSCATTER_GATHER_ENTRY> (
                 ExAllocateFromNPagedLookasideList(&m_ScatterGatherLookaside)
@@ -314,8 +290,7 @@ ULONG CHardwareSimulation::ProgramScatterGatherMappings(IN PKSSTREAM_POINTER Clo
         Entry->ByteCount = MappingsCount;
         Entry->CloneEntry = Clone;
 
-        // Move forward a specific number of bytes in chunking this into
-        // mapping sized va buffers.
+        // Move forward a specific number of bytes in chunking this into mapping sized va buffers.
         *Buffer += MappingsCount;
         Mappings = reinterpret_cast <PKSMAPPING> ((reinterpret_cast <PUCHAR> (Mappings) + MappingStride));
 
@@ -334,27 +309,24 @@ ULONG CHardwareSimulation::ProgramScatterGatherMappings(IN PKSSTREAM_POINTER Clo
 NTSTATUS CHardwareSimulation::FillScatterGatherBuffers() {
     /*++
     Routine Description:
-        The hardware has synthesized a buffer in scratch space and we're to
-        fill scatter / gather buffers.
+        The hardware has synthesized a buffer in scratch space and we're to fill scatter / gather buffers.
     Arguments:
         None
     Return Value:
         Success / Failure
     --*/
 
-    // We're using this list lock to protect our scatter / gather lists instead
-    // of some hardware mechanism / KeSynchronizeExecution / whatever.
+    // We're using this list lock to protect our scatter / gather lists instead of some hardware mechanism /
+    // KeSynchronizeExecution / whatever.
     KeAcquireSpinLockAtDpcLevel(&m_ListLock);
 
     auto Buffer = reinterpret_cast <PUCHAR> (m_SynthesisBuffer);
     ULONG BufferRemaining = m_ImageSize;
 
-    // For simplification, if there aren't enough scatter / gather buffers
-    // queued, we don't partially fill the ones that are available.  We just
-    // skip the frame and consider it starvation.
-    //
-    // This could be enforced by only programming scatter / gather mappings
-    // for a buffer if all of them fit in the table also...
+    // For simplification, if there aren't enough scatter / gather buffers queued, we don't partially fill the ones that
+    // are available. We just skip the frame and consider it starvation.
+    // This could be enforced by only programming scatter / gather mappings for a buffer if all of them fit in
+    // the table also...
     while (BufferRemaining && m_ScatterGatherMappingsQueued > 0 && m_ScatterGatherBytesQueued >= BufferRemaining) {
         LIST_ENTRY *listEntry = RemoveHeadList(&m_ScatterGatherMappings);
         m_ScatterGatherMappingsQueued--;
@@ -407,8 +379,7 @@ NTSTATUS CHardwareSimulation::FillScatterGatherBuffers() {
 void CHardwareSimulation:: FakeHardware( ){
     /*++
     Routine Description:
-        Simulate an interrupt and what the hardware would have done in the
-        time since the previous interrupt.
+        Simulate an interrupt and what the hardware would have done in the time since the previous interrupt.
     Arguments:
         None
     Return Value:
@@ -417,9 +388,8 @@ void CHardwareSimulation:: FakeHardware( ){
 
     m_InterruptTime++;
 
-    // The hardware can be in a pause state in which case, it issues interrupts
-    // but does not complete mappings.  In this case, don't bother synthesizing
-    // a frame and doing the work of looking through the mappings table.
+    // The hardware can be in a pause state in which case, it issues interrupts but does not complete mappings.
+    // In this case, don't bother synthesizing a frame and doing the work of looking through the mappings table.
     if (m_HardwareState == HardwareRunning) {
         // Generate a "time stamp" just to overlay it onto the capture image.
         // It makes it more exciting than bars that do nothing.
@@ -465,8 +435,7 @@ void CHardwareSimulation:: FakeHardware( ){
         }
     }
 
-    // Issue an interrupt to our hardware sink.  This is a "fake" interrupt.
-    // It will occur at DISPATCH_LEVEL.
+    // Issue an interrupt to our hardware sink. This is a "fake" interrupt. It will occur at DISPATCH_LEVEL.
     m_HardwareSink->Interrupt();
 
     // Reschedule the timer if the hardware isn't being stopped.

@@ -32,8 +32,7 @@ void __cdecl operator delete[](PVOID pVoid) {
     Routine Description:
         Array delete() operator.
     Arguments:
-        pVoid -
-            The memory to free.
+        pVoid - The memory to free.
     Return Value:
         None
     --*/
@@ -47,10 +46,8 @@ void __cdecl operator delete(void *pVoid, size_t /*size*/) {
     Routine Description:
         Sized delete() operator.
     Arguments:
-        pVoid -
-            The memory to free.
-        size -
-            The size of the memory to free.
+        pVoid - The memory to free.
+        size - The size of the memory to free.
     Return Value:
         None
     --*/
@@ -65,10 +62,8 @@ void __cdecl operator delete[](void *pVoid, size_t /*size*/) {
     Routine Description:
         Sized delete[]() operator.
     Arguments:
-        pVoid -
-            The memory to free.
-        size -
-            The size of the memory to free.
+        pVoid - The memory to free.
+        size - The size of the memory to free.
     Return Value:
         None
     --*/
@@ -96,8 +91,7 @@ NTSTATUS CCaptureDevice::DispatchCreate(IN PKSDEVICE Device) {
     Routine Description:
         Create the capture device.  This is the creation dispatch for the capture device.
     Arguments:
-        Device -
-            The AVStream device being created.
+        Device - The AVStream device being created.
     Return Value:
         Success / Failure
     --*/
@@ -110,13 +104,10 @@ NTSTATUS CCaptureDevice::DispatchCreate(IN PKSDEVICE Device) {
         // Return failure if we couldn't create the pin.
         Status = STATUS_INSUFFICIENT_RESOURCES;
     } else {
-        // Add the item to the object bag if we were successful.
-        // Whenever the device goes away, the bag is cleaned up and
-        // we will be freed.
-        //
-        // For backwards compatibility with DirectX 8.0, we must grab
-        // the device mutex before doing this.  For Windows XP, this is
-        // not required, but it is still safe.
+        // Add the item to the object bag if we were successful. Whenever the device goes away, the bag is cleaned up
+        // and we will be freed.
+        // For backwards compatibility with DirectX 8.0, we must grab the device mutex before doing this.
+        // For Windows XP, this is not required, but it is still safe.
         KsAcquireDevice(Device);
         Status = KsAddItemToObjectBag(
                 Device->Bag,
@@ -143,21 +134,17 @@ NTSTATUS CCaptureDevice::PnpStart(IN PCM_RESOURCE_LIST TranslatedResourceList,
     Routine Description:
         Called at Pnp start.  We start up our virtual hardware simulation.
     Arguments:
-        TranslatedResourceList -
-            The translated resource list from Pnp
-        UntranslatedResourceList -
-            The untranslated resource list from Pnp
+        TranslatedResourceList - The translated resource list from Pnp
+        UntranslatedResourceList - The untranslated resource list from Pnp
     Return Value:
         Success / Failure
     --*/
 
     PAGED_CODE();
 
-    // Normally, we'd do things here like parsing the resource lists and
-    // connecting our interrupt.  Since this is a simulation, there isn't
-    // much to parse.  The parsing and connection should be the same as
-    // any WDM driver.  The sections that will differ are illustrated below
-    // in setting up a simulated DMA.
+    // Normally, we'd do things here like parsing the resource lists and connecting our interrupt. Since this is
+    // a simulation, there isn't much to parse. The parsing and connection should be the same as any WDM driver.
+    // The sections that will differ are illustrated below in setting up a simulated DMA.
     NTSTATUS Status = STATUS_SUCCESS;
 
     if (!m_Device->Started) {
@@ -168,11 +155,9 @@ NTSTATUS CCaptureDevice::PnpStart(IN PCM_RESOURCE_LIST TranslatedResourceList,
         KsReleaseDevice(m_Device);
 
     }
-    // By PnP, it's possible to receive multiple starts without an intervening
-    // stop (to reevaluate resources, for example).  Thus, we only perform
-    // creations of the simulation on the initial start and ignore any 
-    // subsequent start.  Hardware drivers with resources should evaluate
-    // resources and make changes on 2nd start.
+    // By PnP, it's possible to receive multiple starts without an intervening stop (to reevaluate resources,
+    // for example). Thus, we only perform creations of the simulation on the initial start and ignore any
+    // subsequent start. Hardware drivers with resources should evaluate resources and make changes on 2nd start.
     if (NT_SUCCESS(Status) && (!m_Device->Started)) {
         m_HardwareSimulation = new(NonPagedPoolNx, 'miSH') CHardwareSimulation(this);
         if (!m_HardwareSimulation) {
@@ -195,8 +180,8 @@ NTSTATUS CCaptureDevice::PnpStart(IN PCM_RESOURCE_LIST TranslatedResourceList,
 void CCaptureDevice::PnpStop() {
     /*++
     Routine Description:
-        This is the pnp stop dispatch for the capture device.  It releases any
-        adapter object previously allocated by IoGetDmaAdapter during Pnp Start.
+        This is the pnp stop dispatch for the capture device. It releases any adapter object previously allocated
+        by IoGetDmaAdapter during Pnp Start.
     Arguments:
         None
     Return Value:
@@ -219,19 +204,13 @@ NTSTATUS CCaptureDevice::AcquireHardwareResources(IN ICaptureSink *CaptureSink,
                                                   IN PKS_VIDEOINFOHEADER VideoInfoHeader) {
     /*++
     Routine Description:
-        Acquire hardware resources for the capture hardware.  If the
-        resources are already acquired, this will return an error.
-        The hardware configuration must be passed as a VideoInfoHeader.
+        Acquire hardware resources for the capture hardware. If the resources are already acquired, this will return
+        an error. The hardware configuration must be passed as a VideoInfoHeader.
     Arguments:
-        CaptureSink -
-            The capture sink attempting to acquire resources.  When scatter /
-            gather mappings are completed, the capture sink specified here is
-            what is notified of the completions.
-        VideoInfoHeader -
-            Information about the capture stream.  This **MUST** remain
-            stable until the caller releases hardware resources.  Note
-            that this could also be guaranteed by bagging it in the device
-            object bag as well.
+        CaptureSink - The capture sink attempting to acquire resources. When scatter/gather mappings are completed,
+            the capture sink specified here is what is notified of the completions.
+        VideoInfoHeader - Information about the capture stream. This **MUST** remain stable until the caller releases
+            hardware resources. Note that this could also be guaranteed by bagging it in the device object bag as well.
     Return Value:
         Success / Failure
     --*/
@@ -240,13 +219,12 @@ NTSTATUS CCaptureDevice::AcquireHardwareResources(IN ICaptureSink *CaptureSink,
 
     NTSTATUS Status = STATUS_SUCCESS;
 
-    // If we're the first pin to go into acquire (remember we can have
-    // a filter in another graph going simultaneously), grab the resources.
+    // If we're the first pin to go into acquire (remember we can have a filter in another graph going simultaneously),
+    // grab the resources.
     if (InterlockedCompareExchange(&m_PinsWithResources, 1, 0) == 0) {
         m_VideoInfoHeader = VideoInfoHeader;
 
-        // If there's an old hardware simulation sitting around for some
-        // reason, blow it away.
+        // If there's an old hardware simulation sitting around for some reason, blow it away.
         if (m_ImageSynth) {
             delete m_ImageSynth;
             m_ImageSynth = nullptr;
@@ -256,9 +234,8 @@ NTSTATUS CCaptureDevice::AcquireHardwareResources(IN ICaptureSink *CaptureSink,
         if (m_VideoInfoHeader->bmiHeader.biBitCount == 24 &&
             m_VideoInfoHeader->bmiHeader.biCompression == KS_BI_RGB) {
 
-            // If we're RGB24, create a new RGB24 synth.  RGB24 surfaces
-            // can be in either orientation.  The origin is lower left if
-            // height < 0.  Otherwise, it's upper left.
+            // If we're RGB24, create a new RGB24 synth. RGB24 surfaces can be in either orientation.
+            // The origin is lower left if height < 0. Otherwise, it's upper left.
             m_ImageSynth = new(NonPagedPoolNx, 'RysI') CRGB24Synthesizer(m_VideoInfoHeader->bmiHeader.biHeight >= 0);
         } else if (m_VideoInfoHeader->bmiHeader.biBitCount == 16 &&
                    (m_VideoInfoHeader->bmiHeader.biCompression == FOURCC_YUY2)) {
@@ -293,8 +270,7 @@ NTSTATUS CCaptureDevice::AcquireHardwareResources(IN ICaptureSink *CaptureSink,
 void CCaptureDevice::ReleaseHardwareResources() {
     /*++
     Routine Description:
-        Release hardware resources.  This should only be called by
-        an object which has acquired them.
+        Release hardware resources.  This should only be called by an object which has acquired them.
     Arguments:
         None
     Return Value:
@@ -311,8 +287,7 @@ void CCaptureDevice::ReleaseHardwareResources() {
     m_VideoInfoHeader = nullptr;
     m_CaptureSink = nullptr;
 
-    // Release our "lock" on hardware resources.  This will allow another
-    // pin (perhaps in another graph) to acquire them.
+    // Release our "lock" on hardware resources.  This will allow another pin (perhaps in another graph) to acquire them
     InterlockedExchange(&m_PinsWithResources, 0);
 }
 
@@ -322,8 +297,7 @@ void CCaptureDevice::ReleaseHardwareResources() {
 NTSTATUS CCaptureDevice::Start() {
     /*++
     Routine Description:
-        Start the capture device based on the video info header we were told
-        about when resources were acquired.
+        Start the capture device based on the video info header we were told about when resources were acquired.
     Arguments:
         None
     Return Value:
@@ -347,17 +321,13 @@ NTSTATUS CCaptureDevice::Start() {
 NTSTATUS CCaptureDevice::Pause(IN BOOLEAN Pausing) {
     /*++
     Routine Description:
-        Pause or unpause the hardware simulation.  This is an effective start
-        or stop without resetting counters and formats.  Note that this can
-        only be called to transition from started -> paused -> started.  Calling
+        Pause or unpause the hardware simulation. This is an effective start or stop without resetting counters
+        and formats. Note that this can only be called to transition from started -> paused -> started. Calling
         this without starting the hardware with Start() does nothing.
     Arguments:
-        Pausing -
-            An indicatation of whether we are pausing or unpausing
-            TRUE -
-                Pause the hardware simulation
-            FALSE -
-                Unpause the hardware simulation
+        Pausing - An indicatation of whether we are pausing or unpausing
+            TRUE - Pause the hardware simulation
+            FALSE - Unpause the hardware simulation
     Return Value:
         Success / Failure
     --*/
@@ -398,16 +368,11 @@ ULONG CCaptureDevice::ProgramScatterGatherMappings(
     Routine Description:
         Program the scatter / gather mappings for the "fake" hardware.
     Arguments:
-        Buffer -
-            Points to a pointer to the virtual address of the topmost
-            scatter / gather chunk.  The pointer will be updated as the
-            device "programs" mappings.  Reason for this is that we get
-            the physical addresses and sizes, but must calculate the virtual
-            addresses...  This is used as scratch space for that.
-        Mappings -
-            An array of mappings to program
-        MappingsCount -
-            The count of mappings in the array
+        Buffer - Points to a pointer to the virtual address of the topmost scatter / gather chunk. The pointer will be
+            updated as the device "programs" mappings. Reason for this is that we get the physical addresses and sizes,
+            but must calculate the virtual addresses...  This is used as scratch space for that.
+        Mappings - An array of mappings to program
+        MappingsCount - The count of mappings in the array
     Return Value:
         The number of mappings successfully programmed
     --*/
@@ -435,13 +400,12 @@ ULONG CCaptureDevice::ProgramScatterGatherMappings(
 ULONG CCaptureDevice::QueryInterruptTime() const {
     /*++
     Routine Description:
-        Return the number of frame intervals that have elapsed since the
-        start of the device.  This will be the frame number.
+        Return the number of frame intervals that have elapsed since the start of the device.
+        This will be the frame number.
     Arguments:
         None
     Return Value:
-        The interrupt time of the device (the number of frame intervals that
-        have elapsed since the start of the device).
+        The interrupt time of the device (the number of frame intervals that have elapsed since the start of the device)
     --*/
 
     return m_InterruptTime;
@@ -453,8 +417,8 @@ ULONG CCaptureDevice::QueryInterruptTime() const {
 void CCaptureDevice::Interrupt() {
     /*++
     Routine Description:
-        This is the "faked" interrupt service routine for this device.  It
-        is called at dispatch level by the hardware simulation.
+        This is the "faked" interrupt service routine for this device.
+        It is called at dispatch level by the hardware simulation.
     Arguments:
         None
     Return Value:
@@ -463,15 +427,12 @@ void CCaptureDevice::Interrupt() {
 
     m_InterruptTime++;
 
-    // Realistically, we'd do some hardware manipulation here and then queue
-    // a DPC.  Since this is fake hardware, we do what's necessary here.  This
-    // is pretty much what the DPC would look like short of the access
-    // of hardware registers (ReadNumberOfMappingsCompleted) which would likely
-    // be done in the ISR.
+    // Realistically, we'd do some hardware manipulation here and then queue a DPC. Since this is fake hardware, we do
+    // what's necessary here. This is pretty much what the DPC would look like short of the access of hardware registers
+    // (ReadNumberOfMappingsCompleted) which would likely be done in the ISR.
     ULONG NumMappingsCompleted = m_HardwareSimulation->ReadNumberOfMappingsCompleted();
 
-    // Inform the capture sink that a given number of scatter / gather
-    // mappings have completed.
+    // Inform the capture sink that a given number of scatter / gather mappings have completed.
     m_CaptureSink->CompleteMappings(NumMappingsCompleted - m_LastMappingsCompleted);
     m_LastMappingsCompleted = NumMappingsCompleted;
 }
@@ -480,14 +441,11 @@ void CCaptureDevice::Interrupt() {
     DESCRIPTOR AND DISPATCH LAYOUT
 **************************************************************************/
 
-// CaptureFilterDescriptor:
 // The filter descriptor for the capture device.
 DEFINE_KSFILTER_DESCRIPTOR_TABLE (FilterDescriptors) {&CaptureFilterDescriptor};
 
-// CaptureDeviceDispatch:
-// This is the dispatch table for the capture device.  Plug and play
-// notifications as well as power management notifications are dispatched
-// through this table.
+// This is the dispatch table for the capture device. Plug and play notifications as well as power management
+// notifications are dispatched through this table.
 const KSDEVICE_DISPATCH CaptureDeviceDispatch = {
         CCaptureDevice::DispatchCreate,         // Pnp Add Device
         CCaptureDevice::DispatchPnpStart,       // Pnp Start
@@ -505,12 +463,9 @@ const KSDEVICE_DISPATCH CaptureDeviceDispatch = {
         nullptr                                    // Pnp Query Interface
 };
 
-// CaptureDeviceDescriptor:
-// This is the device descriptor for the capture device.  It points to the
-// dispatch table and contains a list of filter descriptors that describe
-// filter-types that this device supports.  Note that the filter-descriptors
-// can be created dynamically and the factories created via 
-// KsCreateFilterFactory as well.  
+// This is the device descriptor for the capture device. It points to the dispatch table and contains a list of filter
+// descriptors that describe filter-types that this device supports. Note that the filter-descriptors can be created
+// dynamically and the factories created via KsCreateFilterFactory as well.
 const KSDEVICE_DESCRIPTOR CaptureDeviceDescriptor = {
         &CaptureDeviceDispatch,
         0,
@@ -526,20 +481,16 @@ extern "C" DRIVER_INITIALIZE DriverEntry;
 extern "C" NTSTATUS DriverEntry(IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRING RegistryPath) {
     /*++
     Routine Description:
-        Driver entry point.  Pass off control to the AVStream initialization
-        function (KsInitializeDriver) and return the status code from it.
+        Driver entry point. Pass off control to the AVStream initialization function (KsInitializeDriver)
+        and return the status code from it.
     Arguments:
-        DriverObject -
-            The WDM driver object for our driver
-        RegistryPath -
-            The registry path for our registry info
+        DriverObject - The WDM driver object for our driver
+        RegistryPath - The registry path for our registry info
     Return Value:
         As from KsInitializeDriver
     --*/
 
-    // Simply pass the device descriptor and parameters off to AVStream
-    // to initialize us.  This will cause filter factories to be set up
-    // at add & start.  Everything is done based on the descriptors passed
-    // here.
+    // Simply pass the device descriptor and parameters off to AVStream to initialize us. This will cause filter
+    // factories to be set up at add & start. Everything is done based on the descriptors passed here.
     return KsInitializeDriver(DriverObject, RegistryPath, &CaptureDeviceDescriptor);
 }

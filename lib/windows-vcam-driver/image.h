@@ -23,9 +23,8 @@ typedef enum {
 
 /*************************************************
     CImageSynthesizer
-    This class synthesizes images in various formats for output from the
-    capture filter.  It is capable of performing various text overlays onto
-    the image surface.
+    This class synthesizes images in various formats for output from the capture filter.
+    It is capable of performing various text overlays onto the image surface.
 *************************************************/
 
 class CImageSynthesizer {

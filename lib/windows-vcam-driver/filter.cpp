@@ -12,14 +12,11 @@
 NTSTATUS CCaptureFilter::DispatchCreate(IN PKSFILTER Filter, IN PIRP Irp) {
     /*++
     Routine Description:
-        This is the creation dispatch for the capture filter.  It creates
-        the CCaptureFilter object, associates it with the AVStream filter
-        object, and bag the CCaptureFilter for later cleanup.
+        This is the creation dispatch for the capture filter. It creates the CCaptureFilter object, associates it with
+        the AVStream filter object, and bag the CCaptureFilter for later cleanup.
     Arguments:
-        Filter -
-            The AVStream filter being created
-        Irp -
-            The creation Irp
+        Filter - The AVStream filter being created
+        Irp - The creation Irp
     Return Value:
         Success / failure
     --*/
@@ -32,12 +29,11 @@ NTSTATUS CCaptureFilter::DispatchCreate(IN PKSFILTER Filter, IN PIRP Irp) {
         // Return failure if we couldn't create the filter.
         Status = STATUS_INSUFFICIENT_RESOURCES;
     } else {
-        // Add the item to the object bag if we we were successful.
-        // Whenever the filter closes, the bag is cleaned up and we will be
-        // freed.
+        // Add the item to the object bag if we we were successful. Whenever the filter closes, the bag is cleaned up
+        // and we will be freed.
         Status = KsAddItemToObjectBag(Filter->Bag, reinterpret_cast <PVOID> (CapFilter),
                                       reinterpret_cast <PFNKSFREE> (CCaptureFilter::Cleanup));
-        if (!NT_SUCCESS (Status)) {
+        if (!NT_SUCCESS(Status)) {
             delete CapFilter;
         } else {
             Filter->Context = reinterpret_cast <PVOID> (CapFilter);
@@ -52,15 +48,13 @@ NTSTATUS CCaptureFilter::DispatchCreate(IN PKSFILTER Filter, IN PIRP Irp) {
 
 GUID g_PINNAME_VIDEO_CAPTURE = {STATIC_PINNAME_VIDEO_CAPTURE};
 
-// CaptureFilterCategories:
 // The list of category GUIDs for the capture filter.
 const GUID CaptureFilterCategories[CAPTURE_FILTER_CATEGORIES_COUNT] = {
-        STATICGUIDOF (KSCATEGORY_VIDEO),
-        STATICGUIDOF (KSCATEGORY_CAPTURE),
-        STATICGUIDOF (KSCATEGORY_VIDEO_CAMERA)
+        STATICGUIDOF(KSCATEGORY_VIDEO),
+        STATICGUIDOF(KSCATEGORY_CAPTURE),
+        STATICGUIDOF(KSCATEGORY_VIDEO_CAMERA)
 };
 
-// CaptureFilterPinDescriptors:
 // The list of pin descriptors on the capture filter.
 const KSPIN_DESCRIPTOR_EX CaptureFilterPinDescriptors[CAPTURE_FILTER_PIN_COUNT] = {
         // Video Capture Pin
@@ -89,10 +83,8 @@ const KSPIN_DESCRIPTOR_EX CaptureFilterPinDescriptors[CAPTURE_FILTER_PIN_COUNT] 
         }
 };
 
-// CaptureFilterDispatch:
-// This is the dispatch table for the capture filter.  It provides notification
-// of creation, closure, processing (for filter-centrics, not for the capture
-// filter), and resets (for filter-centrics, not for the capture filter).
+// This is the dispatch table for the capture filter. It provides notification of creation, closure, processing
+// (for filter-centrics, not for the capture filter), and resets (for filter-centrics, not for the capture filter).
 const KSFILTER_DISPATCH CaptureFilterDispatch = {
         CCaptureFilter::DispatchCreate,         // Filter Create
         nullptr,                                   // Filter Close
@@ -101,19 +93,17 @@ const KSFILTER_DISPATCH CaptureFilterDispatch = {
 };
 
 
-// CaptureFilterDescription:
-// The descriptor for the capture filter.  We don't specify any topology
-// since there's only one pin on the filter.  Realistically, there would
-// be some topological relationships here because there would be input 
-// pins from crossbars and the like.
+// The descriptor for the capture filter. We don't specify any topology since there's only one pin on the filter.
+// Realistically, there would be some topological relationships here because there would be input pins from crossbars
+// and the like.
 const KSFILTER_DESCRIPTOR CaptureFilterDescriptor = {
         &CaptureFilterDispatch,                 // Dispatch Table
         nullptr,                                   // Automation Table
         KSFILTER_DESCRIPTOR_VERSION,            // Version
         0,                                      // Flags
         &KSNAME_Filter,                         // Reference GUID
-        DEFINE_KSFILTER_PIN_DESCRIPTORS (CaptureFilterPinDescriptors),
-        DEFINE_KSFILTER_CATEGORIES (CaptureFilterCategories),
+        DEFINE_KSFILTER_PIN_DESCRIPTORS(CaptureFilterPinDescriptors),
+        DEFINE_KSFILTER_CATEGORIES(CaptureFilterCategories),
         0,
         sizeof(KSNODE_DESCRIPTOR),
         nullptr,
