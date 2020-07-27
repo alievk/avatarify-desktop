@@ -1,15 +1,3 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        purecall.c
-    Abstract:
-        This file contains the _purecall stub necessary for virtual function
-        usage in drivers on 98 gold.
-    History:
-        created 9/16/02
-**************************************************************************/
-
 /*************************************************
     Function:
         _purecall

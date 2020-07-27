@@ -1,14 +1,3 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        filter.h
-    Abstract:
-        This file contains the filter level header for the capture filter.
-    History:
-        created 3/12/2001
-**************************************************************************/
-
 class CCaptureFilter {
 private:
     // The AVStream filter object associated with this CCaptureFilter.
@@ -27,11 +16,11 @@ public:
     // The capture filter object constructor.  Since the new operator will
     // have zeroed the memory, do not bother initializing any NULL or 0
     // fields.  Only initialize non-NULL, non-0 fields.
-    CCaptureFilter(IN PKSFILTER Filter) : m_Filter(Filter) {}
+    explicit CCaptureFilter(IN PKSFILTER Filter) : m_Filter(Filter) {}
 
     // ~CCaptureFilter():
     // The capture filter destructor.
-    ~CCaptureFilter() {}
+    ~CCaptureFilter() = default;
 
     // DispatchCreate():
     // This is the filter creation dispatch for the capture filter.  It

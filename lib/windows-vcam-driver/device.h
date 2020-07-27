@@ -1,16 +1,3 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        device.h
-    Abstract:
-        The header for the device level of the simulated hardware.  This is
-        not actually the hardware simulation itself.  The hardware simulation
-        is contained in hwsim.*, image.*.
-    History:
-        created 3/9/2001
-**************************************************************************/
-
 class CCaptureDevice : public IHardwareSink {
 private:
     // The AVStream device we're associated with.
@@ -18,37 +5,37 @@ private:
 
     // Number of pins with resources acquired.  This is used as a locking
     // mechanism for resource acquisition on the device.
-    LONG m_PinsWithResources;
+    LONG m_PinsWithResources{};
 
     // Since we don't have physical hardware, this provides the hardware
     // simulation.  m_HardwareSimulation provides the fake ISR, fake DPC,
     // etc...  m_ImageSynth provides RGB24 and UYVY image synthesis and
     // overlay in software.
-    CHardwareSimulation *m_HardwareSimulation;
-    CImageSynthesizer *m_ImageSynth;
+    CHardwareSimulation *m_HardwareSimulation{};
+    CImageSynthesizer *m_ImageSynth{};
 
     // The number of ISR's that have occurred since capture started.
-    ULONG m_InterruptTime;
+    ULONG m_InterruptTime{};
 
     // The last reading of mappings completed.
-    ULONG m_LastMappingsCompleted;
+    ULONG m_LastMappingsCompleted{};
 
     // The Dma adapter object we acquired through IoGetDmaAdapter() during
     // Pnp start.  This must be initialized with AVStream in order to perform
     // Dma directly into the capture buffers.
-    PADAPTER_OBJECT m_DmaAdapterObject;
+    PADAPTER_OBJECT m_DmaAdapterObject{};
 
     // The number of map registers returned from IoGetDmaAdapter().
-    ULONG m_NumberOfMapRegisters;
+    ULONG m_NumberOfMapRegisters{};
 
     // The capture sink.  When we complete scatter / gather mappings, we
     // notify the capture sink.
-    ICaptureSink *m_CaptureSink;
+    ICaptureSink *m_CaptureSink{};
 
     // The video info header we're basing hardware settings on.  The pin
     // provides this to us when acquiring resources and must guarantee its
     // stability until resources are released.
-    PKS_VIDEOINFOHEADER m_VideoInfoHeader;
+    PKS_VIDEOINFOHEADER m_VideoInfoHeader{};
 
     // Cleanup():
     // This is the free callback for the bagged capture device.  Not providing
@@ -73,11 +60,11 @@ public:
     // The capture device class constructor.  Since everything should have
     // been zero'ed by the new operator, don't bother setting anything to
     // zero or NULL.  Only initialize non-NULL, non-0 fields.
-    CCaptureDevice(IN PKSDEVICE Device) : m_Device(Device) {}
+    explicit CCaptureDevice(IN PKSDEVICE Device) : m_Device(Device) {}
 
     // ~CCaptureDevice():
     // The capture device destructor.
-    ~CCaptureDevice() {}
+    ~CCaptureDevice() = default;
 
     // DispatchCreate():
     // This is the Add Device dispatch for the capture device.  It creates
@@ -137,14 +124,14 @@ public:
 
     // QueryInterruptTime():
     // Determine the frame number that this frame corresponds to.
-    ULONG QueryInterruptTime();
+    ULONG QueryInterruptTime() const;
 
     // IHardwareSink::Interrupt():
     // The interrupt service routine as called through the hardware sink
     // interface.  The "fake" hardware uses this method to inform the device
     // of a "fake" ISR.  The routine is called at dispatch level and must
     // be in locked code.
-    virtual void Interrupt();
+    void Interrupt() override;
 
     LONG GetDroppedFrameCount() {
         return m_HardwareSimulation->GetSkippedFrameCount();

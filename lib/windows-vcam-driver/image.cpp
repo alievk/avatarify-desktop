@@ -1,17 +1,3 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        image.cpp
-    Abstract:
-        The image synthesis and overlay code.  These objects provide image
-        synthesis (pixel, color-bar, etc...) onto RGB24 and UYVY buffers as
-        well as software string overlay into these buffers.
-	This entire file, data and all, must be in locked segments.
-    History:
-        created 1/16/2001
-**************************************************************************/
-
 #include "avshws.h"
 
 /**************************************************************************
@@ -292,7 +278,6 @@ const UCHAR CRGB24Synthesizer::Colors[MAX_COLOR][3] = {
         {255, 0,   255},      // MAGENTA
         {0,   0,   255},        // RED
         {255, 0,   0},        // BLUE
-        {128, 128, 128}     // GREY
 };
 
 const UCHAR CYUVSynthesizer::Colors[MAX_COLOR][3] = {
@@ -304,7 +289,6 @@ const UCHAR CYUVSynthesizer::Colors[MAX_COLOR][3] = {
         {202, 106, 222},    // MAGENTA
         {90,  81,  240},      // RED
         {240, 41,  109},     // BLUE
-        {128, 125, 128},    // GREY
 };
 
 /**************************************************************************

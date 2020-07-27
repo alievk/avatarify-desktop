@@ -1,25 +1,6 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        capture.h
-    Abstract:
-        This file contains header for the video capture pin on the capture
-        filter.  The capture sample performs "fake" DMA directly into
-        the capture buffers.  Common buffer DMA will work slightly differently.
-
-        For common buffer DMA, the general technique would be DPC schedules
-        processing with KsPinAttemptProcessing.  The processing routine grabs
-        the leading edge, copies data out of the common buffer and advances.
-        Cloning would not be necessary with this technique.  It would be 
-        similiar to the way "AVSSamp" works, but it would be pin-centric.
-    History:
-        created 3/8/2001
-**************************************************************************/
 #include <initguid.h>
 
 // STREAM_POINTER_CONTEXT:
-//
 // This is the context structure we associate with all clone stream pointers.
 // It allows the mapping code to rip apart the buffer into chunks the same
 // size as the scatter/gather mappings in order to fake scatter / gather
@@ -114,18 +95,18 @@ public:
     // The capture pin's constructor.  Initialize any non-0, non-NULL fields
     // (since new will have zero'ed the memory anyway) and set up our
     // device level pointers for access during capture routines.
-    CCapturePin(IN PKSPIN Pin);
+    explicit CCapturePin(IN PKSPIN Pin);
 
     // ~CCapturePin():
     // The capture pin's destructor.
-    ~CCapturePin() {}
+    ~CCapturePin() = default;
 
     // ICaptureSink::CompleteMappings()
     // This is the capture sink notification mechanism for mapping completion.
     // When the device DPC detects that a given number of mappings have been
     // completed by the fake hardware, it signals the capture sink of this
     // through this method.
-    virtual void CompleteMappings(IN ULONG NumMappings);
+    void CompleteMappings(IN ULONG NumMappings) override;
 
     /*************************************************
 

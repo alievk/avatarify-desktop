@@ -1,32 +1,10 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        capture.cpp
-    Abstract:
-        This file contains source for the video capture pin on the capture
-        filter.  The capture sample performs "fake" DMA directly into
-        the capture buffers.  Common buffer DMA will work slightly differently.
-
-        For common buffer DMA, the general technique would be DPC schedules
-        processing with KsPinAttemptProcessing.  The processing routine grabs
-        the leading edge, copies data out of the common buffer and advances.
-        Cloning would not be necessary with this technique.  It would be 
-        similiar to the way "AVSSamp" works, but it would be pin-centric.
-    History:
-        created 3/8/2001
-**************************************************************************/
-
 #include "avshws.h"
 #include <ksmedia.h>
 #include <ntintsafe.h>
 
 /**************************************************************************
-
     PAGEABLE CODE
-
 **************************************************************************/
-
 
 #ifdef ALLOC_PRAGMA
 #pragma code_seg("PAGE")
@@ -180,15 +158,15 @@ PKS_VIDEOINFOHEADER CCapturePin::CaptureVideoInfoHeader() {
     );
 
     if (!m_VideoInfoHeader)
-        return NULL;
+        return nullptr;
 
     // Bag the newly allocated header space.  This will get cleaned up
     // automatically when the pin closes.
-    NTSTATUS Status = KsAddItemToObjectBag(m_Pin->Bag, reinterpret_cast <PVOID> (m_VideoInfoHeader), NULL);
+    NTSTATUS Status = KsAddItemToObjectBag(m_Pin->Bag, reinterpret_cast <PVOID> (m_VideoInfoHeader), nullptr);
 
     if (!NT_SUCCESS (Status)) {
         ExFreePool(m_VideoInfoHeader);
-        return NULL;
+        return nullptr;
     } else {
         // Copy the connection format video info header into the newly
         // allocated "captured" video info header.
@@ -221,11 +199,11 @@ NTSTATUS CCapturePin::Process() {
 
     while (NT_SUCCESS (Status) && Leading) {
         PKSSTREAM_POINTER ClonePointer;
-        PSTREAM_POINTER_CONTEXT SPContext = NULL;
+        PSTREAM_POINTER_CONTEXT SPContext = nullptr;
 
         // If no data is present in the Leading edge stream pointer, just
         // move on to the next frame
-        if (NULL == Leading->StreamHeader->Data) {
+        if (nullptr == Leading->StreamHeader->Data) {
             Status = KsStreamPointerAdvance(Leading);
             continue;
         }
@@ -239,7 +217,7 @@ NTSTATUS CCapturePin::Process() {
         if (!m_PreviousStreamPointer) {
             // First thing we need to do is clone the leading edge.  This allows
             // us to keep reference on the frames while they're in DMA.
-            Status = KsStreamPointerClone(Leading, NULL, sizeof(STREAM_POINTER_CONTEXT), &ClonePointer);
+            Status = KsStreamPointerClone(Leading, nullptr, sizeof(STREAM_POINTER_CONTEXT), &ClonePointer);
 
             // I use this for easy chunking of the buffer.  We're not really
             // dealing with physical addresses.  This keeps track of what 
@@ -283,7 +261,7 @@ NTSTATUS CCapturePin::Process() {
         // logic, make a check to see if we completely used the mappings in
         // the leading edge.  Set a flag.
         if (MappingsUsed == Leading->OffsetOut.Remaining) {
-            m_PreviousStreamPointer = NULL;
+            m_PreviousStreamPointer = nullptr;
         } else {
             m_PreviousStreamPointer = ClonePointer;
         }
@@ -354,7 +332,7 @@ NTSTATUS CCapturePin::CleanupReferences() {
     PAGED_CODE();
 
     PKSSTREAM_POINTER Clone = KsPinGetFirstCloneStreamPointer(m_Pin);
-    PKSSTREAM_POINTER NextClone = NULL;
+    PKSSTREAM_POINTER NextClone = nullptr;
 
     // Walk through the clones, deleting them, and setting DataUsed to
     // zero since we didn't use any data!
@@ -421,7 +399,7 @@ NTSTATUS CCapturePin::SetState(IN KSSTATE ToState, IN KSSTATE FromState) {
                 // If we got an interface to the clock, we must release it.
                 if (m_Clock) {
                     m_Clock->Release();
-                    m_Clock = NULL;
+                    m_Clock = nullptr;
                 }
                 m_Device->ReleaseHardwareResources();
                 m_AcquiredResources = FALSE;
@@ -446,7 +424,7 @@ NTSTATUS CCapturePin::SetState(IN KSSTATE ToState, IN KSSTATE FromState) {
                     if (!NT_SUCCESS (KsPinGetReferenceClockInterface(m_Pin, &m_Clock))) {
                         // If we could not get an interface to the clock,
                         // don't use one.  
-                        m_Clock = NULL;
+                        m_Clock = nullptr;
                     }
                 } else {
                     m_AcquiredResources = FALSE;
@@ -574,11 +552,9 @@ NTSTATUS CCapturePin::IntersectHandler(
     if (IsEqualGUID(CallerDataRange->Specifier, VideoInfoSpecifier) &&
         CallerDataRange->FormatSize >= sizeof(KS_DATARANGE_VIDEO)) {
 
-        PKS_DATARANGE_VIDEO callerDataRange =
-                reinterpret_cast <PKS_DATARANGE_VIDEO> (CallerDataRange);
+        auto callerDataRange = reinterpret_cast <PKS_DATARANGE_VIDEO> (CallerDataRange);
 
-        PKS_DATARANGE_VIDEO descriptorDataRange =
-                reinterpret_cast <PKS_DATARANGE_VIDEO> (DescriptorDataRange);
+        auto descriptorDataRange = reinterpret_cast <PKS_DATARANGE_VIDEO> (DescriptorDataRange);
 
         PKS_DATAFORMAT_VIDEOINFOHEADER FormatVideoInfoHeader;
 
@@ -652,9 +628,8 @@ NTSTATUS CCapturePin::IntersectHandler(
         // Note that for compressed sizes, this calculation will probably not
         // be just width * height * bitdepth
         FormatVideoInfoHeader->VideoInfoHeader.bmiHeader.biSizeImage =
-        FormatVideoInfoHeader->DataFormat.SampleSize = KS_DIBSIZE (FormatVideoInfoHeader->VideoInfoHeader.bmiHeader);
+        FormatVideoInfoHeader->DataFormat.SampleSize = KS_DIBSIZE(FormatVideoInfoHeader->VideoInfoHeader.bmiHeader);
 
-        //
         // REVIEW - Perform other validation such as cropping and scaling checks
         return STATUS_SUCCESS;
     } // End of VIDEOINFOHEADER specifier
@@ -740,7 +715,7 @@ NTSTATUS CCapturePin::DispatchSetFormat(IN PKSPIN Pin, IN PKSDATAFORMAT OldForma
 
     const GUID VideoInfoSpecifier = {STATICGUIDOF(KSDATAFORMAT_SPECIFIER_VIDEOINFO)};
 
-    CCapturePin *CapPin = NULL;
+    CCapturePin *CapPin = nullptr;
 
     // Find the pin, if it exists yet.  OldFormat will be an indication of
     // this.  If we're changing formats, OldFormat will be non-NULL.
@@ -754,12 +729,10 @@ NTSTATUS CCapturePin::DispatchSetFormat(IN PKSPIN Pin, IN PKSDATAFORMAT OldForma
     if (IsEqualGUID(Pin->ConnectionFormat->Specifier, VideoInfoSpecifier) &&
         Pin->ConnectionFormat->FormatSize >= sizeof(KS_DATAFORMAT_VIDEOINFOHEADER)) {
 
-        PKS_DATAFORMAT_VIDEOINFOHEADER ConnectionFormat =
-                reinterpret_cast <PKS_DATAFORMAT_VIDEOINFOHEADER> (Pin->ConnectionFormat);
+        auto ConnectionFormat = reinterpret_cast <PKS_DATAFORMAT_VIDEOINFOHEADER> (Pin->ConnectionFormat);
 
-        // DataRange comes out of OUR data range list.  I know the range
-        // is valid as such.
-        const KS_DATARANGE_VIDEO *VIRange = reinterpret_cast <const KS_DATARANGE_VIDEO *> (DataRange);
+        // DataRange comes out of OUR data range list.  I know the range is valid as such.
+        const auto *VIRange = reinterpret_cast <const KS_DATARANGE_VIDEO *> (DataRange);
 
         // Check that bmiHeader.biSize is valid since we use it later.
         ULONG VideoHeaderSize = KS_SIZE_VIDEOHEADER (&ConnectionFormat->VideoInfoHeader);
@@ -795,9 +768,10 @@ NTSTATUS CCapturePin::DispatchSetFormat(IN PKSPIN Pin, IN PKSDATAFORMAT OldForma
                                        (ULONG) abs(ConnectionFormat->VideoInfoHeader.bmiHeader.biHeight),
                                        &ImageSize)) {
                 Status = STATUS_INVALID_PARAMETER;
-            } else if (!MultiplyCheckOverflow(ImageSize,
-                                              (ULONG) (ConnectionFormat->VideoInfoHeader.bmiHeader.biBitCount / 8),
-                                              &ImageSize)) {
+            } else if (!MultiplyCheckOverflow(
+                    ImageSize,
+                    (ULONG) (ConnectionFormat->VideoInfoHeader.bmiHeader.biBitCount / 8),
+                    &ImageSize)) {
                 // We only support KS_BI_RGB (24) and KS_BI_YUV422 (16), so
                 // this is valid for those formats.
                 Status = STATUS_INVALID_PARAMETER;
@@ -837,9 +811,7 @@ NTSTATUS CCapturePin::DispatchSetFormat(IN PKSPIN Pin, IN PKSDATAFORMAT OldForma
 }
 
 /**************************************************************************
-
     LOCKED CODE
-
 **************************************************************************/
 
 #ifdef ALLOC_PRAGMA
@@ -901,9 +873,7 @@ void CCapturePin::CompleteMappings(IN ULONG NumMappings) {
             // will get that size.  If the proper data type handlers are not 
             // installed, the stream header will be of default size.
             if (Clone->StreamHeader->Size >= sizeof(KSSTREAM_HEADER) + sizeof(KS_FRAME_INFO)) {
-                PKS_FRAME_INFO FrameInfo = reinterpret_cast <PKS_FRAME_INFO> (
-                        Clone->StreamHeader + 1
-                );
+                auto FrameInfo = reinterpret_cast <PKS_FRAME_INFO> (Clone->StreamHeader + 1);
                 FrameInfo->ExtendedHeaderSize = sizeof(KS_FRAME_INFO);
                 FrameInfo->dwFrameFlags = KS_VIDEO_FLAG_FRAME;
                 FrameInfo->PictureNumber = (LONGLONG) m_FrameNumber;
@@ -938,9 +908,7 @@ void CCapturePin::CompleteMappings(IN ULONG NumMappings) {
 }
 
 /**************************************************************************
-
     DISPATCH AND DESCRIPTOR LAYOUT
-
 **************************************************************************/
 
 // FormatRGB24Bpp_Capture:
@@ -989,7 +957,6 @@ const KS_DATARANGE_VIDEO FormatRGB24Bpp_Capture = {
                 8 * 3 * 30 * D_X * D_Y,  // MinBitsPerSecond;
                 8 * 3 * 30 * D_X * D_Y   // MaxBitsPerSecond;
         },
-
         // KS_VIDEOINFOHEADER (default format)
         {
                 0, 0, 0, 0,                            // RECT  rcSource;
@@ -1014,9 +981,7 @@ const KS_DATARANGE_VIDEO FormatRGB24Bpp_Capture = {
 // FormatYUY2_Capture:
 // This is the data range description of the YUY2 format we support.
 const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
-        //
         // KSDATARANGE
-        //
         {
                 sizeof(KS_DATARANGE_VIDEO),            // FormatSize
                 0,                                      // Flags
@@ -1059,7 +1024,6 @@ const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
                 8 * 2 * 30 * D_X * D_Y,  // MinBitsPerSecond;
                 8 * 2 * 30 * DMAX_X * DMAX_Y,   // MaxBitsPerSecond;
         },
-
         // KS_VIDEOINFOHEADER (default format)
         {
                 0, 0, 0, 0,                         // RECT  rcSource;
@@ -1087,15 +1051,15 @@ const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
 // about creation, closure, processing, data formats, etc...
 const KSPIN_DISPATCH CapturePinDispatch = {
         CCapturePin::DispatchCreate,            // Pin Create
-        NULL,                                   // Pin Close
+        nullptr,                                   // Pin Close
         CCapturePin::DispatchProcess,           // Pin Process
-        NULL,                                   // Pin Reset
+        nullptr,                                   // Pin Reset
         CCapturePin::DispatchSetFormat,         // Pin Set Data Format
         CCapturePin::DispatchSetState,          // Pin Set Device State
-        NULL,                                   // Pin Connect
-        NULL,                                   // Pin Disconnect
-        NULL,                                   // Clock Dispatch
-        NULL                                    // Allocator Dispatch
+        nullptr,                                   // Pin Connect
+        nullptr,                                   // Pin Disconnect
+        nullptr,                                   // Clock Dispatch
+        nullptr                                    // Allocator Dispatch
 };
 
 // CapturePinAllocatorFraming:
@@ -1103,8 +1067,7 @@ const KSPIN_DISPATCH CapturePinDispatch = {
 // will be modified via KsEdit when the actual capture format is determined.
 DECLARE_SIMPLE_FRAMING_EX (CapturePinAllocatorFraming,
                            STATICGUIDOF(KSMEMORY_TYPE_KERNEL_NONPAGED),
-                           KSALLOCATOR_REQUIREMENTF_SYSTEM_MEMORY |
-                           KSALLOCATOR_REQUIREMENTF_PREFERENCES_ONLY,
+                           KSALLOCATOR_REQUIREMENTF_SYSTEM_MEMORY | KSALLOCATOR_REQUIREMENTF_PREFERENCES_ONLY,
                            2,
                            0,
                            2 * PAGE_SIZE,

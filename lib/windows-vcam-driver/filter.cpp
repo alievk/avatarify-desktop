@@ -1,15 +1,3 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        filter.cpp
-    Abstract:
-        This file contains the filter level implementation for the
-        capture filter.
-    History:
-        created 3/12/2001
-**************************************************************************/
-
 #include "avshws.h"
 
 /**************************************************************************
@@ -39,9 +27,7 @@ NTSTATUS CCaptureFilter::DispatchCreate(IN PKSFILTER Filter, IN PIRP Irp) {
     PAGED_CODE();
 
     NTSTATUS Status = STATUS_SUCCESS;
-
-    CCaptureFilter *CapFilter = new(NonPagedPoolNx, 'liFC') CCaptureFilter(Filter);
-
+    auto *CapFilter = new(NonPagedPoolNx, 'liFC') CCaptureFilter(Filter);
     if (!CapFilter) {
         // Return failure if we couldn't create the filter.
         Status = STATUS_INSUFFICIENT_RESOURCES;
@@ -51,7 +37,6 @@ NTSTATUS CCaptureFilter::DispatchCreate(IN PKSFILTER Filter, IN PIRP Irp) {
         // freed.
         Status = KsAddItemToObjectBag(Filter->Bag, reinterpret_cast <PVOID> (CapFilter),
                                       reinterpret_cast <PFNKSFREE> (CCaptureFilter::Cleanup));
-
         if (!NT_SUCCESS (Status)) {
             delete CapFilter;
         } else {
@@ -81,12 +66,12 @@ const KSPIN_DESCRIPTOR_EX CaptureFilterPinDescriptors[CAPTURE_FILTER_PIN_COUNT] 
         // Video Capture Pin
         {
                 &CapturePinDispatch,
-                NULL,
+                nullptr,
                 {
                         0,                              // Interfaces (NULL, 0 == default)
-                        NULL,
+                        nullptr,
                         0,                              // Mediums (NULL, 0 == default)
-                        NULL,
+                        nullptr,
                         SIZEOF_ARRAY(CapturePinDataRanges),// Range Count
                         CapturePinDataRanges,           // Ranges
                         KSPIN_DATAFLOW_OUT,             // Dataflow
@@ -110,9 +95,9 @@ const KSPIN_DESCRIPTOR_EX CaptureFilterPinDescriptors[CAPTURE_FILTER_PIN_COUNT] 
 // filter), and resets (for filter-centrics, not for the capture filter).
 const KSFILTER_DISPATCH CaptureFilterDispatch = {
         CCaptureFilter::DispatchCreate,         // Filter Create
-        NULL,                                   // Filter Close
-        NULL,                                   // Filter Process
-        NULL                                    // Filter Reset
+        nullptr,                                   // Filter Close
+        nullptr,                                   // Filter Process
+        nullptr                                    // Filter Reset
 };
 
 
@@ -123,7 +108,7 @@ const KSFILTER_DISPATCH CaptureFilterDispatch = {
 // pins from crossbars and the like.
 const KSFILTER_DESCRIPTOR CaptureFilterDescriptor = {
         &CaptureFilterDispatch,                 // Dispatch Table
-        NULL,                                   // Automation Table
+        nullptr,                                   // Automation Table
         KSFILTER_DESCRIPTOR_VERSION,            // Version
         0,                                      // Flags
         &KSNAME_Filter,                         // Reference GUID
@@ -131,8 +116,8 @@ const KSFILTER_DESCRIPTOR CaptureFilterDescriptor = {
         DEFINE_KSFILTER_CATEGORIES (CaptureFilterCategories),
         0,
         sizeof(KSNODE_DESCRIPTOR),
-        NULL,
+        nullptr,
         0,
-        NULL,
-        NULL                                    // Component ID
+        nullptr,
+        nullptr                                    // Component ID
 };

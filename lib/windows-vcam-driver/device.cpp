@@ -1,16 +1,3 @@
-/**************************************************************************
-    AVStream Simulated Hardware Sample
-    Copyright (c) 2001, Microsoft Corporation.
-    File:
-        device.cpp
-    Abstract:
-        This file contains the device level implementation of the AVStream
-        hardware sample.  Note that this is not the "fake" hardware.  The
-        "fake" hardware is in hwsim.cpp.
-    History:
-        created 3/9/2001
-**************************************************************************/
-
 #include "avshws.h"
 
 PVOID operator new(size_t iSize,
@@ -118,9 +105,7 @@ NTSTATUS CCaptureDevice::DispatchCreate(IN PKSDEVICE Device) {
     PAGED_CODE();
 
     NTSTATUS Status;
-
-    CCaptureDevice *CapDevice = new(NonPagedPoolNx, 'veDC') CCaptureDevice(Device);
-
+    auto *CapDevice = new(NonPagedPoolNx, 'veDC') CCaptureDevice(Device);
     if (!CapDevice) {
         // Return failure if we couldn't create the pin.
         Status = STATUS_INSUFFICIENT_RESOURCES;
@@ -178,8 +163,8 @@ NTSTATUS CCaptureDevice::PnpStart(IN PCM_RESOURCE_LIST TranslatedResourceList,
     if (!m_Device->Started) {
         // Create the Filter for the device
         KsAcquireDevice(m_Device);
-        Status = KsCreateFilterFactory(m_Device->FunctionalDeviceObject, &CaptureFilterDescriptor, L"GLOBAL", NULL,
-                                       KSCREATE_ITEM_FREEONSTOP, NULL, NULL, NULL);
+        Status = KsCreateFilterFactory(m_Device->FunctionalDeviceObject, &CaptureFilterDescriptor, L"GLOBAL", nullptr,
+                                       KSCREATE_ITEM_FREEONSTOP, nullptr, nullptr, nullptr);
         KsReleaseDevice(m_Device);
 
     }
@@ -223,7 +208,7 @@ void CCaptureDevice::PnpStop() {
     if (m_DmaAdapterObject) {
         // Return the DMA adapter back to the system.
         m_DmaAdapterObject->DmaOperations->PutDmaAdapter(m_DmaAdapterObject);
-        m_DmaAdapterObject = NULL;
+        m_DmaAdapterObject = nullptr;
     }
 }
 
@@ -264,7 +249,7 @@ NTSTATUS CCaptureDevice::AcquireHardwareResources(IN ICaptureSink *CaptureSink,
         // reason, blow it away.
         if (m_ImageSynth) {
             delete m_ImageSynth;
-            m_ImageSynth = NULL;
+            m_ImageSynth = nullptr;
         }
 
         // Create the necessary type of image synthesizer.
@@ -321,11 +306,10 @@ void CCaptureDevice::ReleaseHardwareResources() {
     // Blow away the image synth.
     if (m_ImageSynth) {
         delete m_ImageSynth;
-        m_ImageSynth = NULL;
+        m_ImageSynth = nullptr;
     }
-
-    m_VideoInfoHeader = NULL;
-    m_CaptureSink = NULL;
+    m_VideoInfoHeader = nullptr;
+    m_CaptureSink = nullptr;
 
     // Release our "lock" on hardware resources.  This will allow another
     // pin (perhaps in another graph) to acquire them.
@@ -448,7 +432,7 @@ ULONG CCaptureDevice::ProgramScatterGatherMappings(
 #endif // ALLOC_PRAGMA
 
 
-ULONG CCaptureDevice::QueryInterruptTime() {
+ULONG CCaptureDevice::QueryInterruptTime() const {
     /*++
     Routine Description:
         Return the number of frame intervals that have elapsed since the
@@ -507,18 +491,18 @@ DEFINE_KSFILTER_DESCRIPTOR_TABLE (FilterDescriptors) {&CaptureFilterDescriptor};
 const KSDEVICE_DISPATCH CaptureDeviceDispatch = {
         CCaptureDevice::DispatchCreate,         // Pnp Add Device
         CCaptureDevice::DispatchPnpStart,       // Pnp Start
-        NULL,                                   // Post-Start
-        NULL,                                   // Pnp Query Stop
-        NULL,                                   // Pnp Cancel Stop
+        nullptr,                                   // Post-Start
+        nullptr,                                   // Pnp Query Stop
+        nullptr,                                   // Pnp Cancel Stop
         CCaptureDevice::DispatchPnpStop,        // Pnp Stop
-        NULL,                                   // Pnp Query Remove
-        NULL,                                   // Pnp Cancel Remove
-        NULL,                                   // Pnp Remove
-        NULL,                                   // Pnp Query Capabilities
-        NULL,                                   // Pnp Surprise Removal
-        NULL,                                   // Power Query Power
-        NULL,                                   // Power Set Power
-        NULL                                    // Pnp Query Interface
+        nullptr,                                   // Pnp Query Remove
+        nullptr,                                   // Pnp Cancel Remove
+        nullptr,                                   // Pnp Remove
+        nullptr,                                   // Pnp Query Capabilities
+        nullptr,                                   // Pnp Surprise Removal
+        nullptr,                                   // Power Query Power
+        nullptr,                                   // Power Set Power
+        nullptr                                    // Pnp Query Interface
 };
 
 // CaptureDeviceDescriptor:
@@ -530,7 +514,7 @@ const KSDEVICE_DISPATCH CaptureDeviceDispatch = {
 const KSDEVICE_DESCRIPTOR CaptureDeviceDescriptor = {
         &CaptureDeviceDispatch,
         0,
-        NULL
+        nullptr
 };
 
 /**************************************************************************
