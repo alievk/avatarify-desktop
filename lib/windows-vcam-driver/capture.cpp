@@ -56,8 +56,7 @@ NTSTATUS CCapturePin::DispatchCreate(IN PKSPIN Pin, IN PIRP Irp) {
 
     NTSTATUS Status = STATUS_SUCCESS;
 
-    CCapturePin *CapPin = new(NonPagedPoolNx, 'niPC') CCapturePin(Pin);
-
+    auto *CapPin = new(NonPagedPoolNx, 'niPC') CCapturePin(Pin);
     if (!CapPin) {
         // Return failure if we couldn't create the pin.
         Status = STATUS_INSUFFICIENT_RESOURCES;

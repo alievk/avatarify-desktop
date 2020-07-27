@@ -2,7 +2,6 @@
     Constants
 **************************************************************************/
 
-// COLOR:
 // Pixel color for placement onto the synthesis buffer.
 typedef enum {
     BLACK = 0,
@@ -18,7 +17,6 @@ typedef enum {
     TRANSPARENT,
 } COLOR;
 
-// POSITION_CENTER:
 // Only useful for text overlay.  This can be substituted for LocX or LocY
 // in order to center the text screen on the synthesis buffer.
 #define POSITION_CENTER ((ULONG)-1)
@@ -36,21 +34,16 @@ protected:
     ULONG m_Width;
     ULONG m_Height;
 
-    // The synthesis buffer.  All scan conversion happens in the synthesis
-    // buffer.  This must be set with SetBuffer() before any scan conversion
-    // routines are called.
+    // The synthesis buffer. All scan conversion happens in the synthesis buffer. This must be set with SetBuffer()
+    // before any scan conversion routines are called.
     PUCHAR m_SynthesisBuffer;
 
-    // The default cursor.  This is a pointer into the synthesis buffer where
-    // a non specific PutPixel will be placed. 
+    // The default cursor. This is a pointer into the synthesis buffer where a non specific PutPixel will be placed.
     PUCHAR m_Cursor{};
 public:
-    // PutPixel():
-    // Place a pixel at the specified image cursor and move right
-    // by one pixel.  No bounds checking...  wrap around occurs.
+    // Place a pixel at the specified image cursor and move right by one pixel. No bounds checking... wrap around occurs
     virtual void PutPixel(PUCHAR *ImageLocation, COLOR Color) = 0;
 
-    // PutPixel():
     // Place a pixel at the default image cursor and move right by one pixel. No bounds checking... wrap around occurs.
     // If the derived class doesn't provide an implementation, provide one.
     virtual void PutPixel(COLOR Color) {
@@ -59,31 +52,24 @@ public:
 
     virtual long GetBytesPerPixel() = 0;
 
-
-    // GetImageLocation():
-    // Get the location into the image buffer for a specific X/Y location.
-    // This also sets the synthesizer's default cursor to the position
-    // LocX, LocY.
+    // Get the location into the image buffer for a specific X/Y location. This also sets the synthesizer's default
+    // cursor to the position LocX, LocY.
     virtual PUCHAR GetImageLocation(ULONG LocX, ULONG LocY) = 0;
 
-    // SetImageSize():
     // Set the image size of the synthesis buffer.
     void SetImageSize(ULONG Width, ULONG Height) {
         m_Width = Width;
         m_Height = Height;
     }
 
-    // SetBuffer():
     // Set the buffer the synthesizer generates images to.
     void SetBuffer(PUCHAR SynthesisBuffer) {
         m_SynthesisBuffer = SynthesisBuffer;
     }
 
-    // SynthesizeBars():
     // Synthesize EIA-189-A standard color bars.
     void SynthesizeBars();
 
-    // OverlayText():
     // Overlay a text string onto the image.
     void OverlayText(
             _In_ ULONG LocX,
@@ -114,9 +100,7 @@ private:
     const static UCHAR Colors[MAX_COLOR][3];
     BOOLEAN m_FlipVertical;
 public:
-    // PutPixel():
-    // Place a pixel at a specific cursor location.  *ImageLocation must
-    // reside within the synthesis buffer.
+    // Place a pixel at a specific cursor location. *ImageLocation must reside within the synthesis buffer.
     void PutPixel(PUCHAR *ImageLocation, COLOR Color) override {
         if (Color != TRANSPARENT) {
             *(*ImageLocation)++ = Colors[(ULONG) Color][0];
@@ -127,9 +111,7 @@ public:
         }
     }
 
-    // PutPixel():
-    // Place a pixel at the default cursor location.  The cursor location
-    // must be set via GetImageLocation(x, y).
+    // Place a pixel at the default cursor location.  The cursor location must be set via GetImageLocation(x, y).
     void PutPixel(COLOR Color) override {
         if (Color != TRANSPARENT) {
             *m_Cursor++ = Colors[(ULONG) Color][0];
@@ -174,9 +156,7 @@ private:
 
     BOOLEAN m_Parity{};
 public:
-    // PutPixel():
-    // Place a pixel at a specific cursor location.  *ImageLocation must
-    // reside within the synthesis buffer.
+    // Place a pixel at a specific cursor location. *ImageLocation must reside within the synthesis buffer.
     void PutPixel(PUCHAR *ImageLocation, COLOR Color) override {
         BOOLEAN Parity = (((*ImageLocation - m_SynthesisBuffer) & 0x2) != 0);
 #if DBG
@@ -198,9 +178,7 @@ public:
         }
     }
 
-    // PutPixel():
-    // Place a pixel at the default cursor location.  The cursor location
-    // must be set via GetImageLocation(x, y).
+    // Place a pixel at the default cursor location. The cursor location must be set via GetImageLocation(x, y).
     void PutPixel(COLOR Color) override {
         if (Color != TRANSPARENT) {
             if (m_Parity) {

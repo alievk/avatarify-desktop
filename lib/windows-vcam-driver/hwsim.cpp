@@ -70,9 +70,8 @@ NTSTATUS CHardwareSimulation::Start(IN CImageSynthesizer *ImageSynth, IN LONGLON
                                     IN ULONG Height, IN ULONG ImageSize) {
     /*++
     Routine Description:
-        Start the hardware simulation.  This will kick the interrupts on,
-        begin issuing DPC's, filling in capture information, etc...
-        We keep track of starvation starting at this point.
+        Start the hardware simulation.  This will kick the interrupts on, begin issuing DPC's, filling in capture
+        information, etc... We keep track of starvation starting at this point.
     Arguments:
         ImageSynth -
             The image synthesizer to use to generate pictures to display on the capture buffer.

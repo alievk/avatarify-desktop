@@ -10,9 +10,9 @@ extern "C" {
 }
 
 #include <windef.h>
-#include <stdio.h>
+#include <cstdio>
 #include <ntstrsafe.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <windef.h>
 
 #define NOBITMAP
@@ -110,18 +110,16 @@ typedef enum _HARDWARE_STATE {
 *************************************************/
 
 // IHardwareSink:
-// This interface is used by the hardware simulation to fake interrupt
-// service routines.  The Interrupt method is called at DPC as a fake
-// interrupt.
+// This interface is used by the hardware simulation to fake interrupt service routines. The Interrupt method is called
+// at DPC as a fake interrupt.
 class IHardwareSink {
 public:
     virtual void Interrupt() = 0;
 };
 
 // ICaptureSink:
-// This is a capture sink interface.  The device level calls back the
-// CompleteMappings method passing the number of completed mappings for
-// the capture pin.  This method is called during the device DPC.
+// This is a capture sink interface. The device level calls back the CompleteMappings method passing the number of
+// completed mappings for the capture pin. This method is called during the device DPC.
 class ICaptureSink {
 public:
     virtual void CompleteMappings(IN ULONG NumMappings) = 0;

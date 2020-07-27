@@ -109,3 +109,5 @@ cmake-build-release
 *.exp
 .vs/
 CMake/
+/lib/windows-vcam-driver/x64/
+/lib/windows-vcam-driver/Debug/
