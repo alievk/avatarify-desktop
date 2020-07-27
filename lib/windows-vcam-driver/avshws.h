@@ -37,9 +37,13 @@ extern "C" {
 #include <ntstrsafe.h>
 #include <stdlib.h>
 #include <windef.h>
+
 #define NOBITMAP
+
 #include <mmreg.h>
+
 #undef NOBITMAP
+
 #include <unknown.h>
 #include <ks.h>
 #include <ksmedia.h>
@@ -71,13 +75,13 @@ const DebugLevel = DEBUGLVL_TERSE;
     }\
 }
 #else // !DBG
-   #define _DbgPrintF(lvl, strings)
+#define _DbgPrintF(lvl, strings)
 #endif // !DBG
 
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))
 
-#ifndef mmioFOURCC    
-#define mmioFOURCC( ch0, ch1, ch2, ch3 )                \
+#ifndef mmioFOURCC
+#define mmioFOURCC(ch0, ch1, ch2, ch3)                \
         ( (DWORD)(BYTE)(ch0) | ( (DWORD)(BYTE)(ch1) << 8 ) |    \
         ( (DWORD)(BYTE)(ch2) << 16 ) | ( (DWORD)(BYTE)(ch3) << 24 ) )
 #endif
@@ -114,43 +118,22 @@ const DebugLevel = DEBUGLVL_TERSE;
 //
 // filter.cpp externs:
 //
-extern
-const
-KSFILTER_DISPATCH
-CaptureFilterDispatch;
+extern const KSFILTER_DISPATCH CaptureFilterDispatch;
 
-extern
-const
-KSFILTER_DESCRIPTOR
-CaptureFilterDescriptor;
+extern const KSFILTER_DESCRIPTOR CaptureFilterDescriptor;
 
-extern
-const
-KSPIN_DESCRIPTOR_EX
-CaptureFilterPinDescriptors [CAPTURE_FILTER_PIN_COUNT];
+extern const KSPIN_DESCRIPTOR_EX CaptureFilterPinDescriptors[CAPTURE_FILTER_PIN_COUNT];
 
-extern
-const
-GUID
-CaptureFilterCategories [CAPTURE_FILTER_CATEGORIES_COUNT];
+extern const GUID CaptureFilterCategories[CAPTURE_FILTER_CATEGORIES_COUNT];
 
 //
 // capture.cpp externs:
 //
-extern 
-const
-KSALLOCATOR_FRAMING_EX
-CapturePinAllocatorFraming;
+extern const KSALLOCATOR_FRAMING_EX CapturePinAllocatorFraming;
 
-extern 
-const
-KSPIN_DISPATCH
-CapturePinDispatch;
+extern const KSPIN_DISPATCH CapturePinDispatch;
 
-extern
-const
-PKSDATARANGE
-CapturePinDataRanges [CAPTURE_PIN_DATA_RANGE_COUNT];
+extern const PKSDATARANGE CapturePinDataRanges[CAPTURE_PIN_DATA_RANGE_COUNT];
 
 /*************************************************
 
@@ -159,11 +142,9 @@ CapturePinDataRanges [CAPTURE_PIN_DATA_RANGE_COUNT];
 *************************************************/
 
 typedef enum _HARDWARE_STATE {
-
     HardwareStopped = 0,
     HardwarePaused,
     HardwareRunning
-
 } HARDWARE_STATE, *PHARDWARE_STATE;
 
 /*************************************************
@@ -180,14 +161,8 @@ typedef enum _HARDWARE_STATE {
 // interrupt.
 //
 class IHardwareSink {
-
 public:
-
-    virtual
-    void
-    Interrupt (
-        ) = 0;
-
+    virtual void Interrupt() = 0;
 };
 
 //
@@ -198,17 +173,9 @@ public:
 // the capture pin.  This method is called during the device DPC.
 //
 class ICaptureSink {
-
 public:
-
-    virtual
-    void
-    CompleteMappings (
-        IN ULONG NumMappings
-        ) = 0;
-
+    virtual void CompleteMappings(IN ULONG NumMappings) = 0;
 };
-
 
 
 /*************************************************
@@ -225,23 +192,19 @@ public:
 
 *************************************************/
 
-PVOID operator new
-(
-    size_t          iSize,
-    _When_((poolType & NonPagedPoolMustSucceed) != 0,
-       __drv_reportError("Must succeed pool allocations are forbidden. "
-             "Allocation failures cause a system crash"))
-    POOL_TYPE       poolType
+PVOID operator new(size_t iSize,
+                   _When_((poolType & NonPagedPoolMustSucceed) != 0,
+                          __drv_reportError("Must succeed pool allocations are forbidden. "
+                                            "Allocation failures cause a system crash"))
+                   POOL_TYPE poolType
 );
 
-PVOID operator new
-(
-    size_t          iSize,
-    _When_((poolType & NonPagedPoolMustSucceed) != 0,
-       __drv_reportError("Must succeed pool allocations are forbidden. "
-             "Allocation failures cause a system crash"))
-    POOL_TYPE       poolType,
-    ULONG           tag
+PVOID operator new(size_t iSize,
+                   _When_((poolType & NonPagedPoolMustSucceed) != 0,
+                          __drv_reportError("Must succeed pool allocations are forbidden. "
+                                            "Allocation failures cause a system crash"))
+                   POOL_TYPE poolType,
+                   ULONG tag
 );
 
 /*++
@@ -266,14 +229,12 @@ Return Value:
     None
 
 --*/
-PVOID 
-operator new[](
-    size_t          iSize,
-    _When_((poolType & NonPagedPoolMustSucceed) != 0,
-        __drv_reportError("Must succeed pool allocations are forbidden. "
-            "Allocation failures cause a system crash"))
-    POOL_TYPE       poolType,
-    ULONG           tag
+PVOID operator new[](size_t iSize,
+                     _When_((poolType & NonPagedPoolMustSucceed) != 0,
+                            __drv_reportError("Must succeed pool allocations are forbidden. "
+                                              "Allocation failures cause a system crash"))
+                     POOL_TYPE poolType,
+                     ULONG tag
 );
 
 /*++
@@ -292,11 +253,7 @@ Return Value:
     None
 
 --*/
-void 
-__cdecl 
-operator delete[](
-    PVOID pVoid
-);
+void __cdecl operator delete[](PVOID pVoid);
 
 /*++
 
@@ -317,11 +274,7 @@ Return Value:
     None
 
 --*/
-void __cdecl operator delete
-(
-    void *pVoid,
-    size_t /*size*/
-);
+void __cdecl operator delete(void *pVoid, size_t /*size*/);
 
 /*++
 
@@ -342,11 +295,7 @@ Return Value:
     None
 
 --*/
-void __cdecl operator delete[]
-(
-    void *pVoid,
-    size_t /*size*/
-);
+void __cdecl operator delete[](void *pVoid, size_t /*size*/);
 
 #endif // _NEW_DELETE_OPERATORS_
 
@@ -365,4 +314,5 @@ void __cdecl operator delete[]
 #include "filter.h"
 #include "capture.h"
 #include <uuids.h>
+
 #endif //_avshws_h_
