@@ -10,10 +10,10 @@
 #pragma code_seg("PAGE")
 #endif // ALLOC_PRAGMA
 
-#define DMAX_X 320
-#define DMAX_Y 240
-#define D_X 320
-#define D_Y 240
+#define DMAX_X 640
+#define DMAX_Y 480
+#define D_X 640
+#define D_Y 480
 
 CCapturePin::CCapturePin(IN PKSPIN Pin) : m_Pin(Pin), m_PresentationTime(0) {
     /*++
@@ -29,7 +29,7 @@ CCapturePin::CCapturePin(IN PKSPIN Pin) : m_Pin(Pin), m_PresentationTime(0) {
 
     PKSDEVICE Device = KsPinGetDevice(Pin);
 
-    // Set up our device pointer.  This gives us access to "hardware I/O" during the capture routines.
+    // Set up our device pointer. This gives us access to "hardware I/O" during the capture routines.
     m_Device = reinterpret_cast <CCaptureDevice *> (Device->Context);
 }
 
@@ -652,14 +652,13 @@ NTSTATUS CCapturePin::DispatchSetFormat(IN PKSPIN Pin, IN PKSDATAFORMAT OldForma
                                        (ULONG) abs(ConnectionFormat->VideoInfoHeader.bmiHeader.biHeight),
                                        &ImageSize)) {
                 Status = STATUS_INVALID_PARAMETER;
-            } else if (!MultiplyCheckOverflow(
-                    ImageSize,
-                    (ULONG) (ConnectionFormat->VideoInfoHeader.bmiHeader.biBitCount / 8),
-                    &ImageSize)) {
+            } else if (!MultiplyCheckOverflow(ImageSize,
+                                              (ULONG) (ConnectionFormat->VideoInfoHeader.bmiHeader.biBitCount / 8),
+                                              &ImageSize)) {
                 // We only support KS_BI_RGB (24) and KS_BI_YUV422 (16), so this is valid for those formats.
                 Status = STATUS_INVALID_PARAMETER;
             } else if (ConnectionFormat->VideoInfoHeader.bmiHeader.biSizeImage < ImageSize) {
-                // Valid for the formats we use.  Otherwise, this would be checked later.
+                // Valid for the formats we use. Otherwise, this would be checked later.
                 Status = STATUS_INVALID_PARAMETER;
             } else {
                 // We can accept the format.
@@ -783,8 +782,7 @@ void CCapturePin::CompleteMappings(IN ULONG NumMappings) {
 
 // This is the data range description of the RGB24 capture format we support.
 const KS_DATARANGE_VIDEO FormatRGB24Bpp_Capture = {
-        // KSDATARANGE
-        {
+        {  // KSDATARANGE
                 sizeof(KS_DATARANGE_VIDEO),                // FormatSize
                 0,                                          // Flags
                 D_X * D_Y * 3,                              // SampleSize
@@ -795,18 +793,14 @@ const KS_DATARANGE_VIDEO FormatRGB24Bpp_Capture = {
                 0xaf, 0x0b, 0xa7, 0x70,                 // aka. MEDIASUBTYPE_RGB24,
                 STATICGUIDOF (KSDATAFORMAT_SPECIFIER_VIDEOINFO) // aka. FORMAT_VideoInfo
         },
-
         TRUE,               // BOOL,  bFixedSizeSamples (all samples same size?)
         FALSE,              // BOOL,  bTemporalCompression (all I frames?)
         0,                  // Reserved (was StreamDescriptionFlags)
-        0,                  // Reserved (was MemoryAllocationFlags
-        //           (KS_VIDEO_ALLOC_*))
-        // _KS_VIDEO_STREAM_CONFIG_CAPS
-        {
+        0,                  // Reserved (was MemoryAllocationFlags (KS_VIDEO_ALLOC_*))
+        {  // _KS_VIDEO_STREAM_CONFIG_CAPS
                 STATICGUIDOF(KSDATAFORMAT_SPECIFIER_VIDEOINFO), // GUID
                 KS_AnalogVideo_None,                            // AnalogVideoStandard
-                D_X, D_Y,        // InputSize, (the inherent size of the incoming signal
-                //             with every digitized pixel unique)
+                D_X, D_Y,        // InputSize, (inherent size of the incoming signal with every digitized pixel unique)
                 D_X, D_Y,        // MinCroppingSize, smallest rcSrc cropping rect allowed
                 D_X, D_Y,        // MaxCroppingSize, largest  rcSrc cropping rect allowed
                 8,              // CropGranularityX, granularity of cropping size
@@ -826,8 +820,7 @@ const KS_DATARANGE_VIDEO FormatRGB24Bpp_Capture = {
                 8 * 3 * 30 * D_X * D_Y,  // MinBitsPerSecond;
                 8 * 3 * 30 * D_X * D_Y   // MaxBitsPerSecond;
         },
-        // KS_VIDEOINFOHEADER (default format)
-        {
+        {  // KS_VIDEOINFOHEADER (default format)
                 0, 0, 0, 0,                            // RECT  rcSource;
                 0, 0, 0, 0,                            // RECT  rcTarget;
                 D_X * D_Y * 3 * 8 * 30,             // DWORD dwBitRate;
@@ -849,8 +842,7 @@ const KS_DATARANGE_VIDEO FormatRGB24Bpp_Capture = {
 
 // This is the data range description of the YUY2 format we support.
 const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
-        // KSDATARANGE
-        {
+        {  // KSDATARANGE
                 sizeof(KS_DATARANGE_VIDEO),            // FormatSize
                 0,                                      // Flags
                 DMAX_X * DMAX_Y * 2,                    // SampleSize
@@ -860,19 +852,14 @@ const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
                 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71,     //aka. MEDIASUBTYPE_YUY2,
                 STATICGUIDOF (KSDATAFORMAT_SPECIFIER_VIDEOINFO) // aka. FORMAT_VideoInfo
         },
-
         TRUE,               // BOOL,  bFixedSizeSamples (all samples same size?)
         FALSE,              // BOOL,  bTemporalCompression (all I frames?)
         0,                  // Reserved (was StreamDescriptionFlags)
-        0,                  // Reserved (was MemoryAllocationFlags
-        //           (KS_VIDEO_ALLOC_*))
-
-        // _KS_VIDEO_STREAM_CONFIG_CAPS
-        {
+        0,                  // Reserved (was MemoryAllocationFlags (KS_VIDEO_ALLOC_*))
+        {  // _KS_VIDEO_STREAM_CONFIG_CAPS
                 STATICGUIDOF(KSDATAFORMAT_SPECIFIER_VIDEOINFO), // GUID
                 KS_AnalogVideo_None,                            // AnalogVideoStandard
-                DMAX_X, DMAX_Y, // InputSize, (the inherent size of the incoming signal
-                //             with every digitized pixel unique)
+                DMAX_X, DMAX_Y, // InputSize, (inherent size of the incoming signal with every digitized pixel unique)
                 D_X, D_Y,        // MinCroppingSize, smallest rcSrc cropping rect allowed
                 DMAX_X, DMAX_Y, // MaxCroppingSize, largest  rcSrc cropping rect allowed
                 8,              // CropGranularityX, granularity of cropping size
@@ -892,8 +879,7 @@ const KS_DATARANGE_VIDEO FormatYUY2_Capture = {
                 8 * 2 * 30 * D_X * D_Y,  // MinBitsPerSecond;
                 8 * 2 * 30 * DMAX_X * DMAX_Y,   // MaxBitsPerSecond;
         },
-        // KS_VIDEOINFOHEADER (default format)
-        {
+        {  // KS_VIDEOINFOHEADER (default format)
                 0, 0, 0, 0,                         // RECT  rcSource;
                 0, 0, 0, 0,                         // RECT  rcTarget;
                 DMAX_X * DMAX_Y * 2 * 8 * 30,       // DWORD dwBitRate;

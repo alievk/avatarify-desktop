@@ -1,31 +1,21 @@
 #include "avshws.h"
 
-PVOID operator new(size_t iSize,
-                   _When_((poolType & NonPagedPoolMustSucceed) != 0,
-                          __drv_reportError("Must succeed pool allocations are forbidden. "
-                                            "Allocation failures cause a system crash"))
-                   POOL_TYPE poolType) {
+auto reportError = "Must succeed pool allocations are forbidden. Allocation failures cause a system crash";
+
+PVOID operator new(size_t iSize, _When_((poolType & NonPagedPoolMustSucceed) != 0,
+                                        __drv_reportError(reportError)) POOL_TYPE poolType) {
     return ExAllocatePoolZero(poolType, iSize, 'wNCK');
 }
 
-PVOID operator new(size_t iSize,
-                   _When_((poolType & NonPagedPoolMustSucceed) != 0,
-                          __drv_reportError("Must succeed pool allocations are forbidden. "
-                                            "Allocation failures cause a system crash"))
-                   POOL_TYPE poolType,
-                   ULONG tag) {
+PVOID operator new(size_t iSize, _When_((poolType & NonPagedPoolMustSucceed) != 0,
+                                        __drv_reportError(reportError)) POOL_TYPE poolType, ULONG tag) {
     return ExAllocatePoolZero(poolType, iSize, tag);
 }
 
-PVOID operator new[](size_t iSize,
-                     _When_((poolType & NonPagedPoolMustSucceed) != 0,
-                            __drv_reportError("Must succeed pool allocations are forbidden. "
-                                              "Allocation failures cause a system crash"))
-                     POOL_TYPE poolType,
-                     ULONG tag) {
+PVOID operator new[](size_t iSize, _When_((poolType & NonPagedPoolMustSucceed) != 0,
+                                          __drv_reportError(reportError)) POOL_TYPE poolType, ULONG tag) {
     return ExAllocatePoolZero(poolType, iSize, tag);
 }
-
 
 void __cdecl operator delete[](PVOID pVoid) {
     /*++
@@ -67,6 +57,7 @@ void __cdecl operator delete[](void *pVoid, size_t /*size*/) {
     Return Value:
         None
     --*/
+
     if (pVoid) {
         ExFreePool(pVoid);
     }
@@ -233,13 +224,11 @@ NTSTATUS CCaptureDevice::AcquireHardwareResources(IN ICaptureSink *CaptureSink,
         // Create the necessary type of image synthesizer.
         if (m_VideoInfoHeader->bmiHeader.biBitCount == 24 &&
             m_VideoInfoHeader->bmiHeader.biCompression == KS_BI_RGB) {
-
             // If we're RGB24, create a new RGB24 synth. RGB24 surfaces can be in either orientation.
             // The origin is lower left if height < 0. Otherwise, it's upper left.
             m_ImageSynth = new(NonPagedPoolNx, 'RysI') CRGB24Synthesizer(m_VideoInfoHeader->bmiHeader.biHeight >= 0);
         } else if (m_VideoInfoHeader->bmiHeader.biBitCount == 16 &&
-                   (m_VideoInfoHeader->bmiHeader.biCompression == FOURCC_YUY2)) {
-
+                   m_VideoInfoHeader->bmiHeader.biCompression == FOURCC_YUY2) {
             // If we're UYVY, create the YUV synth.
             m_ImageSynth = new(NonPagedPoolNx, 'YysI') CYUVSynthesizer;
         } else {

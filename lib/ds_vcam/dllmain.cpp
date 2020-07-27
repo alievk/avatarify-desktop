@@ -18,7 +18,7 @@
 
 #include "stdafx.h"
 #include "CVCamFilter.h"
-#include "Log.h"
+#include "utils/Log.h"
 
 
 #define CreateComObject(clsid, iid, var) CoCreateInstance( clsid, NULL, CLSCTX_INPROC_SERVER, iid, (void **)&var);

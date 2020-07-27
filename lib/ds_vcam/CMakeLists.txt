@@ -27,9 +27,7 @@ set(SOURCES
         dllmain.cpp
         DSVCam.def
         stdafx.h
-        Log.h
-        utils/base64.cpp
-        utils/base64.h
+        utils/Log.h
         )
 
 set(CMAKE_ENABLE_EXPORTS TRUE)

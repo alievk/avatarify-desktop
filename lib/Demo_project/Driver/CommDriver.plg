@@ -1,0 +1,48 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: CommDriver - Win32 Free--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP7D.tmp" with contents
+[
+/nologo /Gz /ML /W3 /WX /Oy /Gy /I "E:\NTDDK\inc\ddk" /I "E:\NTDDK\inc" /I "i386\\" /I "." /I "E:\PROGRA~1\NuMega\DRIVER~1\DRIVER~3\..\common\include\stl" /I "E:\NTDDK\inc\ddk\wdm" /I "E:\NTDDK\inc\win98" /FI"E:\NTDDK\inc\warning.h" /D WIN32=100 /D "STD_CALL" /D CONDITION_HANDLING=1 /D NT_UP=1 /D NT_INST=0 /D _NT1X_=100 /D WINNT=1 /D _WIN32_WINNT=0x0400 /D WIN32_LEAN_AND_MEAN=1 /D DEVL=1 /D FPO=1 /D "_IDWBUILD" /D "NDEBUG" /D _DLL=1 /D _X86_=1 /D i386=1 /FR"Free/" /Fo"Free/" /Oxs /Zel -cbstring /QIfdiv- /QIf /GF /c 
+"E:\Article\Driver\CommDriver.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP7D.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP7E.tmp" with contents
+[
+int64.lib ntoskrnl.lib hal.lib /nologo /base:"0x10000" /version:4.0 /entry:"DriverEntry" /incremental:no /pdb:"Free/CommDriver.pdb" /machine:IX86 /nodefaultlib /out:"obj\i386\Free\CommDriver.sys" /libpath:"E:\NTDDK\libfre\i386" /libpath:"E:\NTDDK\\" /libpath:"E:\NTDDK\lib\i386\free" /driver /debug:MINIMAL /IGNORE:4001,4037,4039,4065,4070,4078,4087,4089,4096,4210 /MERGE:_PAGE=PAGE /MERGE:_TEXT=.text /SECTION:INIT,d /MERGE:.rdata=.text /FULLBUILD /RELEASE /FORCE:MULTIPLE /OPT:REF /align:0x20 /osversion:4.00 /subsystem:native 
+.\Free\CommDriver.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP7E.tmp"
+<h3>Output Window</h3>
+Compiling...
+CommDriver.c
+Linking...
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP80.bat" with contents
+[
+@echo off
+E:\PROGRA~1\NuMega\DRIVER~1\SoftICE\nmsym.exe /translate:source,package,always obj\i386\Free\CommDriver.sys
+copy obj\i386\Free\CommDriver.sys ..\Bin
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP80.bat"
+Generating SoftICE Symbol file CommDriver.nms
+
+Compuware NM32 Symbol Translator/Loader version 1.24
+(C) Compuware  Technologies, 1996-2000
+
+MODULE=obj\i386\Free\CommDriver.sys
+PROMPT=OFF
+Translation of E:\Article\Driver\obj\i386\Free\CommDriver.sys successfully completed
+已复制         1 个文件。
+
+
+
+<h3>Results</h3>
+CommDriver.sys - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

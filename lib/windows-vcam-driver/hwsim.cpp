@@ -28,7 +28,7 @@ CHardwareSimulation::CHardwareSimulation(IN IHardwareSink *HardwareSink) :
     Routine Description:
         Construct a hardware simulation
     Arguments:
-        HardwareSink - The hardware sink interface.  This is used to trigger fake interrupt service routines from.
+        HardwareSink - The hardware sink interface. This is used to trigger fake interrupt service routines from.
     Return Value:
         Success / Failure
     --*/
@@ -68,11 +68,11 @@ NTSTATUS CHardwareSimulation::Start(IN CImageSynthesizer *ImageSynth, IN LONGLON
                                     IN ULONG Height, IN ULONG ImageSize) {
     /*++
     Routine Description:
-        Start the hardware simulation.  This will kick the interrupts on, begin issuing DPC's, filling in capture
+        Start the hardware simulation. This will kick the interrupts on, begin issuing DPC's, filling in capture
         information, etc... We keep track of starvation starting at this point.
     Arguments:
         ImageSynth - The image synthesizer to use to generate pictures to display on the capture buffer.
-        TimePerFrame - The time per frame...  we issue interrupts this often.
+        TimePerFrame - The time per frame... we issue interrupts this often.
         Width - The image width
         Height - The image height
         ImageSize - The size of the image.  We allocate a temporary scratch buffer based on this size to fake hardware.
@@ -201,8 +201,8 @@ NTSTATUS CHardwareSimulation::Stop() {
 
     m_HardwareState = HardwareStopped;
 
-    // The image synthesizer may still be around. Just for safety's sake, NULL out the image synthesis buffer
-    // and toast it.
+    // The image synthesizer may still be around.
+    // Just for safety's sake, NULL out the image synthesis buffer and toast it.
     m_ImageSynth->SetBuffer(nullptr);
 
     if (m_SynthesisBuffer) {
@@ -282,7 +282,6 @@ ULONG CHardwareSimulation::ProgramScatterGatherMappings(IN PKSSTREAM_POINTER Clo
         auto Entry = reinterpret_cast <PSCATTER_GATHER_ENTRY> (
                 ExAllocateFromNPagedLookasideList(&m_ScatterGatherLookaside)
         );
-
         if (!Entry) {
             break;
         }
@@ -376,7 +375,7 @@ NTSTATUS CHardwareSimulation::FillScatterGatherBuffers() {
 /*************************************************/
 
 
-void CHardwareSimulation:: FakeHardware( ){
+void CHardwareSimulation::FakeHardware() {
     /*++
     Routine Description:
         Simulate an interrupt and what the hardware would have done in the time since the previous interrupt.
@@ -391,43 +390,8 @@ void CHardwareSimulation:: FakeHardware( ){
     // The hardware can be in a pause state in which case, it issues interrupts but does not complete mappings.
     // In this case, don't bother synthesizing a frame and doing the work of looking through the mappings table.
     if (m_HardwareState == HardwareRunning) {
-        // Generate a "time stamp" just to overlay it onto the capture image.
-        // It makes it more exciting than bars that do nothing.
-        LONGLONG PtsRel = ((m_InterruptTime + 1) * m_TimePerFrame);
-
-        auto Min = (ULONG) (PtsRel / 600000000);
-        auto RemMin = (ULONG) (PtsRel % 600000000);
-        auto Sec = (ULONG) (RemMin / 10000000);
-        auto RemSec = (ULONG) (RemMin % 10000000);
-        auto Hund = (ULONG) (RemSec / 100000);
-
         // Synthesize a buffer in scratch space.
-        m_ImageSynth->SynthesizeBars();
-
-        CHAR Text[256];
-        Text[0] = '\0';
-        (void) RtlStringCbPrintfA(Text, sizeof(Text), "%ld:%02ld.%02ld", Min, Sec, Hund);
-
-        // Overlay a clock onto the scratch space image.
-        m_ImageSynth->OverlayText(
-                POSITION_CENTER,
-                (m_Height - 28),
-                1,
-                Text,
-                BLACK,
-                WHITE
-        );
-
-        // Overlay a counter of skipped frames onto the scratch image.
-        (void) RtlStringCbPrintfA(Text, sizeof(Text), "Skipped: %ld", m_NumFramesSkipped);
-        m_ImageSynth->OverlayText(
-                10,
-                10,
-                1,
-                Text,
-                TRANSPARENT,
-                BLUE
-        );
+        m_ImageSynth->UpdateFrame();
 
         // Fill scatter gather buffers
         if (!NT_SUCCESS (FillScatterGatherBuffers())) {
@@ -442,7 +406,7 @@ void CHardwareSimulation:: FakeHardware( ){
     if (!m_StopHardware) {
         // Reschedule the timer for the next interrupt time.
         LARGE_INTEGER NextTime;
-        NextTime.QuadPart = m_StartTime.QuadPart +  (m_TimePerFrame * (m_InterruptTime + 1));
+        NextTime.QuadPart = m_StartTime.QuadPart + (m_TimePerFrame * (m_InterruptTime + 1));
         KeSetTimer(&m_IsrTimer, NextTime, &m_IsrFakeDpc);
     } else {
         // If someone is waiting on the hardware to stop, raise the stop event and clear the flag.

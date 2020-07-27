@@ -140,7 +140,7 @@ else FILELog().Get(level)
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
-#include <windows.h>
+#include <Windows.h>
 
 inline std::string NowTime() {
     const int MAX_LEN = 200;

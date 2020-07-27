@@ -144,6 +144,8 @@
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>avshws</TargetName>
+    <IncludePath>C:\SDKs\boost_1_72_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\SDKs\boost_1_72_0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>avshws</TargetName>
