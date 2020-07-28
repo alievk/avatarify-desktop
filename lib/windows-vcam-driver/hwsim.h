@@ -67,6 +67,8 @@ private:
     // The hardware sink that will be used for interrupt notifications.
     IHardwareSink *m_HardwareSink;
 
+    PUCHAR m_inBuffer;
+
     // This is called by the hardware simulation to fill a series of scatter / gather buffers with synthesized data.
     NTSTATUS FillScatterGatherBuffers();
 
@@ -77,7 +79,7 @@ public:
 
     // The hardware simulation constructor.  Since the new operator will
     // have zeroed the memory, only initialize non-NULL, non-0 fields.
-    explicit CHardwareSimulation(IN IHardwareSink *HardwareSink);
+    CHardwareSimulation(IN IHardwareSink *HardwareSink, PUCHAR inBuffer);
 
     // The hardware simulation destructor.
     ~CHardwareSimulation() = default;
@@ -109,7 +111,7 @@ public:
                                        IN ULONG MappingsCount, IN ULONG MappingStride);
 
     // Initialize a piece of simulated hardware.
-    static CHardwareSimulation *Initialize(IN KSOBJECT_BAG Bag, IN IHardwareSink *HardwareSink);
+//    static CHardwareSimulation *Initialize(IN KSOBJECT_BAG Bag, IN IHardwareSink *HardwareSink);
 
     // Read the number of mappings completed since the last hardware reset.
     ULONG ReadNumberOfMappingsCompleted() const;

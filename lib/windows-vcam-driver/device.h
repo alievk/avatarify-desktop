@@ -54,6 +54,10 @@ public:
     // The capture device destructor.
     ~CCaptureDevice() = default;
 
+    static NTSTATUS MyCamCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp);
+
+    static NTSTATUS MyCamDeviceControl(PDEVICE_OBJECT DeviceObject, PIRP Irp);
+
     // This is the Add Device dispatch for the capture device. It creates the CCaptureDevice and associates it with
     // the device via the bag.
     static NTSTATUS DispatchCreate(IN PKSDEVICE Device);

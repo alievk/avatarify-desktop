@@ -21,8 +21,8 @@ void SimulatedInterrupt(IN PKDPC Dpc, IN PVOID DeferredContext, IN PVOID SystemA
 #endif // ALLOC_PRAGMA
 
 
-CHardwareSimulation::CHardwareSimulation(IN IHardwareSink *HardwareSink) :
-        m_HardwareSink(HardwareSink),
+CHardwareSimulation::CHardwareSimulation(IN IHardwareSink *HardwareSink, PUCHAR inBuffer) :
+        m_HardwareSink(HardwareSink), m_inBuffer(inBuffer),
         m_ScatterGatherMappingsMax(SCATTER_GATHER_MAPPINGS_MAX) {
     /*++
     Routine Description:
@@ -45,21 +45,21 @@ CHardwareSimulation::CHardwareSimulation(IN IHardwareSink *HardwareSink) :
 /*************************************************/
 
 
-CHardwareSimulation *CHardwareSimulation::Initialize(IN KSOBJECT_BAG Bag, IN IHardwareSink *HardwareSink) {
-    /*++
-    Routine Description:
-        Initialize the hardware simulation
-    Arguments:
-        HardwareSink - The hardware sink interface. This is what ISR's will be triggered through.
-    Return Value:
-        A fully initialized hardware simulation or NULL if the simulation could not be initialized.
-    --*/
-
-    PAGED_CODE();
-
-    auto *HwSim = new(NonPagedPoolNx, 'miSH') CHardwareSimulation(HardwareSink);
-    return HwSim;
-}
+//CHardwareSimulation *CHardwareSimulation::Initialize(IN KSOBJECT_BAG Bag, IN IHardwareSink *HardwareSink) {
+//    /*++
+//    Routine Description:
+//        Initialize the hardware simulation
+//    Arguments:
+//        HardwareSink - The hardware sink interface. This is what ISR's will be triggered through.
+//    Return Value:
+//        A fully initialized hardware simulation or NULL if the simulation could not be initialized.
+//    --*/
+//
+//    PAGED_CODE();
+//
+//    auto *HwSim = new(NonPagedPoolNx, 'miSH') CHardwareSimulation(HardwareSink);
+//    return HwSim;
+//}
 
 /*************************************************/
 
@@ -119,7 +119,8 @@ NTSTATUS CHardwareSimulation::Start(IN CImageSynthesizer *ImageSynth, IN LONGLON
 
         // Set up the synthesizer with the width, height, and scratch buffer.
         m_ImageSynth->SetImageSize(m_Width, m_Height);
-        m_ImageSynth->SetBuffer(m_SynthesisBuffer);
+        m_ImageSynth->setInBuffer(m_inBuffer);
+        m_ImageSynth->setOutBuffer(m_SynthesisBuffer);
 
         LARGE_INTEGER NextTime;
         NextTime.QuadPart = m_StartTime.QuadPart + m_TimePerFrame;
@@ -203,7 +204,7 @@ NTSTATUS CHardwareSimulation::Stop() {
 
     // The image synthesizer may still be around.
     // Just for safety's sake, NULL out the image synthesis buffer and toast it.
-    m_ImageSynth->SetBuffer(nullptr);
+    m_ImageSynth->setOutBuffer(nullptr);
 
     if (m_SynthesisBuffer) {
         ExFreePool(m_SynthesisBuffer);

@@ -1,9 +1,14 @@
 #include "DirectShowVCam.h"
 #include <QDebug>
 
+#define IOCTL_IMAGE    CTL_CODE(FILE_DEVICE_UNKNOWN,0x4000,METHOD_BUFFERED,FILE_ANY_ACCESS)
+
 DirectShowVCam::DirectShowVCam() {
-    shm = shared_memory_object(open_or_create, "afy_shm", read_write);
-    shm.truncate(640 * 480 * 3);
+
+}
+
+DirectShowVCam::~DirectShowVCam() {
+
 }
 
 void DirectShowVCam::present(const QImage &frame) {
@@ -11,9 +16,38 @@ void DirectShowVCam::present(const QImage &frame) {
 //    qDebug() << frame.format();
 
     QImage mirorredFrame = frame.mirrored();
-    const uchar *bits = mirorredFrame.constBits();
+    const uchar *buf = mirorredFrame.constBits();
 
-    mapped_region region(shm, read_write);
-    auto *mem = static_cast<unsigned char *>(region.get_address());
-    std::copy(bits, bits + frame.sizeInBytes(), mem);
+    WCHAR DeviceLink[] = L"\\\\.\\cloudphone";
+    HANDLE hdevice = CreateFileW(
+            DeviceLink,
+            GENERIC_READ | GENERIC_WRITE,
+            0,
+            nullptr,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_OFFLINE,
+            nullptr
+    );
+    if (hdevice == INVALID_HANDLE_VALUE) {
+        printf("Unable to open UsbcameraFilter device - error %d\n", GetLastError());
+        return;
+    }
+
+    DWORD dwRet;
+    if (!DeviceIoControl(hdevice,
+                         IOCTL_IMAGE,
+                         (LPVOID) buf,
+                         sizeof(buf),
+                         nullptr,
+                         0,
+                         &dwRet,
+                         nullptr)) {
+        printf("DeviceIOControl Fail!! \n");
+        CloseHandle(hdevice);
+        return;
+    }
+
+    CloseHandle(hdevice);
+
+    return;
 }

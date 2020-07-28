@@ -10,7 +10,8 @@ protected:
     ULONG m_bytesPerPixel;
     ULONG m_Width;
     ULONG m_Height;
-    PUCHAR m_Buffer;
+    PUCHAR m_inBuffer;
+    PUCHAR m_outBuffer;
 
 public:
     void SetImageSize(ULONG Width, ULONG Height) {
@@ -18,8 +19,12 @@ public:
         m_Height = Height;
     }
 
-    void SetBuffer(PUCHAR SynthesisBuffer) {
-        m_Buffer = SynthesisBuffer;
+    void setInBuffer(PUCHAR buffer) {
+        m_inBuffer = buffer;
+    }
+
+    void setOutBuffer(PUCHAR buffer) {
+        m_outBuffer = buffer;
     }
 
     ULONG GetBytesPerPixel() const {
@@ -29,7 +34,7 @@ public:
     void UpdateFrame() const;
 
     explicit CImageSynthesizer(ULONG bytesPerPixel) : m_bytesPerPixel(bytesPerPixel), m_Width(0), m_Height(0),
-                                                      m_Buffer(nullptr) {}
+                                                      m_inBuffer(nullptr), m_outBuffer(nullptr) {}
 
     virtual ~CImageSynthesizer() = default;
 };

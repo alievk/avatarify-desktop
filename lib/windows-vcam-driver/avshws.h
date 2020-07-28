@@ -35,7 +35,7 @@ extern "C" {
 #define DEBUGLVL_TERSE 1
 #define DEBUGLVL_ERROR 0
 
-const DebugLevel = DEBUGLVL_TERSE;
+const int DebugLevel = DEBUGLVL_TERSE;
 
 #if (DBG)
 #define _DbgPrintF(lvl, strings) \

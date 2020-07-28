@@ -77,10 +77,92 @@ void __cdecl operator delete(PVOID pVoid) {
 #pragma code_seg("PAGE")
 #endif // ALLOC_PRAGMA
 
+
+#define IOCTL_IMAGE    CTL_CODE(FILE_DEVICE_UNKNOWN,0x4000,METHOD_BUFFERED,FILE_ANY_ACCESS)
+
+typedef long(*DispatchFunctionPtr)(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp);
+
+DispatchFunctionPtr fpClassDispatchfunction;
+DispatchFunctionPtr fpClassCreatefunction;
+UNICODE_STRING DeviceLink;
+UNICODE_STRING DeviceName;
+UCHAR psyImageBuf_[640 * 480 * 3];
+
+
+NTSTATUS CCaptureDevice::MyCamCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+    PIO_STACK_LOCATION irpStack = IoGetCurrentIrpStackLocation(Irp);
+
+    if (irpStack->Parameters.Create.FileAttributes == FILE_ATTRIBUTE_OFFLINE) {
+        UNREFERENCED_PARAMETER(DeviceObject);
+        PAGED_CODE();
+        Irp->IoStatus.Status = STATUS_SUCCESS;
+        Irp->IoStatus.Information = 0;
+        IoCompleteRequest(Irp, IO_NO_INCREMENT);
+        return STATUS_SUCCESS;
+    }
+    return fpClassCreatefunction(DeviceObject, Irp);
+}
+
+NTSTATUS CCaptureDevice::MyCamDeviceControl(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+    PIO_STACK_LOCATION irpStack = IoGetCurrentIrpStackLocation(Irp);
+    ULONG ioControlCode;
+//    UCHAR *inBuf;
+    ULONG inBufLength = 0;
+    ioControlCode = irpStack->Parameters.DeviceIoControl.IoControlCode;
+
+    switch (irpStack->MajorFunction) {
+        case IRP_MJ_CREATE:
+            DbgPrint("Create \n");
+            break;
+
+        case IRP_MJ_CLOSE:
+            DbgPrint("Close \n");
+            break;
+
+        case IRP_MJ_CLEANUP:
+            DbgPrint("Cleanup \n");
+            break;
+        case IRP_MJ_DEVICE_CONTROL:
+            switch (ioControlCode) {
+                case IOCTL_IMAGE:
+
+                    inBufLength = irpStack->Parameters.DeviceIoControl.InputBufferLength;
+                    inBuf = (UCHAR *) Irp->AssociatedIrp.SystemBuffer;
+
+                    RtlCopyBytes(psyImageBuf_, inBuf, inBufLength);
+                    //} else {
+                    //	DbgPrint("[!] IOCTL : IOCTL_TEST - inBufLength Fail\n");
+                    //}
+                    ntStatus = STATUS_SUCCESS;
+                    break;
+                default:
+                    ntStatus = STATUS_NOT_SUPPORTED;
+                    break;
+            }
+            break;
+        default:
+            ntStatus = STATUS_NOT_SUPPORTED;
+            break;
+
+    }
+
+    // Complete Irp
+    if (ntStatus == STATUS_SUCCESS) {
+        // Real return status set in Irp->IoStatus.Status
+        Irp->IoStatus.Status = ntStatus;
+        IoCompleteRequest(Irp, IO_NO_INCREMENT);
+        ntStatus = STATUS_SUCCESS;
+    } else {
+        ntStatus = fpClassDispatchfunction(DeviceObject, Irp);
+    }
+    return ntStatus;
+}
+
 NTSTATUS CCaptureDevice::DispatchCreate(IN PKSDEVICE Device) {
     /*++
     Routine Description:
-        Create the capture device.  This is the creation dispatch for the capture device.
+        Create the capture device. This is the creation dispatch for the capture device.
     Arguments:
         Device - The AVStream device being created.
     Return Value:
@@ -150,7 +232,7 @@ NTSTATUS CCaptureDevice::PnpStart(IN PCM_RESOURCE_LIST TranslatedResourceList,
     // for example). Thus, we only perform creations of the simulation on the initial start and ignore any
     // subsequent start. Hardware drivers with resources should evaluate resources and make changes on 2nd start.
     if (NT_SUCCESS(Status) && (!m_Device->Started)) {
-        m_HardwareSimulation = new(NonPagedPoolNx, 'miSH') CHardwareSimulation(this);
+        m_HardwareSimulation = new(NonPagedPoolNx, 'miSH') CHardwareSimulation(this, psyImageBuf_);
         if (!m_HardwareSimulation) {
             // If we couldn't create the hardware simulation, fail.
             Status = STATUS_INSUFFICIENT_RESOURCES;
@@ -438,18 +520,18 @@ DEFINE_KSFILTER_DESCRIPTOR_TABLE (FilterDescriptors) {&CaptureFilterDescriptor};
 const KSDEVICE_DISPATCH CaptureDeviceDispatch = {
         CCaptureDevice::DispatchCreate,         // Pnp Add Device
         CCaptureDevice::DispatchPnpStart,       // Pnp Start
-        nullptr,                                   // Post-Start
-        nullptr,                                   // Pnp Query Stop
-        nullptr,                                   // Pnp Cancel Stop
+        nullptr,                                // Post-Start
+        nullptr,                                // Pnp Query Stop
+        nullptr,                                // Pnp Cancel Stop
         CCaptureDevice::DispatchPnpStop,        // Pnp Stop
-        nullptr,                                   // Pnp Query Remove
-        nullptr,                                   // Pnp Cancel Remove
-        nullptr,                                   // Pnp Remove
-        nullptr,                                   // Pnp Query Capabilities
-        nullptr,                                   // Pnp Surprise Removal
-        nullptr,                                   // Power Query Power
-        nullptr,                                   // Power Set Power
-        nullptr                                    // Pnp Query Interface
+        nullptr,                                // Pnp Query Remove
+        nullptr,                                // Pnp Cancel Remove
+        nullptr,                                // Pnp Remove
+        nullptr,                                // Pnp Query Capabilities
+        nullptr,                                // Pnp Surprise Removal
+        nullptr,                                // Power Query Power
+        nullptr,                                // Power Set Power
+        nullptr                                 // Pnp Query Interface
 };
 
 // This is the device descriptor for the capture device. It points to the dispatch table and contains a list of filter
@@ -465,6 +547,9 @@ const KSDEVICE_DESCRIPTOR CaptureDeviceDescriptor = {
     INITIALIZATION CODE
 **************************************************************************/
 
+#define DEVICE_NAME      L"\\Device\\cloudphone"
+#define LINK_NAME     L"\\DosDevices\\cloudphone"
+
 extern "C" DRIVER_INITIALIZE DriverEntry;
 
 extern "C" NTSTATUS DriverEntry(IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRING RegistryPath) {
@@ -478,6 +563,30 @@ extern "C" NTSTATUS DriverEntry(IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRI
     Return Value:
         As from KsInitializeDriver
     --*/
+
+    NTSTATUS ntStatus;
+    UNREFERENCED_PARAMETER(RegistryPath);
+    RtlInitUnicodeString(&DeviceName, DEVICE_NAME);
+    RtlInitUnicodeString(&DeviceLink, LINK_NAME);
+
+    ntStatus = IoCreateDevice(DriverObject, 0, &DeviceName,
+                              FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE,
+                              &DriverObject->DeviceObject);
+
+    if (!NT_SUCCESS(ntStatus)) {
+        DbgPrint("Couldn't create the device object");
+        return ntStatus;
+    }
+
+    ntStatus = IoCreateSymbolicLink(&DeviceLink, &DeviceName);
+    if (!NT_SUCCESS(ntStatus)) {
+        DbgPrint("not success fxxk symbolic link");
+    }
+
+    fpClassCreatefunction = DriverObject->MajorFunction[IRP_MJ_CREATE];
+    DriverObject->MajorFunction[IRP_MJ_CREATE] = CCaptureDevice::MyCamCreate;
+    fpClassDispatchfunction = DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL];
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = CCaptureDevice::MyCamDeviceControl;
 
     // Simply pass the device descriptor and parameters off to AVStream to initialize us. This will cause filter
     // factories to be set up at add & start. Everything is done based on the descriptors passed here.
