@@ -4,7 +4,7 @@
 
 #include <QImage>
 
-class AbstractVCam : public QObject {
+class AbstractVCamInterface : public QObject {
 Q_OBJECT
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled)
 public:

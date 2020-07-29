@@ -1,14 +1,14 @@
 #ifndef DRIVERVCAM_H
 #define DRIVERVCAM_H
 
-#include <src/vcam/AbstractVCam.h>
+#include <src/vcam/AbstractVCamInterface.h>
 #include <windows.h>
 
-class DriverVCam : public AbstractVCam {
+class DriverVCamBridge : public AbstractVCamInterface {
 public:
-    DriverVCam();
+    DriverVCamBridge();
 
-    ~DriverVCam() override;
+    ~DriverVCamBridge() override;
 
     void present(const QImage &frame) override;
 

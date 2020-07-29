@@ -1,12 +1,12 @@
-#include "DirectShowVCam.h"
+#include "DirectShowVCamBridge.h"
 #include <QDebug>
 
-DirectShowVCam::DirectShowVCam() {
+DirectShowVCamBridge::DirectShowVCamBridge() {
     shm = shared_memory_object(open_or_create, "afy_shm", read_write);
     shm.truncate(640 * 480 * 3);
 }
 
-void DirectShowVCam::present(const QImage &frame) {
+void DirectShowVCamBridge::present(const QImage &frame) {
 //    qDebug() << "DirectShowVCam::present" << frame.width() << "x" << frame.height() << "@" << frame.depth();
 //    qDebug() << frame.format();
 

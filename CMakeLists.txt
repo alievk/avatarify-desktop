@@ -6,7 +6,7 @@ message("-- build ${PROJECT}")
 
 # virtual camera
 if (MSVC)
-    add_subdirectory(lib/ds_vcam)
+    add_subdirectory(lib/dshow_vcam)
 endif ()
 
 
@@ -61,10 +61,11 @@ set(HEADERS ${HEADERS}
         src/predictors/LibtorchPredictor.h
         src/predictors/LibtorchIdentityPredictor.h
         src/predictors/LibtorchFOMM.h
-        src/vcam/AbstractVCam.h
+        src/vcam/AbstractVCamInterface.h
+        src/vcam/AkVCamBridge.h
         src/vcam/StubVCam.h
-        src/vcam/windows/DriverVCam.h
-        src/vcam/windows/DirectShowVCam.h
+        src/vcam/windows/DirectShowVCamBridge.h
+        src/vcam/windows/DriverVCamBridge.h
         src/InferenceManager.h
         src/InferenceWorker.h
         )
@@ -77,10 +78,11 @@ set(SOURCES ${SOURCES}
         src/predictors/LibtorchPredictor.cpp
         src/predictors/LibtorchIdentityPredictor.cpp
         src/predictors/LibtorchFOMM.cpp
-        src/vcam/AbstractVCam.cpp
+        src/vcam/AbstractVCamInterface.cpp
+        src/vcam/AkVCamBridge.cpp
         src/vcam/StubVCam.cpp
-        src/vcam/windows/DriverVCam.cpp
-        src/vcam/windows/DirectShowVCam.cpp
+        src/vcam/windows/DirectShowVCamBridge.cpp
+        src/vcam/windows/DriverVCamBridge.cpp
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp
@@ -88,6 +90,7 @@ set(SOURCES ${SOURCES}
 add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
 target_include_directories(${PROJECT} PRIVATE
         ${Boost_INCLUDE_DIRS}
+        ../lib/akvirtualcamera/
         )
 target_link_libraries(${PROJECT}
         Qt5::Widgets
@@ -96,6 +99,7 @@ target_link_libraries(${PROJECT}
         Qt5::Multimedia
         ${TORCH_LIBRARIES}
         ${Boost_LIBRARIES}
+        ../lib/build-akvirtualcamera-Desktop_Qt_5_15_0_MSVC2019_64bit-Release/VCamUtils/release/cl/x86_64/bin/VCamUtils
         )
 set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 14)
 

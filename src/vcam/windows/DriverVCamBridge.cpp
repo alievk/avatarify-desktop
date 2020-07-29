@@ -1,8 +1,8 @@
-#include "DriverVCam.h"
+#include "DriverVCamBridge.h"
 
 #define IOCTL_IMAGE    CTL_CODE(FILE_DEVICE_UNKNOWN, 0x4000, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
-DriverVCam::DriverVCam() {
+DriverVCamBridge::DriverVCamBridge() {
     WCHAR DeviceLink[] = L"\\\\.\\cloudphone";
     hdevice = CreateFileW(
             DeviceLink,
@@ -19,11 +19,11 @@ DriverVCam::DriverVCam() {
     }
 }
 
-DriverVCam::~DriverVCam() {
+DriverVCamBridge::~DriverVCamBridge() {
     CloseHandle(hdevice);
 }
 
-void DriverVCam::present(const QImage &frame) {
+void DriverVCamBridge::present(const QImage &frame) {
 //    qDebug() << "DirectShowVCam::present" << frame.width() << "x" << frame.height() << "@" << frame.depth();
 //    qDebug() << frame.format();
 

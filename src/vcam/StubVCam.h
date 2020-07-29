@@ -2,9 +2,9 @@
 #define STUBVCAM_H
 
 
-#include "AbstractVCam.h"
+#include "AbstractVCamInterface.h"
 
-class StubVCam : public AbstractVCam {
+class StubVCam : public AbstractVCamInterface {
 public:
     void present(const QImage& generatedFrame) override;
 };

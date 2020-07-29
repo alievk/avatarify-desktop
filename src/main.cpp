@@ -5,9 +5,9 @@
 
 #if defined(WIN32)
 
-#include "vcam/windows/DirectShowVCam.h"
+#include "vcam/AkVCamBridge.h"
 
-typedef DirectShowVCam VCamImpl;
+typedef AkVCamBridge VCamImpl;
 #else
 
 #include "vcam/StubVCam.h"

@@ -23,11 +23,11 @@ void InferenceManager::setCamera(AsyncCameraCapture *camera) {
     startWorkerIfReady();
 }
 
-AbstractVCam *InferenceManager::virtualCamera() {
+AbstractVCamInterface *InferenceManager::virtualCamera() {
     return m_virtualCamera;
 }
 
-void InferenceManager::setVirtualCamera(AbstractVCam *virtualCamera) {
+void InferenceManager::setVirtualCamera(AbstractVCamInterface *virtualCamera) {
     qDebug() << "InferenceManager::setVirtualCamera";
     if (m_virtualCamera == virtualCamera)
         return;

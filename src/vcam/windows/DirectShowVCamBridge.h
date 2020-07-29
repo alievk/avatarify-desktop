@@ -3,13 +3,13 @@
 
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include <src/vcam/AbstractVCam.h>
+#include <src/vcam/AbstractVCamInterface.h>
 
 using namespace boost::interprocess;
 
-class DirectShowVCam : public AbstractVCam {
+class DirectShowVCamBridge : public AbstractVCamInterface {
 public:
-    DirectShowVCam();
+    DirectShowVCamBridge();
 
     void present(const QImage &frame) override;
 
