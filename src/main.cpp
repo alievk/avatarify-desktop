@@ -5,7 +5,7 @@
 
 #if defined(WIN32)
 
-#include "vcam/DirectShowVCam.h"
+#include "vcam/windows/DirectShowVCam.h"
 
 typedef DirectShowVCam VCamImpl;
 #else

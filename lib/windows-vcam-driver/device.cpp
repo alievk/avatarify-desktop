@@ -77,8 +77,7 @@ void __cdecl operator delete(PVOID pVoid) {
 #pragma code_seg("PAGE")
 #endif // ALLOC_PRAGMA
 
-
-#define IOCTL_IMAGE    CTL_CODE(FILE_DEVICE_UNKNOWN,0x4000,METHOD_BUFFERED,FILE_ANY_ACCESS)
+#define IOCTL_IMAGE    CTL_CODE(FILE_DEVICE_UNKNOWN, 0x4000, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 typedef long(*DispatchFunctionPtr)(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp);
 
@@ -107,8 +106,8 @@ NTSTATUS CCaptureDevice::MyCamDeviceControl(PDEVICE_OBJECT DeviceObject, PIRP Ir
     NTSTATUS ntStatus = STATUS_SUCCESS;
     PIO_STACK_LOCATION irpStack = IoGetCurrentIrpStackLocation(Irp);
     ULONG ioControlCode;
-//    UCHAR *inBuf;
-    ULONG inBufLength = 0;
+    UCHAR *inBuf;
+    ULONG inBufLength;
     ioControlCode = irpStack->Parameters.DeviceIoControl.IoControlCode;
 
     switch (irpStack->MajorFunction) {

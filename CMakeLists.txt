@@ -62,8 +62,9 @@ set(HEADERS ${HEADERS}
         src/predictors/LibtorchIdentityPredictor.h
         src/predictors/LibtorchFOMM.h
         src/vcam/AbstractVCam.h
-        src/vcam/DirectShowVCam.h
         src/vcam/StubVCam.h
+        src/vcam/windows/DriverVCam.h
+        src/vcam/windows/DirectShowVCam.h
         src/InferenceManager.h
         src/InferenceWorker.h
         )
@@ -77,8 +78,9 @@ set(SOURCES ${SOURCES}
         src/predictors/LibtorchIdentityPredictor.cpp
         src/predictors/LibtorchFOMM.cpp
         src/vcam/AbstractVCam.cpp
-        src/vcam/DirectShowVCam.cpp
         src/vcam/StubVCam.cpp
+        src/vcam/windows/DriverVCam.cpp
+        src/vcam/windows/DirectShowVCam.cpp
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp
