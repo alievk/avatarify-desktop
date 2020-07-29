@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-set(PROJECT "DSVCam")
+set(PROJECT "DShowVCam")
 project(${PROJECT})
 
 message("  -- build ${PROJECT}")

@@ -14,7 +14,7 @@ CUnknown *WINAPI CVCamFilter::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr) {
     return punk;
 }
 
-CVCamFilter::CVCamFilter(LPUNKNOWN lpunk, HRESULT *phr) : CSource(NAME("Avatarify Camera v0.1.2"), lpunk, CLSID_VCamFilter) {
+CVCamFilter::CVCamFilter(LPUNKNOWN lpunk, HRESULT *phr) : CSource(NAME("Avatarify DShow Camera"), lpunk, CLSID_VCamFilter) {
     L_(linfo) << "CVCamFilter::CVCamFilter";
 
     ASSERT(phr);

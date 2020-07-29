@@ -29,4 +29,4 @@ if '%errorlevel%' NEQ '0' (
     CD /D "%~dp0"
 :--------------------------------------
     set scriptpath=%~dp0
-    REGSVR32 /U %scriptpath%..\cmake-build-release\lib\ds_vcam\DSVCam.dll
+    REGSVR32 /U %scriptpath%..\cmake-build-release\lib\dshow_vcam\DSVCam.dll
