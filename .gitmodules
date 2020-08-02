@@ -1,4 +1,4 @@
 [submodule "lib/akvirtualcamera"]
 	path = lib/akvirtualcamera
-	url = https://github.com/webcamoid/akvirtualcamera.git
-	branch = master
+	url = https://github.com/vlivashkin/akvirtualcamera.git
+	branch = cmake
