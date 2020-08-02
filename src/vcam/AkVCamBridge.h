@@ -3,11 +3,12 @@
 
 #include <iostream>
 
-#include <lib/akvirtualcamera/VCamUtils/src/ipcbridge.h>
-#include <lib/akvirtualcamera/VCamUtils/src/image/videoformat.h>
-#include <lib/akvirtualcamera/VCamUtils/src/image/videoframe.h>
+#include "lib/akvirtualcamera/VCamUtils/src/ipcbridge.h"
+#include "lib/akvirtualcamera/VCamUtils/src/image/videoformat.h"
+#include "lib/akvirtualcamera/VCamUtils/src/image/videoframe.h"
 
 #include "AbstractVCamInterface.h"
+#include "QDebug"
 
 class AkVCamBridge : public AbstractVCamInterface {
 public:
@@ -18,10 +19,9 @@ public:
     void present(const QImage &generatedFrame) override;
 
 private:
-    static AkVCam::VideoData redFrame();
-
-    AkVCam::IpcBridge ipcb;
-    std::vector<std::string> devices;
+    AkVCam::IpcBridge m_ipcBridge;
+    AkVCam::VideoFormat m_format;
+    std::string m_device;
 };
 
 

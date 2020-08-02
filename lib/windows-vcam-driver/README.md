@@ -10,7 +10,7 @@ products:
 
 # AVStream simulated hardware sample driver (Avshws)
 
-The AVStream simulated hardware sample driver (Avshws) provides a pin-centric [AVStream](https://docs.microsoft.com/windows-hardware/drivers/stream/avstream-overview) capture driver for a simulated piece of hardware. This streaming media driver performs video captures at 320 x 240 pixels in either RGB24 or YUV422 format using direct memory access (DMA) into capture buffers. The purpose of the sample is to demonstrate how to write a pin-centric AVStream minidriver. The sample also shows how to implement DMA by using the related functionality provided by the AVStream class driver.
+The AVStream simulated hardware sample driver (Avshws) provides a pin-centric [AVStream](https://docs.microsoft.com/windows-hardware/drivers/stream/avstream-overview) capture driver for a simulated piece of hardware. This streaming media driver performs video captures at 320 x 240 pixels in either RGB24 or YUV422 m_format using direct memory access (DMA) into capture buffers. The purpose of the sample is to demonstrate how to write a pin-centric AVStream minidriver. The sample also shows how to implement DMA by using the related functionality provided by the AVStream class driver.
 
 This sample features enhanced parameter validation and overflow detection.
 
@@ -46,9 +46,9 @@ The sample driver now appears in the Device Manager console tree under **Sound, 
 
 ## Sample code hierarchy
 
-[**DriverEntry**](https://docs.microsoft.com/previous-versions//ff558717(v=vs.85)) in Device.cpp is the initial point of entry into the driver. This routine passes control to AVStream by calling the [**KsInitializeDriver**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/nf-ks-ksinitializedriver) function. In this call, the minidriver passes the device descriptor, an AVStream structure that recursively defines the AVStream object hierarchy for a driver. This is common behavior for an AVStream minidriver.
+[**DriverEntry**](https://docs.microsoft.com/previous-versions//ff558717(v=vs.85)) in Device.cpp is the initial point of entry into the driver. This routine passes control to AVStream by calling the [**KsInitializeDriver**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/nf-ks-ksinitializedriver) function. In this call, the minidriver passes the m_device descriptor, an AVStream structure that recursively defines the AVStream object hierarchy for a driver. This is common behavior for an AVStream minidriver.
 
-At device start time, a simulated piece of capture hardware is created (the **CHardwareSimulation** class), and a DMA adapter is acquired from the operating system and is registered with AVStream by calling the [**KsDeviceRegisterAdapterObject**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/nf-ks-ksdeviceregisteradapterobject) function. This call is required for a sample that performs DMA access directly into the capture buffers, instead of using DMA access to write to a common buffer. The driver creates the [KS Filter](https://docs.microsoft.com/windows-hardware/drivers/stream/ks-filters) for this device dynamically by calling the [**KsCreateFilterFactory**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/nf-ks-kscreatefilterfactory) function.
+At m_device start time, a simulated piece of capture hardware is created (the **CHardwareSimulation** class), and a DMA adapter is acquired from the operating system and is registered with AVStream by calling the [**KsDeviceRegisterAdapterObject**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/nf-ks-ksdeviceregisteradapterobject) function. This call is required for a sample that performs DMA access directly into the capture buffers, instead of using DMA access to write to a common buffer. The driver creates the [KS Filter](https://docs.microsoft.com/windows-hardware/drivers/stream/ks-filters) for this m_device dynamically by calling the [**KsCreateFilterFactory**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/nf-ks-kscreatefilterfactory) function.
 
 Filter.cpp is where the sample lays out the [**KSPIN\_DESCRIPTOR\_EX**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/ns-ks-_kspin_descriptor_ex) structure for the single video pin. In addition, a [**KSFILTER\_DISPATCH**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/ns-ks-_ksfilter_dispatch) structure and a [**KSFILTER\_DESCRIPTOR**](https://docs.microsoft.com/windows-hardware/drivers/ddi/content/ks/ns-ks-_ksfilter_descriptor) structure are provided in this source file. The filter dispatch provides only a create dispatch, a routine that is included in Filter.cpp. The process dispatch is provided on the pin because this is a pin-centric sample.
 
@@ -70,11 +70,11 @@ Follow these steps to see how the sample driver functions:
 
 1. In the Graphedt tool, click the **Graph** menu and click **Insert Filters**. The sample appears under "WDM Streaming Capture Devices" as "avshws Source."
 
-1. Click **Insert Filter**. The sample appears in the graph as a single filter labeled, "avshws Source." There is one output pin, which is the video capture pin. This pin emits video in YUY2 format.
+1. Click **Insert Filter**. The sample appears in the graph as a single filter labeled, "avshws Source." There is one output pin, which is the video capture pin. This pin emits video in YUY2 m_format.
 
 1. Attach this filter to either a DirectShow Video Renderer or to the VMR default video renderer. Then click **Play**.
 
-The output that is produced by the sample is a 320 x 240 pixel image of standard EIA-189-A color bars. In the middle of the image near the bottom, a clock appears over the image. This clock displays the elapsed time since the graph was introduced into the run state following the last stop. The clock display format is MINUTES:SECONDS.HUNDREDTHS.
+The output that is produced by the sample is a 320 x 240 pixel image of standard EIA-189-A color bars. In the middle of the image near the bottom, a clock appears over the image. This clock displays the elapsed time since the graph was introduced into the run state following the last stop. The clock display m_format is MINUTES:SECONDS.HUNDREDTHS.
 
 In the upper-left corner of the image, a counter counts the number of frames that have been dropped since the graph was introduced into the run state after the last stop.
 

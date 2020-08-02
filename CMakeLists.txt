@@ -1,26 +1,37 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 set(PROJECT "avatarify")
 project(${PROJECT})
 message("-- build ${PROJECT}")
 
-# virtual camera
-if (MSVC)
-    add_subdirectory(lib/dshow_vcam)
-endif ()
+set(CompilerFlags
+        CMAKE_CXX_FLAGS
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS
+        CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE
+        )
+foreach (CompilerFlag ${CompilerFlags})
+    string(REPLACE "/MT" "/MD" ${CompilerFlag} "${${CompilerFlag}}")
+endforeach ()
 
+add_subdirectory(lib/akvirtualcamera)
 
 # libraries paths
 if (MSVC)
     set(QT_INSTALL_PREFIX "C:\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake")
-    set(Boost_INCLUDE_DIR "C:\\SDKs\\boost_1_72_0")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-debug-1.6.0+cpu\\libtorch")
+    else ()
+        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0+cpu\\libtorch")
+    endif ()
 else ()
     set(QT_INSTALL_PREFIX "/usr/local/Cellar/qt/5.15.0/lib/cmake")
-    set(Boost_INCLUDE_DIR "/opt/boost/boost_1_72_0")
+    set(TORCH_INSTALL_PREFIX "./lib/libtorch")
 endif ()
-set(TORCH_INSTALL_PREFIX "./lib/libtorch")
-set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_INSTALL_PREFIX}")
-
+set(TORCH_CMAKE "${TORCH_INSTALL_PREFIX}?/share/cmake/Torch")
+set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_CMAKE}")
 
 # Qt
 find_package(Qt5 COMPONENTS Widgets Qml Quick Multimedia Gui REQUIRED)  # Find the Qt libraries for Qt Quick/QML
@@ -35,22 +46,12 @@ set(CMAKE_AUTORCC ON)  # if you have any .qrc files
 
 qt5_add_resources(QT_RESOURCES src/qml.qrc) # add the resources.qrc file
 qt5_add_resources(QT_RESOURCES resources/resources.qrc) # add the resources.qrc file
-#qt5_create_translation(QT_RESOURCES ./src/avatarify-desktop_en_US.ts)
 
 
 # libtorch
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 set(BUILD_CAFFE2_OPS OFF)
-
-
-# Boost
-set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
-set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
-set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
-find_package(Boost 1.72.0 COMPONENTS date_time REQUIRED)
 
 set(HEADERS ${HEADERS}
         src/camera/AsyncCameraCapture.h
@@ -64,8 +65,6 @@ set(HEADERS ${HEADERS}
         src/vcam/AbstractVCamInterface.h
         src/vcam/AkVCamBridge.h
         src/vcam/StubVCam.h
-        src/vcam/windows/DirectShowVCamBridge.h
-        src/vcam/windows/DriverVCamBridge.h
         src/InferenceManager.h
         src/InferenceWorker.h
         )
@@ -81,33 +80,26 @@ set(SOURCES ${SOURCES}
         src/vcam/AbstractVCamInterface.cpp
         src/vcam/AkVCamBridge.cpp
         src/vcam/StubVCam.cpp
-        src/vcam/windows/DirectShowVCamBridge.cpp
-        src/vcam/windows/DriverVCamBridge.cpp
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp
         )
-add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
-target_include_directories(${PROJECT} PRIVATE
-        ${Boost_INCLUDE_DIRS}
-        ../lib/akvirtualcamera/
+add_executable(${PROJECT}
+        ${HEADERS}
+        ${SOURCES}
+        ${QT_RESOURCES}
         )
-target_link_libraries(${PROJECT}
+target_link_libraries(${PROJECT} PUBLIC
         Qt5::Widgets
         Qt5::Qml
         Qt5::Quick
         Qt5::Multimedia
         ${TORCH_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ../lib/build-akvirtualcamera-Desktop_Qt_5_15_0_MSVC2019_64bit-Release/VCamUtils/release/cl/x86_64/bin/VCamUtils
+        VCamUtils
+        VCamIPC
         )
 set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 14)
 
-if (MSVC)
-    #    target_compile_options(${PROJECT} PRIVATE /W4 /WX)
-else ()
-    target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -pedantic -Werror)
-endif ()
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,

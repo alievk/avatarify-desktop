@@ -12,10 +12,10 @@ import com.avatarify.desktop 1.0
 ApplicationWindow {
     id: window
     visible: true
-    width: 706
-    height: 537
-    minimumWidth: 706
-    minimumHeight: 537
+    width: 638
+    height: 421
+    minimumWidth: 638
+    minimumHeight: 421
     title: "Avatarify Desktop"
 
     Settings {

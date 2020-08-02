@@ -38,9 +38,13 @@ private:
     QScopedPointer<PoorMansProbe> m_videoprobe;
     QScopedPointer<QCameraViewfinderSettings> m_vfsettings;
 
+    const QSize outputResolution;
+    QImage m_frame;
+
+
     QCameraInfo m_cameraInfo;
     bool m_smartCrop = false;
-    QImage m_frame;
+
 };
 
 #endif // BACKEND_H

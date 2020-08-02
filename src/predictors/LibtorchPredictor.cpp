@@ -30,10 +30,17 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
         return drivingFrame;
     }
 
+    if (drivingFrame.width() != 1280 || drivingFrame.height() != 720) {
+        qWarning() << "wrong input size: " << drivingFrame.width() << "x" << drivingFrame.height();
+        return QImage(QSize(1280, 720), QImage::Format_RGB888);
+    }
+
     torch::Tensor drivingImage = qimageToTensor(drivingFrame);
+    drivingImage = drivingImage.slice(3, 160, -160);
     drivingImage = torch::upsample_bilinear2d(drivingImage, {256, 256}, false);
     torch::Tensor generatedImage = predictInternal(drivingImage);
-    generatedImage = at::upsample_bilinear2d(generatedImage, {480, 640}, false);
+    generatedImage = torch::upsample_bilinear2d(generatedImage, {720, 960}, false);
+    generatedImage = torch::nn::functional::pad(generatedImage, torch::nn::functional::PadFuncOptions({160, 160}));
     return tensorToQImage(generatedImage);
 }
 

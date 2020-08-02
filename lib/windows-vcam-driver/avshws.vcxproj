@@ -137,7 +137,7 @@
   <ItemGroup Label="WrappedTaskItems">
     <ClInclude Include="avshws.h" />
     <ClInclude Include="capture.h" />
-    <ClInclude Include="device.h" />
+    <ClInclude Include="m_device.h" />
     <ClInclude Include="filter.h" />
     <ClInclude Include="hwsim.h" />
     <ClInclude Include="image.h" />
@@ -320,7 +320,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="capture.cpp" />
-    <ClCompile Include="device.cpp" />
+    <ClCompile Include="m_device.cpp" />
     <ClCompile Include="filter.cpp" />
     <ClCompile Include="hwsim.cpp" />
     <ClCompile Include="image.cpp" />

@@ -2,11 +2,12 @@
 #include "AsyncCameraCapture.h"
 #include "yuv2rgb.h"
 
-AsyncCameraCapture::AsyncCameraCapture(QObject *parent) : QObject(parent) {
+AsyncCameraCapture::AsyncCameraCapture(QObject *parent) : QObject(parent), outputResolution(1280, 720),
+                                                          m_frame(outputResolution, QImage::Format_RGB888) {
     m_cameraInfo = QCameraInfo::defaultCamera();
 
     m_vfsettings.reset(new QCameraViewfinderSettings());
-    m_vfsettings->setResolution(640, 480);
+//    m_vfsettings->setPixelAspectRatio(16, 9);
 //    m_vfsettings->setMinimumFrameRate(15.0);
 //    m_vfsettings->setMaximumFrameRate(30.0);
 
@@ -42,15 +43,26 @@ void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
 
     m_camera.reset(new QCamera(cameraInfo));
     m_camera->setCaptureMode(QCamera::CaptureViewfinder);
-    m_camera->setViewfinderSettings(*m_vfsettings);
     m_videoprobe.reset(new PoorMansProbe());
     connect(m_videoprobe.data(), &PoorMansProbe::videoFrameProbed, this, &AsyncCameraCapture::processFrame);
     m_videoprobe->setSource(m_camera.data());
+    m_camera->load();
+
+    qDebug() << m_camera->status();
+    qDebug() << m_camera->supportedViewfinderResolutions();
+    for (auto resolution : m_camera->supportedViewfinderResolutions()) {
+        if (resolution == outputResolution) {
+            m_vfsettings->setResolution(resolution);
+            m_camera->setViewfinderSettings(*m_vfsettings);
+            qDebug() << "found 1280x720!";
+            return;
+        }
+    }
     m_camera->start();
 }
 
 void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
-//    qDebug() << "AsyncCameraCapture::processFrame";
+    qDebug() << "AsyncCameraCapture::processFrame";
 
     QVideoFrame cloneFrame(frame);
     cloneFrame.map(QAbstractVideoBuffer::ReadOnly);

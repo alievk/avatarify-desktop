@@ -41,7 +41,9 @@ PoorMansProbe::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType
             << QVideoFrame::Format_Y16
             << QVideoFrame::Format_Jpeg
             << QVideoFrame::Format_CameraRaw
-            << QVideoFrame::Format_AdobeDng;
+            << QVideoFrame::Format_AdobeDng
+            << QVideoFrame::Format_ABGR32
+            << QVideoFrame::Format_YUV422P;
 }
 
 bool PoorMansProbe::present(const QVideoFrame &frame) {

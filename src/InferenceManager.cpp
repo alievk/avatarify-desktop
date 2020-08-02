@@ -83,7 +83,7 @@ void InferenceManager::startWorkerIfReady() {
         if (worker == nullptr) {
             qDebug() << "Start worker!";
 
-            QVideoSurfaceFormat format(QSize(640, 480), QVideoFrame::PixelFormat::Format_ARGB32);
+            QVideoSurfaceFormat format(QSize(1280, 720), QVideoFrame::PixelFormat::Format_ARGB32);
             m_videoSurface->start(format);
 
             worker.reset(new InferenceWorker(m_camera));

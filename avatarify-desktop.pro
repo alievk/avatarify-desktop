@@ -5,6 +5,8 @@ QT += quick \
 CONFIG += c++14 \
     qmltypes
 
+SUBDIRS = "$$PWD/lib/akvirtualcamera"
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Refer to the documentation for the
@@ -17,21 +19,35 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 HEADERS += \
-    src/AsyncCameraCapture.h \
-    src/PoorMansProbe.h \
-    src/predictors/Predictor.h \
+    src/camera/AsyncCameraCapture.h \
+    src/camera/PoorMansProbe.h \
+    src/camera/yuv2rgb.h \
     src/predictors/IdentityPredictor.h \
+    src/predictors/LibtorchFOMM.h \
+    src/predictors/LibtorchIdentityPredictor.h \
+    src/predictors/LibtorchPredictor.h \
+    src/predictors/Predictor.h \
+    src/vcam/AbstractVCamInterface.h \
+    src/vcam/AkVCamBridge.h \
+    src/vcam/StubVCam.h \
     src/InferenceManager.h \
-    src/InferenceWorker.h
+    src/InferenceWorker.h \
 
 SOURCES += \
-    src/AsyncCameraCapture.cpp \
-    src/PoorMansProbe.cpp \
-    src/predictors/Predictor.cpp \
+    src/camera/AsyncCameraCapture.cpp \
+    src/camera/PoorMansProbe.cpp \
+    src/camera/yuv2rgb.cpp \
     src/predictors/IdentityPredictor.cpp \
+    src/predictors/LibtorchFOMM.cpp \
+    src/predictors/LibtorchIdentityPredictor.cpp \
+    src/predictors/LibtorchPredictor.cpp \
+    src/predictors/Predictor.cpp \
+    src/vcam/AbstractVCamInterface.cpp \
+    src/vcam/AkVCamBridge.cpp \
+    src/vcam/StubVCam.cpp \
     src/InferenceManager.cpp \
     src/InferenceWorker.cpp \
-    src/main.cpp
+    src/main.cpp \
 
 RESOURCES += src/qml.qrc
 
@@ -40,6 +56,17 @@ OTHER_FILES = src/main.qml \
 
 TRANSLATIONS += \
     src/avatarify-desktop_en_US.ts
+
+QMAKE_CXXFLAGS += -DGLIBCXX_USE_CXX11_ABI=0
+CONFIG += no_keywords
+
+INCLUDEPATH += "$$PWD\lib\libtorch\include"
+INCLUDEPATH += "$$PWD\lib\libtorch\include\torch\csrc\api\include"
+
+LIBS += -L$$PWD/lib/libtorch/lib
+LIBS += -ltorch -lc10
+
+LIBS += -L$${OUT_PWD}/../../VCamUtils/$${BIN_DIR} -lVCamUtils \
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -54,3 +81,6 @@ QML_IMPORT_MAJOR_VERSION = 1
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    src/.gitignore
