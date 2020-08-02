@@ -7,7 +7,7 @@ PoorMansProbe::PoorMansProbe(QObject *parent) : QAbstractVideoSurface(parent), s
 
 QList<QVideoFrame::PixelFormat>
 PoorMansProbe::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType) const {
-    qDebug() << "PoorMansProbe::supportedPixelFormats" << handleType;
+    qDebug() << "PoorMansProbe::supportedPixelFormats";
     Q_UNUSED(handleType);
     return QList<QVideoFrame::PixelFormat>()
             << QVideoFrame::Format_ARGB32

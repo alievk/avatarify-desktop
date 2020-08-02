@@ -30,7 +30,7 @@ private:
     const int fpsLimit = 25;
 
     AsyncCameraCapture *m_camera;
-    IdentityPredictor m_identityPredictor;
+    LibtorchIdentityPredictor m_identityPredictor;
     LibtorchFOMM m_fommPredictor;
     QString m_avatarPath = "none";
     bool isAlive = true;

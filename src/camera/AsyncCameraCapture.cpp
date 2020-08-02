@@ -48,16 +48,14 @@ void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
     m_videoprobe->setSource(m_camera.data());
     m_camera->load();
 
+    m_vfsettings.reset(new QCameraViewfinderSettings());
     qDebug() << m_camera->status();
-    qDebug() << m_camera->supportedViewfinderResolutions();
-    for (auto resolution : m_camera->supportedViewfinderResolutions()) {
-        if (resolution == outputResolution) {
-            m_vfsettings->setResolution(resolution);
-            m_camera->setViewfinderSettings(*m_vfsettings);
-            qDebug() << "found 1280x720!";
-            return;
-        }
-    }
+    qDebug() << m_camera->supportedViewfinderResolutions(*m_vfsettings.data());
+    m_vfsettings->setResolution(QSize(640, 480));
+    qDebug() << m_camera->supportedViewfinderPixelFormats(*m_vfsettings.data());
+    m_vfsettings->setPixelFormat(QVideoFrame::Format_NV12);
+    m_camera->setViewfinderSettings(*m_vfsettings);
+
     m_camera->start();
 }
 

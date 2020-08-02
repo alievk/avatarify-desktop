@@ -28,6 +28,9 @@ void LibtorchFOMM::setSourceImageInternal(torch::Tensor &newSourceImage) {
     auto kpAndJacobian = KPDetector(newSourceImage);
     kpSource = kpAndJacobian.first;
     kpSourceJacobian = kpAndJacobian.second;
+
+    // recalibrate. This is not mandatory there, but this allows user to recalibrate if they need (by toggling avatar)
+    isCalibrated = false;
 }
 
 torch::Tensor LibtorchFOMM::predictInternal(torch::Tensor &drivingImage) {
