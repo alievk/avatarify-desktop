@@ -4,6 +4,8 @@ set(PROJECT "avatarify")
 project(${PROJECT})
 message("-- build ${PROJECT}")
 
+include(cmake/windeployqt.cmake)
+
 set(CompilerFlags
         CMAKE_CXX_FLAGS
         CMAKE_CXX_FLAGS_DEBUG
@@ -22,15 +24,15 @@ add_subdirectory(lib/akvirtualcamera)
 if (MSVC)
     set(QT_INSTALL_PREFIX "C:\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-debug-1.6.0+cpu\\libtorch")
+        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-debug-1.6.0\\libtorch")
     else ()
-        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0+cpu\\libtorch")
+        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0\\libtorch")
     endif ()
 else ()
     set(QT_INSTALL_PREFIX "/usr/local/Cellar/qt/5.15.0/lib/cmake")
     set(TORCH_INSTALL_PREFIX "./lib/libtorch")
 endif ()
-set(TORCH_CMAKE "${TORCH_INSTALL_PREFIX}?/share/cmake/Torch")
+set(TORCH_CMAKE "${TORCH_INSTALL_PREFIX}/share/cmake/Torch")
 set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_CMAKE}")
 
 # Qt
@@ -111,4 +113,6 @@ if (MSVC)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${TORCH_DLLS}
             $<TARGET_FILE_DIR:${PROJECT}>)
+
+    windeployqt(${PROJECT})
 endif (MSVC)

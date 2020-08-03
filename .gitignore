@@ -108,7 +108,6 @@ cmake-build-release
 *.lastbuildstate
 *.exp
 .vs/
-CMake/
 /lib/windows-vcam-driver/x64/
 /lib/windows-vcam-driver/Debug/
 /lib/ignore/
