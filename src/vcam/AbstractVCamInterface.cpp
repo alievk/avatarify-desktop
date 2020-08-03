@@ -1,12 +1,16 @@
 #include <QDebug>
 #include "AbstractVCamInterface.h"
 
-
-bool AbstractVCamInterface::enabled() const {
-    return m_enabled;
+bool AbstractVCamInterface::available() const {
+    return m_available;
 }
 
-void AbstractVCamInterface::setEnabled(bool enabled) {
-    qDebug() << "AbstractVCam::setEnabled " << enabled;
-    m_enabled = enabled;
+bool AbstractVCamInterface::stream() const {
+    return m_stream;
 }
+
+void AbstractVCamInterface::setStream(bool stream) {
+    qDebug() << "AbstractVCam::setStream " << stream;
+    m_stream = stream;
+}
+

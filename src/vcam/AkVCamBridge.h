@@ -2,6 +2,8 @@
 #define AKVCAM_H
 
 #include <iostream>
+#include <locale>
+#include <codecvt>
 
 #include "lib/akvirtualcamera/VCamUtils/src/ipcbridge.h"
 #include "lib/akvirtualcamera/VCamUtils/src/image/videoformat.h"
@@ -22,10 +24,10 @@ private:
 
     const std::vector<AkVCam::VideoFormat> formats;
 
-    void allocateDevice();
+    bool allocateDevice();
 
     AkVCam::IpcBridge m_ipcBridge;
-    std::string m_device = "<EMPTY>";
+    std::string m_device;
 };
 
 

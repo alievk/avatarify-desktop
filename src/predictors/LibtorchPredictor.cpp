@@ -2,7 +2,7 @@
 #include <QDebug>
 #include "LibtorchPredictor.h"
 
-const torch::Device LibtorchPredictor::device((torch::cuda::is_available()) ? torch::kCUDA : torch::kCPU);
+const torch::Device LibtorchPredictor::device(torch::kCPU);  // (torch::cuda::is_available()) ? torch::kCUDA :
 
 void LibtorchPredictor::setSourceImage(QString &avatarPath) {
     qDebug() << "LibtorchPredictor::setSourceImageInternal";
@@ -58,8 +58,6 @@ QImage LibtorchPredictor::tensorToQImage(torch::Tensor &tensor) {
     int height = tensor.size(2);
     int width = tensor.size(3);
 
-    std::cout << "tensorToQImage is_cuda=" << tensor.is_cuda() << std::endl;
-
-    tensor = (tensor * 255.0f).permute({0, 2, 3, 1}).to(torch::kUInt8).flatten().to(torch::kCPU);
+    tensor = (tensor * 255.0f).permute({0, 2, 3, 1}).to(torch::kUInt8).flatten().cpu();
     return QImage((uchar *) tensor.data_ptr(), width, height, QImage::Format_RGB888).copy();
 }

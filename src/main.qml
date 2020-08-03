@@ -44,7 +44,7 @@ ApplicationWindow {
 
     VCam {
         id: vcam
-        enabled: input_settings.vcam
+        stream: input_settings.vcam
     }
 
     InferenceManager {
@@ -117,6 +117,7 @@ ApplicationWindow {
                             id: cameraVCamCheckbox
                             Layout.fillWidth: true
                             text: "Virtual cam"
+                            enabled: vcam.available
                         }
                         Label {
                             width: 260

@@ -15,6 +15,8 @@ LibtorchFOMM::LibtorchFOMM() {
         qWarning() << "FOMMNoEncoderNoKPDetectorPath doesn't exist";
     }
 
+    torch::NoGradGuard guard;
+
     torch::init_num_threads();
     FOMMEncoderModule = torch::jit::load(FOMMEncoderPath.toStdString(), device);
     KPDetectorModule = torch::jit::load(KPDetectorPath.toStdString(), device);
@@ -39,8 +41,8 @@ torch::Tensor LibtorchFOMM::predictInternal(torch::Tensor &drivingImage) {
     torch::Tensor kpDrivingJacobian = kpAndJacobian.second;
 
     if (!isCalibrated) {
-        kpInitial = kpDriving;
-        kpInitialJacobian = kpDrivingJacobian;
+        kpInitial = kpDriving.clone();
+        kpInitialJacobian = kpDrivingJacobian.clone();
         isCalibrated = true;
     }
 
@@ -49,12 +51,14 @@ torch::Tensor LibtorchFOMM::predictInternal(torch::Tensor &drivingImage) {
 }
 
 torch::Tensor LibtorchFOMM::FOMMEncoder(const torch::Tensor &image) {
-//    qDebug() << "LibtorchPredictor::FOMMEncoder";
+    //    qDebug() << "LibtorchPredictor::FOMMEncoder";
+    torch::NoGradGuard guard;
     return FOMMEncoderModule.forward({image}).toTensor();
 }
 
 std::pair<torch::Tensor, torch::Tensor> LibtorchFOMM::KPDetector(const torch::Tensor &image) {
 //    qDebug() << "LibtorchPredictor::KPDetector";
+    torch::NoGradGuard guard;
     auto outputs = KPDetectorModule.forward({image}).toTuple();
     return std::pair<torch::Tensor, torch::Tensor>(outputs->elements()[0].toTensor(),
                                                    outputs->elements()[1].toTensor());
@@ -62,17 +66,8 @@ std::pair<torch::Tensor, torch::Tensor> LibtorchFOMM::KPDetector(const torch::Te
 
 torch::Tensor LibtorchFOMM::FOMMNoEncoderNoKPDetector(const torch::Tensor &kpDriving,
                                                       const torch::Tensor &kpDrivingJacobian) {
-    std::cout << "sourceImage " << sourceImage.is_cuda() << std::endl;
-    std::cout << "sourceEncoded " << sourceEncoded.is_cuda() << std::endl;
-    std::cout << "kpDriving " << kpDriving.is_cuda() << std::endl;
-    std::cout << "kpDrivingJacobian " << kpDrivingJacobian.is_cuda() << std::endl;
-    std::cout << "kpSource " << kpSource.is_cuda() << std::endl;
-    std::cout << "kpSourceJacobian " << kpSourceJacobian.is_cuda() << std::endl;
-    std::cout << "kpInitial " << kpInitial.is_cuda() << std::endl;
-    std::cout << "kpInitialJacobian " << kpInitialJacobian.is_cuda() << std::endl;
-
-
-//    qDebug() << "LibtorchPredictor::FOMMNoEncoderNoKPDetector";
+    //    qDebug() << "LibtorchPredictor::FOMMNoEncoderNoKPDetector";
+    torch::NoGradGuard guard;
     return FOMMNoEncoderNoKPDetectorModule.forward({sourceImage, sourceEncoded,
                                                     kpDriving, kpDrivingJacobian,
                                                     kpSource, kpSourceJacobian,

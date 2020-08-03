@@ -6,16 +6,20 @@
 
 class AbstractVCamInterface : public QObject {
 Q_OBJECT
-    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled)
+    Q_PROPERTY(bool available READ available)
+    Q_PROPERTY(bool stream READ stream WRITE setStream)
 public:
-    bool enabled() const;
+    bool available() const;
 
-    void setEnabled(bool enabled);
+    bool stream() const;
+
+    void setStream(bool stream);
 
     virtual void present(const QImage &generatedFrame) = 0;
 
-private:
-    bool m_enabled = false;
+protected:
+    bool m_available = false;
+    bool m_stream = false;
 };
 
 

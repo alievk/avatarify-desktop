@@ -58,7 +58,7 @@ void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
 }
 
 void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
-    qDebug() << "AsyncCameraCapture::processFrame";
+//    qDebug() << "AsyncCameraCapture::processFrame";
 
     QVideoFrame cloneFrame(frame);
     cloneFrame.map(QAbstractVideoBuffer::ReadOnly);
