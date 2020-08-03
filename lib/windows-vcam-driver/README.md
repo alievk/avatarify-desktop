@@ -10,7 +10,7 @@ products:
 
 # AVStream simulated hardware sample driver (Avshws)
 
-The AVStream simulated hardware sample driver (Avshws) provides a pin-centric [AVStream](https://docs.microsoft.com/windows-hardware/drivers/stream/avstream-overview) capture driver for a simulated piece of hardware. This streaming media driver performs video captures at 320 x 240 pixels in either RGB24 or YUV422 m_format using direct memory access (DMA) into capture buffers. The purpose of the sample is to demonstrate how to write a pin-centric AVStream minidriver. The sample also shows how to implement DMA by using the related functionality provided by the AVStream class driver.
+The AVStream simulated hardware sample driver (Avshws) provides a pin-centric [AVStream](https://docs.microsoft.com/windows-hardware/drivers/stream/avstream-overview) capture driver for a simulated piece of hardware. This streaming media driver performs video captures at 320 x 240 pixels in either RGB24 or YUV422 format using direct memory access (DMA) into capture buffers. The purpose of the sample is to demonstrate how to write a pin-centric AVStream minidriver. The sample also shows how to implement DMA by using the related functionality provided by the AVStream class driver.
 
 This sample features enhanced parameter validation and overflow detection.
 
@@ -70,11 +70,11 @@ Follow these steps to see how the sample driver functions:
 
 1. In the Graphedt tool, click the **Graph** menu and click **Insert Filters**. The sample appears under "WDM Streaming Capture Devices" as "avshws Source."
 
-1. Click **Insert Filter**. The sample appears in the graph as a single filter labeled, "avshws Source." There is one output pin, which is the video capture pin. This pin emits video in YUY2 m_format.
+1. Click **Insert Filter**. The sample appears in the graph as a single filter labeled, "avshws Source." There is one output pin, which is the video capture pin. This pin emits video in YUY2 format.
 
 1. Attach this filter to either a DirectShow Video Renderer or to the VMR default video renderer. Then click **Play**.
 
-The output that is produced by the sample is a 320 x 240 pixel image of standard EIA-189-A color bars. In the middle of the image near the bottom, a clock appears over the image. This clock displays the elapsed time since the graph was introduced into the run state following the last stop. The clock display m_format is MINUTES:SECONDS.HUNDREDTHS.
+The output that is produced by the sample is a 320 x 240 pixel image of standard EIA-189-A color bars. In the middle of the image near the bottom, a clock appears over the image. This clock displays the elapsed time since the graph was introduced into the run state following the last stop. The clock display format is MINUTES:SECONDS.HUNDREDTHS.
 
 In the upper-left corner of the image, a counter counts the number of frames that have been dropped since the graph was introduced into the run state after the last stop.
 

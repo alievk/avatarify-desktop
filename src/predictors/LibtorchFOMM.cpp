@@ -16,9 +16,9 @@ LibtorchFOMM::LibtorchFOMM() {
     }
 
     torch::init_num_threads();
-    FOMMEncoderModule = torch::jit::load(FOMMEncoderPath.toStdString());
-    KPDetectorModule = torch::jit::load(KPDetectorPath.toStdString());
-    FOMMNoEncoderNoKPDetectorModule = torch::jit::load(FOMMNoEncoderNoKPDetectorPath.toStdString());
+    FOMMEncoderModule = torch::jit::load(FOMMEncoderPath.toStdString(), device);
+    KPDetectorModule = torch::jit::load(KPDetectorPath.toStdString(), device);
+    FOMMNoEncoderNoKPDetectorModule = torch::jit::load(FOMMNoEncoderNoKPDetectorPath.toStdString(), device);
 }
 
 void LibtorchFOMM::setSourceImageInternal(torch::Tensor &newSourceImage) {
@@ -62,18 +62,21 @@ std::pair<torch::Tensor, torch::Tensor> LibtorchFOMM::KPDetector(const torch::Te
 
 torch::Tensor LibtorchFOMM::FOMMNoEncoderNoKPDetector(const torch::Tensor &kpDriving,
                                                       const torch::Tensor &kpDrivingJacobian) {
+    std::cout << "sourceImage " << sourceImage.is_cuda() << std::endl;
+    std::cout << "sourceEncoded " << sourceEncoded.is_cuda() << std::endl;
+    std::cout << "kpDriving " << kpDriving.is_cuda() << std::endl;
+    std::cout << "kpDrivingJacobian " << kpDrivingJacobian.is_cuda() << std::endl;
+    std::cout << "kpSource " << kpSource.is_cuda() << std::endl;
+    std::cout << "kpSourceJacobian " << kpSourceJacobian.is_cuda() << std::endl;
+    std::cout << "kpInitial " << kpInitial.is_cuda() << std::endl;
+    std::cout << "kpInitialJacobian " << kpInitialJacobian.is_cuda() << std::endl;
+
+
 //    qDebug() << "LibtorchPredictor::FOMMNoEncoderNoKPDetector";
-    std::vector<torch::jit::IValue> inputs = {
-            sourceImage,
-            sourceEncoded,
-            kpDriving,
-            kpDrivingJacobian,
-            kpSource,
-            kpSourceJacobian,
-            kpInitial,
-            kpInitialJacobian
-    };
-    return FOMMNoEncoderNoKPDetectorModule.forward(inputs).toTensor();
+    return FOMMNoEncoderNoKPDetectorModule.forward({sourceImage, sourceEncoded,
+                                                    kpDriving, kpDrivingJacobian,
+                                                    kpSource, kpSourceJacobian,
+                                                    kpInitial, kpInitialJacobian}).toTensor();
 }
 
 

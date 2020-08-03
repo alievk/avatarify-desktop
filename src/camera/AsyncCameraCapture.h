@@ -8,6 +8,9 @@
 #include <QImage>
 #include <QCameraInfo>
 #include "PoorMansProbe.h"
+#include "yuv2rgb.h"
+#include "vpImageConvert.h"
+#include <iostream>
 
 class AsyncCameraCapture : public QObject {
 Q_OBJECT

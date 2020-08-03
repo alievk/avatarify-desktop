@@ -10,6 +10,8 @@ public:
 
     QImage predict(QImage &drivingFrame) override;
 
+protected:
+    static const torch::Device device;
     bool isSourceImageReady = false;
 
 private:
@@ -20,7 +22,6 @@ private:
     virtual void setSourceImageInternal(torch::Tensor &avatar) = 0;
 
     virtual torch::Tensor predictInternal(torch::Tensor &drivingImage) = 0;
-
 };
 
 

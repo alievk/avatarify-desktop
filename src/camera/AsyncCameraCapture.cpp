@@ -1,6 +1,4 @@
-#include <iostream>
 #include "AsyncCameraCapture.h"
-#include "yuv2rgb.h"
 
 AsyncCameraCapture::AsyncCameraCapture(QObject *parent) : QObject(parent), outputResolution(1280, 720),
                                                           m_frame(outputResolution, QImage::Format_RGB888) {
@@ -53,7 +51,7 @@ void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
     qDebug() << m_camera->supportedViewfinderResolutions(*m_vfsettings.data());
     m_vfsettings->setResolution(QSize(640, 480));
     qDebug() << m_camera->supportedViewfinderPixelFormats(*m_vfsettings.data());
-    m_vfsettings->setPixelFormat(QVideoFrame::Format_NV12);
+//    m_vfsettings->setPixelFormat(QVideoFrame::Format_NV12);
     m_camera->setViewfinderSettings(*m_vfsettings);
 
     m_camera->start();
@@ -74,6 +72,9 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
     } else if (cloneFrame.pixelFormat() == QVideoFrame::Format_NV21) {
         image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_RGB888);
         nv21_to_rgb(image.bits(), cloneFrame.bits(), cloneFrame.width(), cloneFrame.height());
+    } else if (cloneFrame.pixelFormat() == QVideoFrame::Format_YUYV) {
+        image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_RGB888);
+        YUYVToRGB(cloneFrame.bits(), image.bits(), cloneFrame.width(), cloneFrame.height());
     } else {
         qDebug() << "FUCK " << cloneFrame.pixelFormat();
         int nbytes = cloneFrame.mappedBytes();

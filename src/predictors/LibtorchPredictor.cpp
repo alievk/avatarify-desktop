@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "LibtorchPredictor.h"
 
+const torch::Device LibtorchPredictor::device((torch::cuda::is_available()) ? torch::kCUDA : torch::kCPU);
 
 void LibtorchPredictor::setSourceImage(QString &avatarPath) {
     qDebug() << "LibtorchPredictor::setSourceImageInternal";
@@ -50,13 +51,15 @@ torch::Tensor LibtorchPredictor::qimageToTensor(QImage &image) {
 
     torch::TensorOptions options(torch::kUInt8);
     torch::Tensor tensor = torch::from_blob(image.bits(), {1, height, width, 3}, options);
-    return (tensor / 255.0f).permute({0, 3, 1, 2}).to(torch::kFloat32);  // N C H W
+    return (tensor / 255.0f).permute({0, 3, 1, 2}).to(torch::kFloat32).to(device);  // N C H W
 }
 
 QImage LibtorchPredictor::tensorToQImage(torch::Tensor &tensor) {
     int height = tensor.size(2);
     int width = tensor.size(3);
 
-    tensor = (tensor * 255.0f).permute({0, 2, 3, 1}).to(torch::kUInt8).flatten();
+    std::cout << "tensorToQImage is_cuda=" << tensor.is_cuda() << std::endl;
+
+    tensor = (tensor * 255.0f).permute({0, 2, 3, 1}).to(torch::kUInt8).flatten().to(torch::kCPU);
     return QImage((uchar *) tensor.data_ptr(), width, height, QImage::Format_RGB888).copy();
 }

@@ -14,14 +14,18 @@ class AkVCamBridge : public AbstractVCamInterface {
 public:
     AkVCamBridge();
 
-    ~AkVCamBridge();
-
     void present(const QImage &generatedFrame) override;
 
 private:
+    static const std::wstring description;
+    static const AkVCam::VideoFormat format;
+
+    const std::vector<AkVCam::VideoFormat> formats;
+
+    void allocateDevice();
+
     AkVCam::IpcBridge m_ipcBridge;
-    AkVCam::VideoFormat m_format;
-    std::string m_device;
+    std::string m_device = "<EMPTY>";
 };
 
 

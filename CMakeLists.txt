@@ -4,8 +4,6 @@ set(PROJECT "avatarify")
 project(${PROJECT})
 message("-- build ${PROJECT}")
 
-include(cmake/windeployqt.cmake)
-
 set(CompilerFlags
         CMAKE_CXX_FLAGS
         CMAKE_CXX_FLAGS_DEBUG
@@ -35,6 +33,7 @@ endif ()
 set(TORCH_CMAKE "${TORCH_INSTALL_PREFIX}/share/cmake/Torch")
 set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_CMAKE}")
 
+
 # Qt
 find_package(Qt5 COMPONENTS Widgets Qml Quick Multimedia Gui REQUIRED)  # Find the Qt libraries for Qt Quick/QML
 include_directories(${Qt5Widgets_INCLUDE_DIRS} ${QtQml_INCLUDE_DIRS})
@@ -59,6 +58,7 @@ set(HEADERS ${HEADERS}
         src/camera/AsyncCameraCapture.h
         src/camera/PoorMansProbe.h
         src/camera/yuv2rgb.h
+        src/camera/vpImageConvert.h
         src/predictors/Predictor.h
         src/predictors/IdentityPredictor.h
         src/predictors/LibtorchPredictor.h
@@ -74,6 +74,7 @@ set(SOURCES ${SOURCES}
         src/camera/AsyncCameraCapture.cpp
         src/camera/PoorMansProbe.cpp
         src/camera/yuv2rgb.cpp
+        src/camera/vpImageConvert.cpp
         src/predictors/Predictor.cpp
         src/predictors/IdentityPredictor.cpp
         src/predictors/LibtorchPredictor.cpp
@@ -114,5 +115,7 @@ if (MSVC)
             ${TORCH_DLLS}
             $<TARGET_FILE_DIR:${PROJECT}>)
 
+    # copy QT dlls
+    include(cmake/windeployqt.cmake)
     windeployqt(${PROJECT})
 endif (MSVC)
