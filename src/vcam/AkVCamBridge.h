@@ -20,9 +20,12 @@ public:
 
 private:
     static const std::wstring description;
-    static const AkVCam::VideoFormat format;
-
-    const std::vector<AkVCam::VideoFormat> formats;
+    static const std::vector<AkVCam::PixelFormat> pixelFormats;
+    static const int width = 1280;
+    static const int height = 720;
+    static const int fps = 30;
+    std::vector<AkVCam::VideoFormat> supportedFormats;
+    AkVCam::VideoFormat format;
 
     bool allocateDevice();
 

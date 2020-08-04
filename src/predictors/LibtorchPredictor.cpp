@@ -28,7 +28,7 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
 
     if (!isSourceImageReady) {
         qWarning() << "isSourceImageReady=false";
-        return drivingFrame;
+        return QImage();
     }
 
 //    if (drivingFrame.width() != 1280 || drivingFrame.height() != 720) {

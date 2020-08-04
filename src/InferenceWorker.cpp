@@ -38,5 +38,7 @@ void InferenceWorker::inference() {
     } else {
         generatedFrame = m_identityPredictor.predict(drivingFrame);
     }
-    present(generatedFrame);
+    if (generatedFrame.width() > 0) {
+        present(generatedFrame);
+    }
 }

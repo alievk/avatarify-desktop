@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
-set(PROJECT "avatarify")
+set(PROJECT "Avatarify")
 project(${PROJECT})
 message("-- build ${PROJECT}")
 
@@ -119,3 +119,25 @@ if (MSVC)
     include(cmake/windeployqt.cmake)
     windeployqt(${PROJECT})
 endif (MSVC)
+
+
+#set(CPACK_PACKAGE_NAME "MyPackage")
+#set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MyPackage Installation Example")
+#set(CPACK_PACKAGE_VERSION "1.0.0") # Version of installer
+#
+#include(CPack)
+#include(CPackIFW)
+#
+#cpack_add_component(${PROJECT}
+#        DISPLAY_NAME "MyApp"
+#        DESCRIPTION "My Application")
+#cpack_ifw_configure_component(${PROJECT}
+#        VERSION "1.2.3" # Version of component
+#        SCRIPT "operations.qs")
+#cpack_add_component(mybigplugin
+#        DISPLAY_NAME "MyBigPlugin"
+#        DESCRIPTION "My Big Downloadable Plugin"
+#        DOWNLOADED)
+#cpack_ifw_add_repository(myrepo
+#        URL "http://example.com/ifw/repo/myapp"
+#        DISPLAY_NAME "My Application Repository")
