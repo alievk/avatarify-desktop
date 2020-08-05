@@ -8,9 +8,9 @@
 #include <QImage>
 #include <QCameraInfo>
 #include "PoorMansProbe.h"
-#include "yuv2rgb.h"
-#include "vpImageConvert.h"
 #include <iostream>
+#include <libyuv/convert_argb.h>
+#include <libyuv/convert_from_argb.h>
 
 class AsyncCameraCapture : public QObject {
 Q_OBJECT
@@ -28,7 +28,9 @@ public:
 
     void setSmartCrop(bool smartCrop);
 
-    QImage frame();
+Q_SIGNALS:
+
+    void present(QImage &frame);
 
 private Q_SLOTS:
 
@@ -37,17 +39,16 @@ private Q_SLOTS:
     void processFrame(const QVideoFrame &frame);
 
 private:
+    const QSize outputResolution;
+
+    static void convertToRGB(uint8_t *src, uint8_t *dest, QVideoFrame::PixelFormat format,
+                             uint32_t width, uint32_t height);
+
     QScopedPointer<QCamera> m_camera;
     QScopedPointer<PoorMansProbe> m_videoprobe;
     QScopedPointer<QCameraViewfinderSettings> m_vfsettings;
-
-    const QSize outputResolution;
-    QImage m_frame;
-
-
     QCameraInfo m_cameraInfo;
     bool m_smartCrop = false;
-
 };
 
 #endif // BACKEND_H

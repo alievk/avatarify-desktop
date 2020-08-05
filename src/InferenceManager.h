@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QtCore/QDir>
 #include "camera/AsyncCameraCapture.h"
 #include "vcam/AbstractVCamInterface.h"
 #include "InferenceWorker.h"

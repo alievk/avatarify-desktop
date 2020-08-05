@@ -11,19 +11,35 @@ function(windeployqt target)
     # - after build, we have a bin/lib for analyzing qt dependencies
     # - we run windeployqt on target and deploy Qt libs
 
-    add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND "${_qt_bin_dir}/windeployqt.exe"
-            --verbose 1
-            --release
-            --no-svg
-            --no-angle
-            --no-opengl
-            --no-opengl-sw
-            --no-compiler-runtime
-            --no-system-d3d-compiler
-            --qmldir ${PROJECT_SOURCE_DIR}/src
-            \"$<TARGET_FILE:${target}>\"
-            COMMENT "Deploying Qt libraries using windeployqt for compilation target '${target}' ..."
-            )
-
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND "${_qt_bin_dir}/windeployqt.exe"
+                --verbose 1
+                --debug
+                --no-svg
+                --no-angle
+                --no-opengl
+                --no-opengl-sw
+                --no-compiler-runtime
+                --no-system-d3d-compiler
+                --qmldir ${PROJECT_SOURCE_DIR}/src
+                \"$<TARGET_FILE:${target}>\"
+                COMMENT "Deploying Qt libraries using windeployqt for compilation target '${target}' ..."
+                )
+    else ()
+        add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND "${_qt_bin_dir}/windeployqt.exe"
+                --verbose 1
+                --release
+                --no-svg
+                --no-angle
+                --no-opengl
+                --no-opengl-sw
+                --no-compiler-runtime
+                --no-system-d3d-compiler
+                --qmldir ${PROJECT_SOURCE_DIR}/src
+                \"$<TARGET_FILE:${target}>\"
+                COMMENT "Deploying Qt libraries using windeployqt for compilation target '${target}' ..."
+                )
+    endif()
 endfunction()

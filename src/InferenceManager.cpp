@@ -87,6 +87,7 @@ void InferenceManager::startWorkerIfReady() {
             m_videoSurface->start(format);
 
             worker.reset(new InferenceWorker(m_camera));
+            connect(m_camera, &AsyncCameraCapture::present, worker.data(), &InferenceWorker::setFrame, Qt::DirectConnection);
             connect(worker.data(), &InferenceWorker::present, this, &InferenceManager::presentFrame);
             connect(worker.data(), &QThread::finished, worker.data(), &QObject::deleteLater);
             worker->start();

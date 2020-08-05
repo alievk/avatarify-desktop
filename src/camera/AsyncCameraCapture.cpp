@@ -1,14 +1,8 @@
 #include "AsyncCameraCapture.h"
 
-AsyncCameraCapture::AsyncCameraCapture(QObject *parent) : QObject(parent), outputResolution(1280, 720),
-                                                          m_frame(outputResolution, QImage::Format_RGB888) {
+AsyncCameraCapture::AsyncCameraCapture(QObject *parent) : QObject(parent), outputResolution(1280, 720) {
     m_cameraInfo = QCameraInfo::defaultCamera();
-
     m_vfsettings.reset(new QCameraViewfinderSettings());
-//    m_vfsettings->setPixelAspectRatio(16, 9);
-//    m_vfsettings->setMinimumFrameRate(15.0);
-//    m_vfsettings->setMaximumFrameRate(30.0);
-
     setCamera(m_cameraInfo);
 }
 
@@ -32,10 +26,6 @@ void AsyncCameraCapture::setDeviceId(const QString &deviceId) {
     qDebug() << "AsyncCameraCapture::setDeviceId: Camera with this name is not found!";
 }
 
-QImage AsyncCameraCapture::frame() {
-    return m_frame;
-}
-
 void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
     qDebug() << "cameraInfo: " << cameraInfo;
 
@@ -49,7 +39,7 @@ void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
     m_vfsettings.reset(new QCameraViewfinderSettings());
     qDebug() << m_camera->status();
     qDebug() << m_camera->supportedViewfinderResolutions(*m_vfsettings.data());
-    m_vfsettings->setResolution(QSize(640, 480));
+    m_vfsettings->setResolution(QSize(1280, 720));
     qDebug() << m_camera->supportedViewfinderPixelFormats(*m_vfsettings.data());
 //    m_vfsettings->setPixelFormat(QVideoFrame::Format_NV12);
     m_camera->setViewfinderSettings(*m_vfsettings);
@@ -58,38 +48,38 @@ void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
 }
 
 void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
-//    qDebug() << "AsyncCameraCapture::processFrame";
-
     QVideoFrame cloneFrame(frame);
-    cloneFrame.map(QAbstractVideoBuffer::ReadOnly);
-    QImage::Format format = QVideoFrame::imageFormatFromPixelFormat(cloneFrame.pixelFormat());
-    QImage image;
-    if (format != QImage::Format_Invalid) {
-        image = QImage(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), format);
-    } else if (cloneFrame.pixelFormat() == QVideoFrame::Format_NV12) {
-        image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_RGB888);
-        nv12_to_rgb(image.bits(), cloneFrame.bits(), cloneFrame.width(), cloneFrame.height());
-    } else if (cloneFrame.pixelFormat() == QVideoFrame::Format_NV21) {
-        image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_RGB888);
-        nv21_to_rgb(image.bits(), cloneFrame.bits(), cloneFrame.width(), cloneFrame.height());
-    } else if (cloneFrame.pixelFormat() == QVideoFrame::Format_YUYV) {
-        image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_RGB888);
-        YUYVToRGB(cloneFrame.bits(), image.bits(), cloneFrame.width(), cloneFrame.height());
-    } else {
-        qDebug() << "FUCK " << cloneFrame.pixelFormat();
-        int nbytes = cloneFrame.mappedBytes();
-        image = QImage::fromData(cloneFrame.bits(), nbytes);
-        qDebug() << image.width() << " " << image.height();
+    if (cloneFrame.isValid()) {
+        if (cloneFrame.map(QAbstractVideoBuffer::ReadOnly)) {
+            QVideoFrame::PixelFormat pixelFormat = cloneFrame.pixelFormat();
+            QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(pixelFormat);
+
+//            qDebug() << "AsyncCameraCapture::processFrame " << pixelFormat << " " << imageFormat;
+
+            QImage image;
+            if (imageFormat != QImage::Format_Invalid) {
+                image = QImage(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), imageFormat).mirrored().copy();
+            } else if (pixelFormat == QVideoFrame::Format_NV12 ||
+                       pixelFormat == QVideoFrame::Format_NV21 ||
+                       pixelFormat == QVideoFrame::Format_YUYV) {
+                image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_BGR888);
+                convertToRGB(cloneFrame.bits(), image.bits(), pixelFormat, cloneFrame.width(), cloneFrame.height());
+            } else {
+                qDebug() << "Not supported format: " << cloneFrame.pixelFormat();
+                cloneFrame.unmap();
+                return;
+            }
+            cloneFrame.unmap();
+
+            if (imageFormat != QImage::Format_RGB888) {
+                image = image.convertToFormat(QImage::Format_RGB888);
+            }
+
+            // TODO: crop/smartCrop
+
+            Q_EMIT present(image);
+        }
     }
-    cloneFrame.unmap();
-
-    if (format != QImage::Format_RGB888) {
-        image = image.convertToFormat(QImage::Format_RGB888);
-    }
-
-    // TODO: crop/smartCrop
-
-    m_frame = image;
 }
 
 bool AsyncCameraCapture::smartCrop() const {
@@ -99,4 +89,30 @@ bool AsyncCameraCapture::smartCrop() const {
 void AsyncCameraCapture::setSmartCrop(const bool smartCrop) {
     qDebug() << "AsyncCameraCapture::setSmartCrop " << QString::number(smartCrop);
     m_smartCrop = smartCrop;
+}
+
+void AsyncCameraCapture::convertToRGB(uint8_t *src, uint8_t *dst, QVideoFrame::PixelFormat format,
+                                      uint32_t width, uint32_t height) {
+    static const uint8_t *pY, *pUV;
+    static std::string buffer;
+    if (buffer.size() != width * height * 4) {
+        buffer.resize(width * height * 4);
+    }
+    auto *argbBuffer = (uint8_t *) &buffer[0];
+    switch (format) {
+        case QVideoFrame::Format_NV12:
+            pY = src;
+            pUV = src + width * height;
+            libyuv::NV12ToRGB24(pY, width, pUV, width, dst, width * 3, width, height);
+            break;
+        case QVideoFrame::Format_NV21:
+            pY = src;
+            pUV = src + width * height;
+            libyuv::NV21ToRGB24(pY, width, pUV, width, dst, width * 3, width, height);
+            break;
+        case QVideoFrame::Format_YUYV:  //  YUYV = YUY2
+            libyuv::YUY2ToARGB(src, width * 2, argbBuffer, width * 4, width, height);
+            libyuv::ARGBToRGB24(argbBuffer, width * 4, dst, width * 3, width, height);
+            break;
+    }
 }

@@ -13,16 +13,19 @@ Q_OBJECT
 public:
     explicit InferenceWorker(AsyncCameraCapture *camera);
 
+    void run() override;
+
+    void setAvatarPath(QString avatarPath);
+
 Q_SIGNALS:
+
     void present(QImage generatedFrame);
 
 public Q_SLOTS:
 
-    void setAvatarPath(QString avatarPath);
+    void setFrame(QImage &frame);
 
     void stop();
-
-    void run() override;
 
 private:
     void inference();
@@ -30,9 +33,11 @@ private:
     const int fpsLimit = 25;
 
     AsyncCameraCapture *m_camera;
-    LibtorchIdentityPredictor m_identityPredictor;
+    IdentityPredictor m_identityPredictor;
     LibtorchFOMM m_fommPredictor;
+
     QString m_avatarPath = "none";
+    QImage m_frame;
     bool isAlive = true;
 };
 

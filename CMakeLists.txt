@@ -54,11 +54,19 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 set(BUILD_CAFFE2_OPS OFF)
 
+
+# libyuv
+add_library(libyuv STATIC IMPORTED)
+set_target_properties(libyuv PROPERTIES
+        IMPORTED_LOCATION_DEBUG "C:\\SDKs\\libyuv\\src\\cmake-build-debug\\yuv.lib"
+        IMPORTED_LOCATION_RELEASE "C:\\SDKs\\libyuv\\src\\cmake-build-release\\yuv.lib"
+        INTERFACE_INCLUDE_DIRECTORIES "C:\\SDKs\\libyuv\\src\\include"
+        )
+
+
 set(HEADERS ${HEADERS}
         src/camera/AsyncCameraCapture.h
         src/camera/PoorMansProbe.h
-        src/camera/yuv2rgb.h
-        src/camera/vpImageConvert.h
         src/predictors/Predictor.h
         src/predictors/IdentityPredictor.h
         src/predictors/LibtorchPredictor.h
@@ -73,8 +81,6 @@ set(HEADERS ${HEADERS}
 set(SOURCES ${SOURCES}
         src/camera/AsyncCameraCapture.cpp
         src/camera/PoorMansProbe.cpp
-        src/camera/yuv2rgb.cpp
-        src/camera/vpImageConvert.cpp
         src/predictors/Predictor.cpp
         src/predictors/IdentityPredictor.cpp
         src/predictors/LibtorchPredictor.cpp
@@ -92,6 +98,9 @@ add_executable(${PROJECT}
         ${SOURCES}
         ${QT_RESOURCES}
         )
+target_include_directories(${PROJECT} PRIVATE
+        libyuv
+)
 target_link_libraries(${PROJECT} PUBLIC
         Qt5::Widgets
         Qt5::Qml
@@ -100,6 +109,7 @@ target_link_libraries(${PROJECT} PUBLIC
         ${TORCH_LIBRARIES}
         VCamUtils
         VCamIPC
+        libyuv
         )
 set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 14)
 
