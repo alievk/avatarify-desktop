@@ -16,6 +16,8 @@ foreach (CompilerFlag ${CompilerFlags})
     string(REPLACE "/MT" "/MD" ${CompilerFlag} "${${CompilerFlag}}")
 endforeach ()
 
+set(VERBOSE 1)  # for whom it may concern
+
 add_subdirectory(lib/akvirtualcamera)
 
 # libraries paths
@@ -100,6 +102,7 @@ add_executable(${PROJECT}
         )
 target_include_directories(${PROJECT} PRIVATE
         libyuv
+        ${TORCH_INSTALL_PREFIX}/include
 )
 target_link_libraries(${PROJECT} PUBLIC
         Qt5::Widgets

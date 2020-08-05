@@ -2,7 +2,7 @@
 #include <QDebug>
 #include "LibtorchPredictor.h"
 
-const torch::Device LibtorchPredictor::device(torch::kCPU);  // (torch::cuda::is_available()) ? torch::kCUDA :
+const torch::Device LibtorchPredictor::device((torch::cuda::is_available()) ? torch::kCUDA : torch::kCPU);
 
 void LibtorchPredictor::setSourceImage(QString &avatarPath) {
     qDebug() << "LibtorchPredictor::setSourceImageInternal";
@@ -14,9 +14,9 @@ void LibtorchPredictor::setSourceImage(QString &avatarPath) {
     isSourceImageReady = false;
 
     torch::Tensor newSourceImage = qimageToTensor(avatar);
-    newSourceImage = torch::upsample_bilinear2d(newSourceImage, {480, 480}, false);
+    newSourceImage = torch::upsample_bilinear2d(newSourceImage, {480, 480}, true);
     newSourceImage = torch::nn::functional::pad(newSourceImage, torch::nn::functional::PadFuncOptions({80, 80}));
-    newSourceImage = torch::upsample_bilinear2d(newSourceImage, {256, 256}, false);
+    newSourceImage = torch::upsample_bilinear2d(newSourceImage, {256, 256}, true);
 
     setSourceImageInternal(newSourceImage);
 
@@ -37,7 +37,7 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
 //    }
 
     torch::Tensor drivingImage = qimageToTensor(drivingFrame);
-//    drivingImage = drivingImage.slice(3, 160, -160);
+    drivingImage = drivingImage.slice(3, 160, -160);
     drivingImage = torch::upsample_bilinear2d(drivingImage, {256, 256}, false);
     torch::Tensor generatedImage = predictInternal(drivingImage);
     generatedImage = torch::upsample_bilinear2d(generatedImage, {720, 960}, false);
