@@ -78,6 +78,11 @@ set_target_properties(dlib PROPERTIES
         )
 
 
+# eigen3
+set(EIGEN_INC_DIR C:\\SDKs\\eigen3)
+include_directories(${EIGEN_INC_DIR})
+
+
 set(HEADERS ${HEADERS}
         src/camera/crop/DlibShapePredictor.h
         src/camera/crop/KalmanCrop.h
