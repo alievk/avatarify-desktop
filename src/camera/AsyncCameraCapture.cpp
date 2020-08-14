@@ -1,5 +1,14 @@
 #include "AsyncCameraCapture.h"
 
+template <typename T>
+QImage paddedImage(const QImage & source, int padWidth, T padValue) {
+    QImage padded{source.width() + 2*padWidth, source.height(), source.format()};
+    padded.fill(padValue);
+    QPainter p{&padded};
+    p.drawImage(QPoint(padWidth, 0), source);
+    return padded;
+}
+
 AsyncCameraCapture::AsyncCameraCapture(QObject *parent) : QObject(parent), outputResolution(1280, 720) {
     m_cameraInfo = QCameraInfo::defaultCamera();
     m_vfsettings.reset(new QCameraViewfinderSettings());
@@ -39,7 +48,7 @@ void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
     m_vfsettings.reset(new QCameraViewfinderSettings());
     qDebug() << m_camera->status();
     qDebug() << m_camera->supportedViewfinderResolutions(*m_vfsettings.data());
-    m_vfsettings->setResolution(QSize(1280, 720));
+    m_vfsettings->setResolution(QSize(640, 480));
     qDebug() << m_camera->supportedViewfinderPixelFormats(*m_vfsettings.data());
 //    m_vfsettings->setPixelFormat(QVideoFrame::Format_NV12);
     m_camera->setViewfinderSettings(*m_vfsettings);
@@ -72,7 +81,13 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
             cloneFrame.unmap();
 
             if (imageFormat != QImage::Format_RGB888) {
-                image = image.convertToFormat(QImage::Format_RGB888).copy();
+                image = image.convertToFormat(QImage::Format_RGB888);
+            }
+            if (image.width() == 640 || image.height() == 480) {
+                image = paddedImage(image, 107, QColor(Qt::black));
+            }
+            if (image.width() != 1280 || image.height() != 720) {
+                image = image.scaled(1280, 720);
             }
 
             if (m_smartCropFlag) {

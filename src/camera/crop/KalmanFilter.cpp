@@ -1,58 +1,60 @@
 #include "KalmanFilter.h"
 
-#include <iostream>
-#include <stdexcept>
-
-
-KalmanFilter::KalmanFilter(
-        double dt,
-        const Eigen::MatrixXd &A,
-        const Eigen::MatrixXd &C,
-        const Eigen::MatrixXd &Q,
-        const Eigen::MatrixXd &R,
-        const Eigen::MatrixXd &P)
-        : A(A), C(C), Q(Q), R(R), P0(P),
-          m(C.rows()), n(A.rows()), dt(dt), initialized(false),
-          I(n, n), x_hat(n), x_hat_new(n) {
-    I.setIdentity();
-}
+typedef bool b;
 
 KalmanFilter::KalmanFilter() {}
 
-void KalmanFilter::init(double t0, const Eigen::VectorXd &x0) {
-    x_hat = x0;
-    P = P0;
-    this->t0 = t0;
-    t = t0;
-    initialized = true;
+KalmanFilter::~KalmanFilter() {}
+
+bool KalmanFilter::isInitialized() const {
+    return m_initialized;
 }
 
-void KalmanFilter::init() {
-    x_hat.setZero();
-    P = P0;
-    t0 = 0;
-    t = t0;
-    initialized = true;
+void KalmanFilter::setInitialized(bool initialized) {
+    m_initialized = initialized;
 }
 
-void KalmanFilter::update(const Eigen::VectorXd &y) {
+void KalmanFilter::init(VectorXd &x0, MatrixXd &P, MatrixXd &F, MatrixXd &H, MatrixXd &R, MatrixXd &Q) {
+    m_x = x0;
+    m_P = P;
+    m_F = F;
+    m_H = H;
+    m_R = R;
+    m_Q = Q;
 
-    if (!initialized)
-        throw std::runtime_error("Filter is not initialized!");
-
-    x_hat_new = A * x_hat;
-    P = A * P * A.transpose() + Q;
-    K = P * C.transpose() * (C * P * C.transpose() + R).inverse();
-    x_hat_new += K * (y - C * x_hat_new);
-    P = (I - K * C) * P;
-    x_hat = x_hat_new;
-
-    t += dt;
+    m_initialized = true;
 }
 
-void KalmanFilter::update(const Eigen::VectorXd &y, double dt, const Eigen::MatrixXd A) {
+VectorXd &KalmanFilter::state() {
+    return m_x;
+}
 
-    this->A = A;
-    this->dt = dt;
-    update(y);
+void KalmanFilter::predict() {
+    //Use the state using the state transition matrix
+    m_x = m_F * m_x;
+    //Update the covariance matrix using the process noise and state transition matrix
+    MatrixXd Ft = m_F.transpose();
+    m_P = m_F * m_P * Ft + m_Q;
+}
+
+void KalmanFilter::update(const VectorXd &z) {
+    MatrixXd Ht = m_H.transpose();
+    MatrixXd PHt = m_P * Ht;
+
+    VectorXd y = z - m_H * m_x;
+    MatrixXd S = m_H * PHt + m_R;
+    MatrixXd K = PHt * S.inverse();
+
+    //update State
+    m_x = m_x + (K * y);
+    //update covariance matrix
+    long x_size = m_x.size();
+    MatrixXd I = MatrixXd::Identity(x_size, x_size);
+    m_P = (I - K * m_H) * m_P;
+}
+
+VectorXd &KalmanFilter::step(const VectorXd &z) {
+    predict();
+    update(z);
+    return m_x;
 }

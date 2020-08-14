@@ -8,6 +8,7 @@
 #include <QVideoProbe>
 #include <QImage>
 #include <QCameraInfo>
+#include <QPainter>
 #include <libyuv/convert_argb.h>
 #include <libyuv/convert_from_argb.h>
 #include "PoorMansProbe.h"
