@@ -72,10 +72,12 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
             cloneFrame.unmap();
 
             if (imageFormat != QImage::Format_RGB888) {
-                image = image.convertToFormat(QImage::Format_RGB888);
+                image = image.convertToFormat(QImage::Format_RGB888).copy();
             }
 
-            // TODO: crop/smartCrop
+            if (m_smartCropFlag) {
+                image = m_smartCrop.apply(image);
+            }
 
             Q_EMIT present(image);
         }
@@ -83,12 +85,12 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
 }
 
 bool AsyncCameraCapture::smartCrop() const {
-    return m_smartCrop;
+    return m_smartCropFlag;
 }
 
 void AsyncCameraCapture::setSmartCrop(const bool smartCrop) {
     qDebug() << "AsyncCameraCapture::setSmartCrop " << QString::number(smartCrop);
-    m_smartCrop = smartCrop;
+    m_smartCropFlag = smartCrop;
 }
 
 void AsyncCameraCapture::convertToRGB(uint8_t *src, uint8_t *dst, QVideoFrame::PixelFormat format,

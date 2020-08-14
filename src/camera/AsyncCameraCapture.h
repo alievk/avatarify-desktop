@@ -1,16 +1,17 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
+#include <iostream>
 #include <QObject>
 #include <QString>
 #include <QCamera>
 #include <QVideoProbe>
 #include <QImage>
 #include <QCameraInfo>
-#include "PoorMansProbe.h"
-#include <iostream>
 #include <libyuv/convert_argb.h>
 #include <libyuv/convert_from_argb.h>
+#include "PoorMansProbe.h"
+#include "crop/KalmanCrop.h"
 
 class AsyncCameraCapture : public QObject {
 Q_OBJECT
@@ -48,7 +49,9 @@ private:
     QScopedPointer<PoorMansProbe> m_videoprobe;
     QScopedPointer<QCameraViewfinderSettings> m_vfsettings;
     QCameraInfo m_cameraInfo;
-    bool m_smartCrop = false;
+
+    bool m_smartCropFlag = false;
+    KalmanCrop m_smartCrop;
 };
 
 #endif // BACKEND_H

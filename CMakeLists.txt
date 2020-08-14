@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+include(FetchContent)
 
 set(PROJECT "Avatarify")
 project(${PROJECT})
@@ -66,7 +67,21 @@ set_target_properties(libyuv PROPERTIES
         )
 
 
+# dlib
+set(DLIB_USE_CUDA 0)
+#add_compile_definitions(DLIB_PNG_SUPPORT)
+add_library(dlib STATIC IMPORTED)
+set_target_properties(dlib PROPERTIES
+        IMPORTED_LOCATION_DEBUG "C:\\SDKs\\dlib-19.21\\cmake-build-debug\\dlib\\dlib19.21.0_debug_64bit_msvc1926.lib"
+        IMPORTED_LOCATION_RELEASE "C:\\SDKs\\dlib-19.21\\cmake-build-release\\dlib\\dlib19.21.0_release_64bit_msvc1926.lib"
+        INTERFACE_INCLUDE_DIRECTORIES "C:\\SDKs\\dlib-19.21"
+        )
+
+
 set(HEADERS ${HEADERS}
+        src/camera/crop/DlibShapePredictor.h
+        src/camera/crop/KalmanCrop.h
+        src/camera/crop/KalmanFilter.h
         src/camera/AsyncCameraCapture.h
         src/camera/PoorMansProbe.h
         src/predictors/Predictor.h
@@ -81,6 +96,9 @@ set(HEADERS ${HEADERS}
         src/InferenceWorker.h
         )
 set(SOURCES ${SOURCES}
+        src/camera/crop/DlibShapePredictor.cpp
+        src/camera/crop/KalmanCrop.cpp
+        src/camera/crop/KalmanFilter.cpp
         src/camera/AsyncCameraCapture.cpp
         src/camera/PoorMansProbe.cpp
         src/predictors/Predictor.cpp
@@ -94,6 +112,7 @@ set(SOURCES ${SOURCES}
         src/InferenceManager.cpp
         src/InferenceWorker.cpp
         src/main.cpp
+        "C:/SDKs/dlib-19.21/dlib/all/source.cpp"
         )
 add_executable(${PROJECT}
         ${HEADERS}
@@ -101,9 +120,9 @@ add_executable(${PROJECT}
         ${QT_RESOURCES}
         )
 target_include_directories(${PROJECT} PRIVATE
-        libyuv
         ${TORCH_INSTALL_PREFIX}/include
-)
+        libyuv
+        )
 target_link_libraries(${PROJECT} PUBLIC
         Qt5::Widgets
         Qt5::Qml
@@ -113,24 +132,23 @@ target_link_libraries(${PROJECT} PUBLIC
         VCamUtils
         VCamIPC
         libyuv
+        dlib
         )
 set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 14)
 
 
-# The following code block is suggested to be used on Windows.
-# According to https://github.com/pytorch/pytorch/issues/25457,
-# the DLLs need to be copied to avoid memory errors.
 if (MSVC)
+    # copy QT dlls
+    include(cmake/windeployqt.cmake)
+    windeployqt(${PROJECT})
+
+    # Copy libtorch dlls (https://github.com/pytorch/pytorch/issues/25457)
     file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
     add_custom_command(TARGET ${PROJECT}
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${TORCH_DLLS}
             $<TARGET_FILE_DIR:${PROJECT}>)
-
-    # copy QT dlls
-    include(cmake/windeployqt.cmake)
-    windeployqt(${PROJECT})
 endif (MSVC)
 
 
