@@ -105,6 +105,7 @@ bool AsyncCameraCapture::smartCrop() const {
 
 void AsyncCameraCapture::setSmartCrop(const bool smartCrop) {
     qDebug() << "AsyncCameraCapture::setSmartCrop " << QString::number(smartCrop);
+    m_smartCrop.erase();
     m_smartCropFlag = smartCrop;
 }
 

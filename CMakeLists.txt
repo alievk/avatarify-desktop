@@ -118,7 +118,7 @@ set(SOURCES ${SOURCES}
         src/InferenceWorker.cpp
         src/main.cpp
         "C:/SDKs/dlib-19.21/dlib/all/source.cpp"
-        )
+        src/camera/crop/KalmanFilter1d.cpp src/camera/crop/KalmanFilter1d.h)
 add_executable(${PROJECT}
         ${HEADERS}
         ${SOURCES}

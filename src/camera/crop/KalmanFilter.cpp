@@ -15,12 +15,12 @@ void KalmanFilter::setInitialized(bool initialized) {
 }
 
 void KalmanFilter::init(VectorXd &x0, MatrixXd &P, MatrixXd &F, MatrixXd &H, MatrixXd &R, MatrixXd &Q) {
-    m_x = x0;
-    m_P = P;
-    m_F = F;
-    m_H = H;
-    m_R = R;
-    m_Q = Q;
+    m_x = std::move(x0);
+    m_P = std::move(P);
+    m_F = std::move(F);
+    m_H = std::move(H);
+    m_R = std::move(R);
+    m_Q = std::move(Q);
 
     m_initialized = true;
 }
