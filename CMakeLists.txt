@@ -22,19 +22,28 @@ set(VERBOSE 1)  # for whom it may concern
 add_subdirectory(lib/akvirtualcamera)
 
 # libraries paths
-if (MSVC)
-    set(QT_INSTALL_PREFIX "C:\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake")
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-debug-1.6.0\\libtorch")
-    else ()
-        set(TORCH_INSTALL_PREFIX "C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0\\libtorch")
+if (WIN32)
+    if (MSVC)
+        set(QTDIR "C:\\Qt\\5.15.0\\msvc2019_64")
+    elseif (MINGW)
+        set(QTDIR "C:\\Qt\\5.15.0\\mingw81_64")
     endif ()
-else ()
-    set(QT_INSTALL_PREFIX "/usr/local/Cellar/qt/5.15.0/lib/cmake")
-    set(TORCH_INSTALL_PREFIX "./lib/libtorch")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(TORCHDIR "C:\\SDKs\\libtorch-win-shared-with-deps-debug-1.6.0\\libtorch")
+    else ()
+        set(TORCHDIR "C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0\\libtorch")
+    endif ()
+elseif (APPLE)
+    set(QTDIR "/usr/local/Cellar/qt/5.15.0")
+    set(TORCHDIR "./lib/libtorch")
+elseif (UNIX)
+    set(QTDIR "/usr/local/Cellar/qt/5.15.0")
+    set(TORCHDIR "./lib/libtorch")
 endif ()
-set(TORCH_CMAKE "${TORCH_INSTALL_PREFIX}/share/cmake/Torch")
-set(CMAKE_PREFIX_PATH "${QT_INSTALL_PREFIX};${TORCH_CMAKE}")
+set(ENV{QTDIR} ${QTDIR})
+set(QT_CMAKE "${QTDIR}/lib/cmake")
+set(TORCH_CMAKE "${TORCHDIR}/share/cmake/Torch")
+set(CMAKE_PREFIX_PATH "${QT_CMAKE};${TORCH_CMAKE}")
 
 
 # Qt
@@ -142,7 +151,7 @@ target_link_libraries(${PROJECT} PUBLIC
 set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 14)
 
 
-if (MSVC)
+if (MSVC OR MINGW)
     # copy QT dlls
     include(cmake/windeployqt.cmake)
     windeployqt(${PROJECT})
@@ -154,26 +163,109 @@ if (MSVC)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${TORCH_DLLS}
             $<TARGET_FILE_DIR:${PROJECT}>)
-endif (MSVC)
+endif ()
 
 
-#set(CPACK_PACKAGE_NAME "MyPackage")
-#set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MyPackage Installation Example")
-#set(CPACK_PACKAGE_VERSION "1.0.0") # Version of installer
-#
-#include(CPack)
-#include(CPackIFW)
-#
-#cpack_add_component(${PROJECT}
-#        DISPLAY_NAME "MyApp"
-#        DESCRIPTION "My Application")
-#cpack_ifw_configure_component(${PROJECT}
-#        VERSION "1.2.3" # Version of component
-#        SCRIPT "operations.qs")
-#cpack_add_component(mybigplugin
-#        DISPLAY_NAME "MyBigPlugin"
-#        DESCRIPTION "My Big Downloadable Plugin"
-#        DOWNLOADED)
-#cpack_ifw_add_repository(myrepo
-#        URL "http://example.com/ifw/repo/myapp"
-#        DISPLAY_NAME "My Application Repository")
+# INSTALLER
+set(CPACK_IFW_ROOT "./AfyD_installer")
+install(
+        TARGETS ${PROJECT}
+        RUNTIME DESTINATION ${PROJECT}
+        COMPONENT qt_cpackifw_installer
+        BUNDLE DESTINATION ${PROJECT}
+        COMPONENT qt_cpackifw_installer
+)
+
+function(CPACKIFW_COMMON)
+    set(CPACK_PACKAGE_NAME ${PROJECT})
+    set(CPACK_PACKAGE_FILE_NAME installer)
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Installation Tool")
+    set(CPACK_PACKAGE_VERSION "1.0.0") # Version of installer
+    set(CPACK_COMPONENTS_ALL qt_cpackifw_installer)
+    set(CPACK_IFW_PACKAGE_START_MENU_DIRECTORY ${PROJECT})
+    set(CPACK_GENERATOR IFW)
+    set(CPACK_IFW_VERBOSE ON)
+
+    include(CPack REQUIRED)
+    include(CPackIFW REQUIRED)
+
+    cpack_add_component(
+            qt_cpackifw_installer
+            DISPLAY_NAME "Qt CPackIFW"
+            DESCRIPTION "Install me"
+            REQUIRED
+    )
+
+    cpack_ifw_configure_component(
+            qt_cpackifw_installer
+            FORCED_INSTALLATION
+            NAME qt.cpackifw.installer
+            VERSION ${PROJECT_VERSION} # Version of component
+            LICENSES License ${qt_cpackifw_SOURCE_DIR}/LICENSE
+            DEFAULT TRUE
+    )
+endfunction()
+
+if(CPACK_IFW_ROOT OR DEFINED ENV{QTIFWDIR})
+    if(DEFINED ENV{QTDIR})
+        if(APPLE)
+            if(EXISTS $ENV{QTDIR}/bin/macdeployqt)
+                message("*")
+                message("* Note")
+                message("*")
+                message("* Because of a bug in CPackIFW, it doesn't manage correctly the package created on OSX.")
+                message("* Unfortunately CPackIFW doesn't forward the .dmg extension to the binarycreator (see IFW documentation for more details).")
+                message("* Therefore it creates a .app directory on OSX, that isn't properly a file and cannot be treated the same way .run and .exe files are.")
+                message("* As a result, make package generates an empty directory within the build directory and leaves the bundle somewhere within the _CPack_Packages directory.")
+                message("*")
+                message("* I strongly suggest to run binarycreator through an external script and use the .dmg extension directly. At least until the bug in CPackIFW isn't fixed.")
+                message("* From within the build directory run:")
+                message("*")
+                message("*     binarycreator -f -c _CPack_Packages/Darwin/IFW/installer/config/config.xml -p _CPack_Packages/Darwin/IFW/installer/packages/ package/installer.dmg")
+                message("*")
+                message("* The bundle and the dmg file will be created within the package directory as:")
+                message("*")
+                message("*     package/installer.app [bundle]")
+                message("*     package/installer.dmg [dmg]")
+                message("*")
+
+                add_custom_command(
+                        TARGET ${PROJECT} POST_BUILD
+                        COMMAND $ENV{QTDIR}/bin/macdeployqt ${PROJECT_NAME}.app
+                )
+
+                CPACKIFW_COMMON()
+            else()
+                message("Unable to find executable QTDIR/bin/macdeployqt.")
+            endif()
+        elseif(WIN32)
+            if(EXISTS $ENV{QTDIR}/bin/windeployqt.exe)
+                add_custom_command(
+                        TARGET ${PROJECT} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/windeployqt_stuff
+                        COMMAND $ENV{QTDIR}/bin/windeployqt.exe --compiler-runtime --dir ${CMAKE_BINARY_DIR}/windeployqt_stuff $<TARGET_FILE:${PROJECT}>
+                )
+
+                install(
+                        DIRECTORY ${CMAKE_BINARY_DIR}/windeployqt_stuff/
+                        DESTINATION ${PROJECT_NAME}
+                        COMPONENT qt_cpackifw_installer
+                )
+
+                CPACKIFW_COMMON()
+            else()
+                message("Unable to find executable QTDIR/bin/windeployqt.")
+            endif()
+        elseif(UNIX)
+            CPACKIFW_COMMON()
+        endif()
+    else()
+        message("Set properly environment variable QTDIR to be able to create a package.")
+    endif()
+else()
+    message("If you want to enable target package you can:")
+    message("\t* Either pass -DCPACK_IFW_ROOT=<path> to cmake")
+    message("\t* Or set the environment variable QTIFWDIR")
+    message("To specify the location of the QtIFW tool suite.")
+    message("The specified path should not contain bin at the end (for example: D:\\DevTools\\QtIFW2.0.5).")
+endif()
