@@ -18,6 +18,9 @@ foreach (CompilerFlag ${CompilerFlags})
 endforeach ()
 
 set(VERBOSE 1)  # for whom it may concern
+set(QT_NO_DEBUG_OUTPUT)
+set(QT_NO_INFO_OUTPUT)
+set(QT_NO_WARNING_OUTPUT)
 
 add_subdirectory(lib/akvirtualcamera)
 
@@ -128,11 +131,19 @@ set(SOURCES ${SOURCES}
         src/main.cpp
         "C:/SDKs/dlib-19.21/dlib/all/source.cpp"
         src/camera/crop/KalmanFilter1d.cpp src/camera/crop/KalmanFilter1d.h)
-add_executable(${PROJECT}
-        ${HEADERS}
-        ${SOURCES}
-        ${QT_RESOURCES}
-        )
+if (WIN32)
+    add_executable(${PROJECT} WIN32
+            ${HEADERS}
+            ${SOURCES}
+            ${QT_RESOURCES}
+            )
+else ()
+    add_executable(${PROJECT}
+            ${HEADERS}
+            ${SOURCES}
+            ${QT_RESOURCES}
+            )
+endif ()
 target_include_directories(${PROJECT} PRIVATE
         ${TORCH_INSTALL_PREFIX}/include
         libyuv
@@ -243,11 +254,26 @@ if(CPACK_IFW_ROOT OR DEFINED ENV{QTIFWDIR})
                 add_custom_command(
                         TARGET ${PROJECT} POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/windeployqt_stuff
-                        COMMAND $ENV{QTDIR}/bin/windeployqt.exe --compiler-runtime --dir ${CMAKE_BINARY_DIR}/windeployqt_stuff $<TARGET_FILE:${PROJECT}>
+                        COMMAND $ENV{QTDIR}/bin/windeployqt.exe
+                            --compiler-runtime
+                            --qmldir ${PROJECT_SOURCE_DIR}/src
+                            --dir ${CMAKE_BINARY_DIR}/windeployqt_stuff $<TARGET_FILE:${PROJECT}>
                 )
-
                 install(
                         DIRECTORY ${CMAKE_BINARY_DIR}/windeployqt_stuff/
+                        DESTINATION ${PROJECT_NAME}
+                        COMPONENT qt_cpackifw_installer
+                )
+
+                # libtorch dlls
+                add_custom_command(
+                        TARGET ${PROJECT} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/libtorch_stuff
+                        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/libtorch_stuff
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TORCH_DLLS} $<TARGET_FILE_DIR:${PROJECT}>/libtorch_stuff
+                )
+                install(
+                        DIRECTORY ${CMAKE_BINARY_DIR}/libtorch_stuff/
                         DESTINATION ${PROJECT_NAME}
                         COMPONENT qt_cpackifw_installer
                 )

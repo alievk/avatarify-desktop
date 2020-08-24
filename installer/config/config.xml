@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>Avatarify Desktop</Name>
+    <Version>1.0.0b1</Version>
+    <Title>Avatarify Desktop</Title>
+    <Publisher>Avatarify LLC.</Publisher>
+    <ProductUrl>https://avatarify.ai/</ProductUrl>
+    <StartMenuDir>Avatarify</StartMenuDir>
+    <RunProgram>@TargetDir@/Avatarify.exe</RunProgram>
+
+    <TargetDir>@HomeDir@/Avatarify</TargetDir>
+    <AdminTargetDir>@RootDir@/Avatarify</AdminTargetDir>
+</Installer>

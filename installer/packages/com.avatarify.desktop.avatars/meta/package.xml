@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Default avatars</DisplayName>
+    <Description>Default avatars.</Description>
+    <Version>1.0.0b1</Version>
+    <ReleaseDate>2020-08-24</ReleaseDate>
+    <Script>installscript.qs</Script>
+    <Default>true</Default>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Essential>true</Essential>
+</Package>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Avatarify Desktop</DisplayName>
+    <Description>Avatarify Desktop Application.</Description>
+    <Version>1.0.0b1</Version>
+    <ReleaseDate>2020-08-24</ReleaseDate>
+    <Licenses>
+        <License name="Public License Agreement" file="license.txt" />
+    </Licenses>
+    <Script>installscript.qs</Script>
+    <Default>true</Default>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Essential>true</Essential>
+<!--    <UserInterfaces>-->
+<!--        <UserInterface>page.ui</UserInterface>-->
+<!--    </UserInterfaces>-->
+</Package>

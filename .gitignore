@@ -112,3 +112,4 @@ cmake-build-release
 /lib/windows-vcam-driver/Debug/
 /lib/ignore/
 /AkVirtualCamera.plugin/
+*.7z

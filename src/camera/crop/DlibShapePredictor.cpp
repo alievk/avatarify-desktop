@@ -11,7 +11,7 @@ DlibShapePredictor::DlibShapePredictor(QString weightsPath) {
 
 std::vector<dlib::point> DlibShapePredictor::detect(const QImage &image) {
     QImage smallImg = image.scaled(1280 / downscaleFactor, 720 / downscaleFactor);
-    smallImg.save("./out_qt.bmp");
+//    smallImg.save("./out_qt.bmp");
     dlib::matrix<dlib::rgb_pixel> img;
     convert(smallImg, img);
     std::vector<dlib::point> points = detectFace(img);
