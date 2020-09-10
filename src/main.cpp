@@ -1,6 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QIcon>
 #include "camera/AsyncCameraCapture.h"
+#include "imagecropper/ImageCropperWidget.h"
 #include "InferenceManager.h"
 
 #if defined(WIN32)
@@ -21,10 +23,12 @@ int main(int argc, char *argv[]) {
     app.setOrganizationName("Avatarify");
     app.setOrganizationDomain("avatarify.com");
     app.setApplicationName("Avatarify Desktop");
+    app.setWindowIcon(QIcon(":/resources/favicon"));
 
     qmlRegisterType<AsyncCameraCapture>("com.avatarify.desktop", 1, 0, "AsyncCameraCapture");
     qmlRegisterType<InferenceManager>("com.avatarify.desktop", 1, 0, "InferenceManager");
     qmlRegisterType<VCamImpl>("com.avatarify.desktop", 1, 0, "VCam");
+//    qmlRegisterType<ImageCropperWidget>("com.avatarify.desktop", 1, 0, "ImageCropper");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

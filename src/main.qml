@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.11
+import QtQuick.Dialogs 1.0
 
 import QtMultimedia 5.15
 import Qt.labs.settings 1.0
@@ -218,7 +219,9 @@ ApplicationWindow {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    if (avatarSelector.currentIndex != index) {
+                                    if (index == 0) {
+                                        addImageDialog.open();
+                                    } else if (avatarSelector.currentIndex != index) {
                                         avatarSelector.currentIndex = index;
                                         manager.avatarPath = model.fileName;
                                     } else {
@@ -239,6 +242,20 @@ ApplicationWindow {
                         x: avatarSelector.currentItem != null ? avatarSelector.currentItem.x : -1000
                         z: Infinity
                     }
+                }
+            }
+
+            FileDialog {
+                id: addImageDialog
+                title: "Please choose an image"
+                folder: shortcuts.home
+                nameFilters: [ "Image files (*.jpg *.png)", "All files (*)" ]
+                onAccepted: {
+                    console.log("You chose: " + fileDialog.fileUrls)
+                    cropImageDialog.open()
+                }
+                onRejected: {
+                    console.log("Canceled")
                 }
             }
         }

@@ -26,11 +26,7 @@ add_subdirectory(lib/akvirtualcamera)
 
 # libraries paths
 if (WIN32)
-    if (MSVC)
-        set(QTDIR "C:\\Qt\\5.15.0\\msvc2019_64")
-    elseif (MINGW)
-        set(QTDIR "C:\\Qt\\5.15.0\\mingw81_64")
-    endif ()
+    set(QTDIR "C:\\Qt\\5.15.0\\msvc2019_64")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(TORCHDIR "C:\\SDKs\\libtorch-win-shared-with-deps-debug-1.6.0\\libtorch")
     else ()
@@ -99,8 +95,11 @@ set(HEADERS ${HEADERS}
         src/camera/crop/DlibShapePredictor.h
         src/camera/crop/KalmanCrop.h
         src/camera/crop/KalmanFilter.h
+        src/camera/crop/KalmanFilter1d.h
         src/camera/AsyncCameraCapture.h
         src/camera/PoorMansProbe.h
+        src/imagecropper/ImageCropperWidget.cpp
+        src/imagecropper/ImageCropper.cpp
         src/predictors/Predictor.h
         src/predictors/IdentityPredictor.h
         src/predictors/LibtorchPredictor.h
@@ -116,8 +115,13 @@ set(SOURCES ${SOURCES}
         src/camera/crop/DlibShapePredictor.cpp
         src/camera/crop/KalmanCrop.cpp
         src/camera/crop/KalmanFilter.cpp
+        src/camera/crop/KalmanFilter1d.cpp
         src/camera/AsyncCameraCapture.cpp
         src/camera/PoorMansProbe.cpp
+        src/imagecropper/ImageCropperWidget.h
+        src/imagecropper/ImageCropper.h
+        src/imagecropper/CursorPosition.h
+        src/imagecropper/ImageCropperPrivate.h
         src/predictors/Predictor.cpp
         src/predictors/IdentityPredictor.cpp
         src/predictors/LibtorchPredictor.cpp
@@ -130,7 +134,7 @@ set(SOURCES ${SOURCES}
         src/InferenceWorker.cpp
         src/main.cpp
         "C:/SDKs/dlib-19.21/dlib/all/source.cpp"
-        src/camera/crop/KalmanFilter1d.cpp src/camera/crop/KalmanFilter1d.h)
+        )
 if (WIN32)
     add_executable(${PROJECT} WIN32
             ${HEADERS}
