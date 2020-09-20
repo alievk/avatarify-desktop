@@ -2,3 +2,13 @@
 	path = lib/akvirtualcamera
 	url = https://github.com/vlivashkin/akvirtualcamera.git
 	branch = cmake
+[submodule "lib/eigen"]
+	path = lib/eigen
+	url = https://gitlab.com/libeigen/eigen
+	branch = master
+[submodule "lib/dlib"]
+	path = lib/dlib
+	url = https://github.com/davisking/dlib
+[submodule "lib/libyuv"]
+	path = lib/libyuv
+	url = https://chromium.googlesource.com/libyuv/libyuv

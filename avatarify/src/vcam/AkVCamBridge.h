@@ -5,9 +5,9 @@
 #include <locale>
 #include <codecvt>
 
-#include "lib/akvirtualcamera/VCamUtils/src/ipcbridge.h"
-#include "lib/akvirtualcamera/VCamUtils/src/image/videoformat.h"
-#include "lib/akvirtualcamera/VCamUtils/src/image/videoframe.h"
+#include "ipcbridge.h"
+#include "image/videoformat.h"
+#include "image/videoframe.h"
 
 #include "AbstractVCamInterface.h"
 #include "QDebug"

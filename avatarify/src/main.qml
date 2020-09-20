@@ -1,12 +1,12 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
+import QtQuick 2.12
+import QtQuick.Window 2.12
+import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.11
 import QtQuick.Dialogs 1.0
 
-import QtMultimedia 5.15
+import QtMultimedia 5.12
 import Qt.labs.settings 1.0
-import Qt.labs.folderlistmodel 2.15
+import Qt.labs.folderlistmodel 2.12
 
 import com.avatarify.desktop 1.0
 

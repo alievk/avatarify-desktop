@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
+    qDebug() << "Is CUDA available????? " << torch::cuda::is_available();
 
     return app.exec();
 }

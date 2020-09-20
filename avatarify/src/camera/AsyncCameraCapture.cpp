@@ -70,7 +70,8 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
                 image = QImage(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), imageFormat).mirrored().copy();
             } else if (pixelFormat == QVideoFrame::Format_NV12 ||
                        pixelFormat == QVideoFrame::Format_NV21 ||
-                       pixelFormat == QVideoFrame::Format_YUYV) {
+                       pixelFormat == QVideoFrame::Format_YUYV ||
+                       pixelFormat == QVideoFrame::Format_BGR24) {
                 image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_BGR888);
                 convertToRGB(cloneFrame.bits(), image.bits(), pixelFormat, cloneFrame.width(), cloneFrame.height());
             } else {
@@ -131,6 +132,13 @@ void AsyncCameraCapture::convertToRGB(uint8_t *src, uint8_t *dst, QVideoFrame::P
         case QVideoFrame::Format_YUYV:  //  YUYV = YUY2
             libyuv::YUY2ToARGB(src, width * 2, argbBuffer, width * 4, width, height);
             libyuv::ARGBToRGB24(argbBuffer, width * 4, dst, width * 3, width, height);
+            break;
+        case QVideoFrame::Format_BGR24:
+            for (uint32_t i = 0; i < width * height * 3; i += 3) {
+                dst[i] = src[width * height * 3 - i - 3];
+                dst[i + 1] = src[width * height * 3 - i - 2];
+                dst[i + 2] = src[width * height * 3 - i - 1];
+            }
             break;
     }
 }

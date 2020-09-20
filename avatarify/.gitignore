@@ -1,0 +1,115 @@
+*~
+*.autosave
+*.a
+*.core
+*.moc
+*.o
+*.obj
+*.orig
+*.rej
+*.so
+*.so.*
+*_pch.h.cpp
+*_resource.rc
+*.qm
+.#*
+*.*#
+core
+!core/
+tags
+.DS_Store
+.directory
+*.debug
+Makefile*
+*.prl
+*.app
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Thumbs.db
+*.res
+*.rc
+/.qmake.cache
+/.qmake.stash
+*.d
+
+
+# qtcreator generated files
+*.pro.user*
+
+# xemacs temporary files
+*.flc
+
+# Vim temporary files
+.*.swp
+
+# Visual Studio generated files
+*.ib_pdb_index
+*.idb
+*.ilk
+*.pdb
+*.sln
+*.suo
+*.vcproj
+*vcproj.*.*.user
+*.ncb
+*.sdf
+*.opensdf
+*vcxproj.*
+
+# MinGW generated files
+*.Debug
+*.Release
+
+# Python byte code
+*.pyc
+
+# Binaries
+# --------
+*.dll
+*.exe
+*.out
+
+
+# Compiled Object files
+*.slo
+*.lo
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.dylib
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.lib
+
+# Executables
+
+# Weights
+*.tar
+*.dat
+
+build/
+cmake-build-debug
+cmake-build-release
+/.idea
+/lib/libtorch
+*.pt
+*.log
+*.tlog
+*.lastbuildstate
+*.exp
+.vs/
+/lib/windows-vcam-driver/x64/
+/lib/windows-vcam-driver/Debug/
+/lib/ignore/
+/AkVirtualCamera.plugin/
+*.7z
