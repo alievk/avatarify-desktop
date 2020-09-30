@@ -32,6 +32,9 @@ HEADERS += \
     src/predictors/LibtorchIdentityPredictor.h \
     src/predictors/LibtorchPredictor.h \
     src/predictors/Predictor.h \
+    src/utils/cipherbuf.h \
+    src/utils/cipherreader.h \
+    src/utils/utils.h \
     src/vcam/AbstractVCamInterface.h \
     src/vcam/AkVCamBridge.h \
     src/vcam/StubVCam.h \
@@ -52,6 +55,9 @@ SOURCES += \
     src/predictors/LibtorchIdentityPredictor.cpp \
     src/predictors/LibtorchPredictor.cpp \
     src/predictors/Predictor.cpp \
+    src/utils/cipherbuf.cpp \
+    src/utils/cipherreader.cpp \
+    src/utils/utils.cpp \
     src/vcam/AbstractVCamInterface.cpp \
     src/vcam/AkVCamBridge.cpp \
     src/vcam/StubVCam.cpp \
