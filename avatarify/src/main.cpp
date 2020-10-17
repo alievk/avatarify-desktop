@@ -5,6 +5,8 @@
 #include "imagecropper/ImageCropperWidget.h"
 #include "InferenceManager.h"
 
+#include "utils/amplitudelogger.h"
+
 #if defined(WIN32)
 
 #include "vcam/AkVCamBridge.h"
@@ -17,7 +19,11 @@ typedef AkVCamBridge VCamImpl;
 typedef StubVCam VCamImpl;
 #endif
 
+auto constexpr AMPLITUDE_API_KEY = "19064b86fc8ccf247265200e442a6aad";
+
 int main(int argc, char *argv[]) {
+    AmplitudeLogger::setApiKey(AMPLITUDE_API_KEY);
+    AmplitudeLogger::log("launch");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
     app.setOrganizationName("Avatarify");

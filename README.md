@@ -38,6 +38,21 @@ Tasks in Notion: https://www.notion.so/54100a62141b4a0182df043a24b12d34?v=630854
 
 * **eigen3**. Library for fast matrix computations (needed by kalman crop). [Download here](http://eigen.tuxfamily.org/index.php?title=Main_Page), put to C:\\SDKs\\eigen3 (see [CMakeLists.txt](CMakeLists.txt)). No need to compile, we will use only headers.
 
+* **OpenSSL**. StackOverflow answer:
+	```
+	On Windows if you install Qt via online installer, you can select OpenSSL Toolkit as an optional component.
+	This should provide you with the version definitely compatible with your Qt.
+	If you haven't checked it during installation, you can rerun C:\Qt\MaintenanceTool.exe and select Add or remove components.
+	OpenSSL Toolkit is located under the Developer and Designer Tools section, it is the last entry.
+	However, there's a note in the sidebar:
+	Qt installer doesn't set up OpenSSL environment. User needs to define the path and environment variables.
+	So once installed, you should add the directory with the DLLs to the PATH environment variable or place the needed DLLs near the .exe file (copy them to the debug and release directories of your project).
+	The directory is located at C:\Qt\Tools\OpenSSL\Win_x64\bin (or Win_x86 if you need 32-bit version). The DLLs are named libssl-1_1-x64.dll and libcrypto-1_1-x64.dll in my case.
+	But this wasn't enough to deploy it to another machine, after copying it all I got the same error again.
+	The reason came out to be that OpenSSL DLLs depend on another MSVC runtime version than the Qt app itself, and these errors go unreported.
+	Open these DLLs in Dependency Walker to find out what's missing. In my case it was MSVCR100.dll, so I had to install MSVC 2010 Redistributable x64 (x86 is here).
+	```
+
 
 ### Build project
 * Check that you have all dependencies installed

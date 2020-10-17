@@ -32,6 +32,7 @@ HEADERS += \
     src/predictors/LibtorchIdentityPredictor.h \
     src/predictors/LibtorchPredictor.h \
     src/predictors/Predictor.h \
+    src/utils/amplitudelogger.h \
     src/utils/cipherbuf.h \
     src/utils/cipherreader.h \
     src/utils/utils.h \
@@ -55,6 +56,7 @@ SOURCES += \
     src/predictors/LibtorchIdentityPredictor.cpp \
     src/predictors/LibtorchPredictor.cpp \
     src/predictors/Predictor.cpp \
+    src/utils/amplitudelogger.cpp \
     src/utils/cipherbuf.cpp \
     src/utils/cipherreader.cpp \
     src/utils/utils.cpp \
@@ -128,6 +130,9 @@ SOURCES += \
 
 # eigen
 INCLUDEPATH += $$PWD/../lib/eigen
+
+# openssl
+LIBS += -Lc:/Qt/Tools/OpenSSL/Win_x64/lib/ -llibcrypto -llibssl
 
 QML_IMPORT_NAME = io.qt.examples.backend
 QML_IMPORT_MAJOR_VERSION = 1
