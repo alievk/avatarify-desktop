@@ -13,10 +13,10 @@ import com.avatarify.desktop 1.0
 ApplicationWindow {
     id: window
     visible: true
-    width: 638
-    height: 421
-    minimumWidth: 638
-    minimumHeight: 421
+    minimumWidth: 738
+    minimumHeight: 471
+    width: minimumWidth
+    height: minimumHeight
     title: "Avatarify Desktop"
 
     Settings {
@@ -114,19 +114,38 @@ ApplicationWindow {
                             text: "Smart crop"
                         }
 
-                        Switch {
-                            id: cameraVCamCheckbox
-                            Layout.fillWidth: true
-                            text: "Virtual cam"
-                            enabled: vcam.available
-                        }
                         Label {
                             width: 260
                             Layout.maximumWidth: 260
                             Layout.preferredWidth: 260
                             Layout.minimumWidth: 260
-                            text: "You can use Avatarify as a virtual cam for Skype/Zoom calls"
+                            text: "You can use Avatarify as a virtual cam for Skype/Zoom calls:"
                             wrapMode: Text.WordWrap
+                            visible: vcam.available
+                        }
+
+                        Switch {
+                            id: cameraVCamCheckbox
+                            Layout.fillWidth: true
+                            text: "Virtual cam"
+                            enabled: vcam.available
+                            visible: vcam.available
+                        }
+
+                        Label {
+                            width: 260
+                            Layout.maximumWidth: 260
+                            Layout.preferredWidth: 260
+                            Layout.minimumWidth: 260
+                            text: "Create avatar from image file:"
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Button {
+                            text: "Open image file"
+                            onClicked: {
+                                addImageDialog.open();
+                            }
                         }
                     }
                 }
@@ -219,9 +238,7 @@ ApplicationWindow {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    if (index == 0) {
-                                        addImageDialog.open();
-                                    } else if (avatarSelector.currentIndex != index) {
+                                    if (avatarSelector.currentIndex != index) {
                                         avatarSelector.currentIndex = index;
                                         manager.avatarPath = model.fileName;
                                     } else {
