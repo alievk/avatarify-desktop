@@ -48,9 +48,10 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
 torch::Tensor LibtorchPredictor::qimageToTensor(QImage &image) {
     int height = image.height();
     int width = image.width();
+    auto bytesPerLine = image.bytesPerLine();
 
     torch::TensorOptions options(torch::kUInt8);
-    torch::Tensor tensor = torch::from_blob(image.bits(), {1, height, width, 3}, options);
+    torch::Tensor tensor = torch::from_blob(image.bits(), {1, height, width, 3}, {height * bytesPerLine, bytesPerLine, 3, 1}, options);
     return (tensor / 255.0f).permute({0, 3, 1, 2}).to(torch::kFloat32).to(device);  // N C H W
 }
 
