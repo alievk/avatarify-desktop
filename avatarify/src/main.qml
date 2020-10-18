@@ -268,14 +268,17 @@ ApplicationWindow {
                 folder: shortcuts.home
                 nameFilters: [ "Image files (*.jpg *.png)", "All files (*)" ]
                 onAccepted: {
-                    console.log("You chose: " + fileDialog.fileUrls)
-                    cropImageDialog.open()
+                    console.log("You chose: " + fileUrl)
+                    cropImageWindow.open(fileUrl);
                 }
                 onRejected: {
                     console.log("Canceled")
                 }
             }
         }
+    }
+    CropImageWindow {
+        id: cropImageWindow
     }
 }
 
