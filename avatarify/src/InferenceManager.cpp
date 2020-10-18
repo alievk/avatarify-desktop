@@ -1,4 +1,5 @@
 #include <QVideoSurfaceFormat>
+#include <QtConcurrent/QtConcurrent>
 #include "InferenceManager.h"
 
 InferenceManager::~InferenceManager() {
@@ -73,9 +74,12 @@ void InferenceManager::setAvatarPath(const QString &avatarFilename) {
         return;
 
     m_avatarPath = avatarPath;
-    if (worker != nullptr) {
-        worker->setAvatarPath(m_avatarPath);
-    }
+    QtConcurrent::run([this]() {
+        QMutexLocker mutexLocker(&m_setAvatarPathMutex);
+        if (worker != nullptr) {
+            worker->setAvatarPath(m_avatarPath);
+        }
+    });
 }
 
 void InferenceManager::startWorkerIfReady() {

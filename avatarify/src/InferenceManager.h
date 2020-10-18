@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include <QtCore/QDir>
+#include <QMutex>
 #include "camera/AsyncCameraCapture.h"
 #include "vcam/AbstractVCamInterface.h"
 #include "InferenceWorker.h"
@@ -57,6 +58,7 @@ private:
     bool m_mirror = false;
     QString m_avatarPath;
     QScopedPointer<InferenceWorker> worker;
+    QMutex m_setAvatarPathMutex;
 };
 
 
