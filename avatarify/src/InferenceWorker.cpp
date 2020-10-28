@@ -1,4 +1,5 @@
 #include <QTime>
+#include <QtConcurrent/QtConcurrent>
 #include <qtestsupport_core.h>
 #include <QVideoSurfaceFormat>
 #include <utility>
@@ -9,14 +10,8 @@ InferenceWorker::InferenceWorker(AsyncCameraCapture *camera) : m_camera(camera),
 }
 
 void InferenceWorker::run() {
-    qint64 targetTime = 1000 / fpsLimit;
     while (isAlive) {
-        QTime startTime = QTime::currentTime();
         inference();
-        qint64 sleepTimeMsec = targetTime - QTime::currentTime().msecsTo(startTime);
-        if (sleepTimeMsec > 0) {
-            QTest::qWait(sleepTimeMsec);
-        }
     }
 }
 
@@ -28,20 +23,37 @@ void InferenceWorker::setAvatarPath(QString avatarPath) {
 }
 
 void InferenceWorker::setFrame(QImage &frame) {
-    std::copy(frame.bits(), frame.bits() + frame.sizeInBytes(), m_frame.bits());
+    if (!m_frameMutex.tryLock()) {
+        return;
+    }
+    m_frame = std::move(frame);
+    m_frameReady.wakeAll();
+    m_frameMutex.unlock();
 }
 
 void InferenceWorker::stop() {
     isAlive = false;
+    QtConcurrent::run([this]() {
+        m_frameMutex.lock();
+        m_frameReady.wakeAll();
+        m_frameMutex.unlock();
+    });
 }
 
 void InferenceWorker::inference() {
+    m_frameMutex.lock();
+    m_frameReady.wait(&m_frameMutex);
+    if (!isAlive) {
+        m_frameMutex.unlock();
+        return;
+    }
     QImage generatedFrame;
     if (m_avatarPath != "none") {
         generatedFrame = m_fommPredictor.predict(m_frame);
     } else {
         generatedFrame = m_identityPredictor.predict(m_frame);
     }
+    m_frameMutex.unlock();
     if (generatedFrame.width() > 0) {
         present(generatedFrame);
     }

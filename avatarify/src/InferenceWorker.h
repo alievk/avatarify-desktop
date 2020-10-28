@@ -2,6 +2,8 @@
 #define INFERENCEWORKER_H
 
 #include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 #include "camera/AsyncCameraCapture.h"
 #include "predictors/IdentityPredictor.h"
 #include "predictors/LibtorchIdentityPredictor.h"
@@ -30,8 +32,6 @@ public Q_SLOTS:
 private:
     void inference();
 
-    const int fpsLimit = 25;
-
     AsyncCameraCapture *m_camera;
     IdentityPredictor m_identityPredictor;
     LibtorchFOMM m_fommPredictor;
@@ -39,6 +39,9 @@ private:
     QString m_avatarPath = "none";
     QImage m_frame;
     bool isAlive = true;
+
+    QMutex m_frameMutex;
+    QWaitCondition m_frameReady;
 };
 
 
