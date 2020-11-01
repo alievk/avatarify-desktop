@@ -80,6 +80,7 @@ void InferenceManager::setAvatarPath(const QString &avatarFilename) {
             worker->setAvatarPath(m_avatarPath);
         }
     });
+    Q_EMIT avatarPathChanged();
 }
 
 void InferenceManager::startWorkerIfReady() {

@@ -16,7 +16,7 @@ Q_OBJECT
     Q_PROPERTY(AbstractVCamInterface *virtualCamera READ virtualCamera WRITE setVirtualCamera)
     Q_PROPERTY(QAbstractVideoSurface *videoSurface READ videoSurface WRITE setVideoSurface)
     Q_PROPERTY(bool mirror READ mirror WRITE setMirror)
-    Q_PROPERTY(QString avatarPath READ avatarPath WRITE setAvatarPath)
+    Q_PROPERTY(QString avatarPath READ avatarPath WRITE setAvatarPath NOTIFY avatarPathChanged)
 
 public:
     ~InferenceManager() override;
@@ -47,6 +47,9 @@ public:
 
     Q_INVOKABLE void requestCalibration();
 
+Q_SIGNALS:
+    void avatarPathChanged();
+
 public Q_SLOTS:
 
     void presentFrame(const QImage &generatedFrame);
@@ -58,7 +61,7 @@ private:
     AbstractVCamInterface *m_virtualCamera = nullptr;
     QAbstractVideoSurface *m_videoSurface = nullptr;
     bool m_mirror = false;
-    QString m_avatarPath;
+    QString m_avatarPath{"none"};
     QScopedPointer<InferenceWorker> worker;
     QMutex m_setAvatarPathMutex;
 };

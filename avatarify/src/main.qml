@@ -13,8 +13,8 @@ import com.avatarify.desktop 1.0
 ApplicationWindow {
     id: window
     visible: true
-    minimumWidth: 738
-    minimumHeight: 471
+    minimumWidth: 800
+    minimumHeight: 540
     width: minimumWidth
     height: minimumHeight
     title: "Avatarify Desktop"
@@ -147,6 +147,16 @@ ApplicationWindow {
                                 addImageDialog.open();
                             }
                         }
+
+                        Label {
+                            width: 260
+                            Layout.maximumWidth: 260
+                            Layout.preferredWidth: 260
+                            Layout.minimumWidth: 260
+                            text: "Right-click on avatar to show the calibration overlay:"
+                            wrapMode: Text.WordWrap
+                        }
+
                         RowLayout {
                             Layout.fillWidth: true
                             Button {
@@ -154,6 +164,12 @@ ApplicationWindow {
                                 onClicked: {
                                     manager.requestCalibration();
                                 }
+                            }
+                            Switch {
+                                id: overlayCheckbox
+                                Layout.fillWidth: true
+                                text: "Overlay"
+                                visible: (manager.avatarPath === "none") && (overlayImage.source.toString() !== "")
                             }
                         }
                     }
@@ -175,9 +191,22 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         VideoOutput {
+                            id: videoOutput
                             source: manager
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Image {
+                                id: overlayImage
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                height: videoOutput.contentRect.height
+                                fillMode: Image.PreserveAspectFit//.PreserveAspectCrop
+                                opacity: 0.5
+                                visible: overlayCheckbox.checked && (manager.avatarPath === "none")
+                            }
                         }
                     }
                 }
@@ -230,6 +259,7 @@ ApplicationWindow {
                                 anchors.fill: parent
 
                                 Image {
+                                    id: avatarImage
                                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                                     width: 138
                                     height: 138
@@ -246,13 +276,26 @@ ApplicationWindow {
 
                             MouseArea {
                                 anchors.fill: parent
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
                                 onClicked: {
-                                    if (avatarSelector.currentIndex != index) {
-                                        avatarSelector.currentIndex = index;
-                                        manager.avatarPath = model.fileName;
+                                    if (mouse.button == Qt.LeftButton) {
+                                        if (avatarSelector.currentIndex != index) {
+                                            avatarSelector.currentIndex = index;
+                                            manager.avatarPath = model.fileName;
+                                        } else {
+                                            avatarSelector.currentIndex = -1;
+                                            manager.avatarPath = "none";
+                                        }
                                     } else {
-                                        avatarSelector.currentIndex = -1;
-                                        manager.avatarPath = "none";
+                                        if (manager.avatarPath !== "none") {
+                                            return;
+                                        }
+                                        if (overlayImage.source !== avatarImage.source) {
+                                            overlayImage.source = avatarImage.source;
+                                            overlayCheckbox.checked = true;
+                                        } else {
+                                            overlayCheckbox.checked = !overlayCheckbox.checked;
+                                        }
                                     }
                                 }
                             }
