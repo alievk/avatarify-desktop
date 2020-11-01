@@ -19,6 +19,8 @@ public:
 
     void setAvatarPath(QString avatarPath);
 
+    void requestCalibration();
+
 Q_SIGNALS:
 
     void present(QImage generatedFrame);
@@ -42,6 +44,8 @@ private:
 
     QMutex m_frameMutex;
     QWaitCondition m_frameReady;
+
+    bool m_calibrationRequested{false};
 };
 
 

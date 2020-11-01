@@ -13,6 +13,7 @@ public:
 protected:
     static const torch::Device device;
     bool isSourceImageReady = false;
+    static torch::Tensor frameToImage(QImage &drivingFrame);
 
 private:
     static torch::Tensor qimageToTensor(QImage &image);

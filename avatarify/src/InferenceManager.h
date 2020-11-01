@@ -45,6 +45,8 @@ public:
 
     void startWorkerIfReady();
 
+    Q_INVOKABLE void requestCalibration();
+
 public Q_SLOTS:
 
     void presentFrame(const QImage &generatedFrame);

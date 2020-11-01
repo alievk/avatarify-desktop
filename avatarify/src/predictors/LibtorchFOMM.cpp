@@ -31,6 +31,25 @@ LibtorchFOMM::LibtorchFOMM() {
     FOMMNoEncoderNoKPDetectorModule = torch::jit::load(std::make_unique<CipherReader>(FOMMNoEncoderNoKPDetectorPath.toStdString() + "_"), device);
 }
 
+void LibtorchFOMM::calibrate(QImage &drivingFrame) {
+    auto drivingImage = frameToImage(drivingFrame);
+    auto kpAndJacobian = KPDetector(drivingImage);
+    torch::Tensor kpDriving = kpAndJacobian.first;
+    torch::Tensor kpDrivingJacobian = kpAndJacobian.second;
+    calibrate(kpDriving, kpDrivingJacobian);
+}
+
+void LibtorchFOMM::requestCalibration() {
+    isCalibrated = false;
+}
+
+void LibtorchFOMM::calibrate(at::Tensor &kpDriving,
+                             at::Tensor &kpDrivingJacobian) {
+    kpInitial = kpDriving.clone();
+    kpInitialJacobian = kpDrivingJacobian.clone();
+    isCalibrated = true;
+}
+
 void LibtorchFOMM::setSourceImageInternal(torch::Tensor &newSourceImage) {
     sourceImage = newSourceImage;
 
@@ -40,7 +59,7 @@ void LibtorchFOMM::setSourceImageInternal(torch::Tensor &newSourceImage) {
     kpSourceJacobian = kpAndJacobian.second;
 
     // recalibrate. This is not mandatory there, but this allows user to recalibrate if they need (by toggling avatar)
-    isCalibrated = false;
+    // isCalibrated = false;
 }
 
 torch::Tensor LibtorchFOMM::predictInternal(torch::Tensor &drivingImage) {
@@ -49,9 +68,7 @@ torch::Tensor LibtorchFOMM::predictInternal(torch::Tensor &drivingImage) {
     torch::Tensor kpDrivingJacobian = kpAndJacobian.second;
 
     if (!isCalibrated) {
-        kpInitial = kpDriving.clone();
-        kpInitialJacobian = kpDrivingJacobian.clone();
-        isCalibrated = true;
+        calibrate(kpDriving, kpDrivingJacobian);
     }
 
     torch::Tensor generatedImage = FOMMNoEncoderNoKPDetector(kpDriving, kpDrivingJacobian);

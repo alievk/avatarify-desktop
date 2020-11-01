@@ -22,6 +22,10 @@ void InferenceWorker::setAvatarPath(QString avatarPath) {
     }
 }
 
+void InferenceWorker::requestCalibration() {
+    m_calibrationRequested = true;
+}
+
 void InferenceWorker::setFrame(QImage &frame) {
     if (!m_frameMutex.tryLock()) {
         return;
@@ -49,8 +53,16 @@ void InferenceWorker::inference() {
     }
     QImage generatedFrame;
     if (m_avatarPath != "none") {
+        if (m_calibrationRequested) {
+            m_fommPredictor.requestCalibration();
+            m_calibrationRequested = false;
+        }
         generatedFrame = m_fommPredictor.predict(m_frame);
     } else {
+        if (m_calibrationRequested) {
+            m_fommPredictor.calibrate(m_frame);
+            m_calibrationRequested = false;
+        }
         generatedFrame = m_identityPredictor.predict(m_frame);
     }
     m_frameMutex.unlock();

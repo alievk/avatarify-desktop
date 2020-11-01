@@ -103,6 +103,12 @@ void InferenceManager::startWorkerIfReady() {
     }
 }
 
+void InferenceManager::requestCalibration() {
+    if (worker != nullptr) {
+        worker->requestCalibration();
+    }
+}
+
 void InferenceManager::presentFrame(const QImage &generatedFrame) {
     // vcam
     m_virtualCamera->present(generatedFrame);

@@ -8,6 +8,9 @@ class LibtorchFOMM : public LibtorchPredictor {
 public:
     LibtorchFOMM();
 
+    void calibrate(QImage &drivingFrame);
+    void requestCalibration();
+
 private:
     void setSourceImageInternal(torch::Tensor &newSourceImage) override;
 
@@ -18,6 +21,9 @@ private:
     std::pair<torch::Tensor, torch::Tensor> KPDetector(const torch::Tensor &image);
 
     torch::Tensor FOMMNoEncoderNoKPDetector(const torch::Tensor &kpDriving, const torch::Tensor &kpDrivingJacobian);
+
+    void calibrate(torch::Tensor &kpDriving,
+                   torch::Tensor &kpDrivingJacobian);
 
     const QString FOMMEncoderPath = QDir::homePath() + "/.avatarify/models/FOMMEncoder.pt";
     const QString KPDetectorPath = QDir::homePath() + "/.avatarify/models/KPDetector.pt";

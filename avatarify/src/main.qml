@@ -147,6 +147,15 @@ ApplicationWindow {
                                 addImageDialog.open();
                             }
                         }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Button {
+                                text: "Calibrate"
+                                onClicked: {
+                                    manager.requestCalibration();
+                                }
+                            }
+                        }
                     }
                 }
 

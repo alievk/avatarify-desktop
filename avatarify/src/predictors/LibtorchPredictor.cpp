@@ -36,13 +36,17 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
 //        return QImage(QSize(1280, 720), QImage::Format_RGB888);
 //    }
 
-    torch::Tensor drivingImage = qimageToTensor(drivingFrame);
-    drivingImage = drivingImage.slice(3, 160, -160);
-    drivingImage = torch::upsample_bilinear2d(drivingImage, {256, 256}, false);
+    auto drivingImage = frameToImage(drivingFrame);
     torch::Tensor generatedImage = predictInternal(drivingImage);
     generatedImage = torch::upsample_bilinear2d(generatedImage, {720, 960}, false);
     generatedImage = torch::nn::functional::pad(generatedImage, torch::nn::functional::PadFuncOptions({160, 160}));
     return tensorToQImage(generatedImage);
+}
+
+at::Tensor LibtorchPredictor::frameToImage(QImage &drivingFrame) {
+    auto drivingImage = qimageToTensor(drivingFrame);
+    drivingImage = drivingImage.slice(3, 160, -160);
+    return torch::upsample_bilinear2d(drivingImage, {256, 256}, false);
 }
 
 torch::Tensor LibtorchPredictor::qimageToTensor(QImage &image) {
