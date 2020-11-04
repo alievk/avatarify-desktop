@@ -35,6 +35,7 @@ HEADERS += \
     src/utils/amplitudelogger.h \
     src/utils/cipherbuf.h \
     src/utils/cipherreader.h \
+    src/utils/facefinder.h \
     src/utils/utils.h \
     src/vcam/AbstractVCamInterface.h \
     src/vcam/AkVCamBridge.h \
@@ -59,6 +60,7 @@ SOURCES += \
     src/utils/amplitudelogger.cpp \
     src/utils/cipherbuf.cpp \
     src/utils/cipherreader.cpp \
+    src/utils/facefinder.cpp \
     src/utils/utils.cpp \
     src/vcam/AbstractVCamInterface.cpp \
     src/vcam/AkVCamBridge.cpp \

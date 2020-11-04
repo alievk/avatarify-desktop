@@ -13,7 +13,29 @@ Window {
     title: "Crop your image"
     function open(src) {
         imageToCrop.source = src;
-        cropWindow.show();
+        var points = faceFinder.findFace(src);
+        if (points.length >= 4) {
+            console.log(points);
+            console.log(points.length);
+            cropWindow.show();
+            var xx = points[0] * imageToCrop.width;
+            var yy = points[1]  * imageToCrop.height;
+            var sx = (points[2] - points[0]);
+            var sy = (points[3] - points[1]);
+            var ww = sx * imageToCrop.width;
+            var hh = sy * imageToCrop.height;
+            yy -= Math.min(yy, (0.15 * hh))
+            var s = 1.0 / Math.max(sx, sy);
+            console.log(sx, sy);
+            scaleSlider.value = s;
+            flickable.contentX = xx * s;
+            flickable.contentY = yy * s;
+            scaleSlider.value *= 0.7;
+        } else {
+            scaleSlider.value = 1.0;
+            flickable.contentX = 0;
+            flickable.contentY = 0;
+        }
     }
     readonly property var letters: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
     function getRandomName() {
@@ -37,6 +59,7 @@ Window {
         contentHeight: imageToCrop.height * imageToCrop.scale
         boundsBehavior: Flickable.StopAtBounds
         clip: true
+
         Image {
             id: imageToCrop
             transformOrigin: Item.TopLeft
@@ -44,7 +67,7 @@ Window {
             width: proportion <= 1.0 ? flickable.width : flickable.width * proportion
             height: proportion > 1.0 ? flickable.height : flickable.height / proportion
             fillMode: Image.PreserveAspectFit
-            scale: scaleSlider.value
+            //scale: scaleSlider.value
         }
     }
     Slider {
@@ -59,6 +82,14 @@ Window {
             margins: 10
         }
         orientation: Qt.Horizontal
+        onValueChanged: {
+            var s = imageToCrop.scale;
+            var w = flickable.width / 2;
+            var h = flickable.height / 2;
+            flickable.contentX = ((flickable.contentX + w) * (value / s) - w);
+            flickable.contentY = ((flickable.contentY + h) * (value / s) - h);
+            imageToCrop.scale = value;
+        }
     }
     Button {
         id: buttonOpen
