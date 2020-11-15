@@ -37,6 +37,9 @@ void AsyncCameraCapture::setDeviceId(const QString &deviceId) {
 
 void AsyncCameraCapture::setCamera(const QCameraInfo &cameraInfo) {
     qDebug() << "cameraInfo: " << cameraInfo;
+    if (cameraInfo.deviceName().startsWith("@device:sw:{")) {
+        return;
+    }
 
     m_camera.reset(new QCamera(cameraInfo));
     m_camera->setCaptureMode(QCamera::CaptureViewfinder);

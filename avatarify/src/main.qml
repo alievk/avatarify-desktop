@@ -171,6 +171,17 @@ ApplicationWindow {
                                 text: "Overlay"
                                 visible: (manager.avatarPath === "none") && (overlayImage.source.toString() !== "")
                             }
+                            Slider {
+                                id: overlaySlider
+                                Layout.preferredWidth: 70
+                                visible: overlayCheckbox.visible && overlayCheckbox.checked
+                                from: 0.1
+                                to: 0.9
+                                value: 0.5
+                            }
+                            Item {
+                                Layout.preferredWidth: 5
+                            }
                         }
                     }
                 }
@@ -204,7 +215,7 @@ ApplicationWindow {
                                 }
                                 height: videoOutput.contentRect.height
                                 fillMode: Image.PreserveAspectFit//.PreserveAspectCrop
-                                opacity: 0.5
+                                opacity: overlaySlider.value
                                 visible: overlayCheckbox.checked && (manager.avatarPath === "none")
                             }
                         }

@@ -1,5 +1,8 @@
 #include "AkVCamBridge.h"
 
+#include <QDir>
+#include <QThread>
+
 const std::wstring AkVCamBridge::description(L"Avatarify Camera");
 const std::vector<AkVCam::PixelFormat> AkVCamBridge::pixelFormats({AkVCam::PixelFormat::PixelFormatRGB32,
                                                                    AkVCam::PixelFormat::PixelFormatRGB24,
@@ -15,28 +18,46 @@ AkVCamBridge::AkVCamBridge() : format(AkVCam::PixelFormat::PixelFormatRGB24, wid
 
 bool AkVCamBridge::allocateDevice() {
     m_ipcBridge.connectService(false);
-//    m_ipcBridge.setDriverPaths({L"C:\\Users\\illus\\Documents\\GitHub\\avatarify-desktop-cpp\\cmake-build-release\\lib\\akvirtualcamera"});
-    m_ipcBridge.setDriverPaths({L"C:\\Users\\illus\\Documents\\GitHub\\avatarify-desktop-cpp"});
+    m_ipcBridge.setDriverPaths({QDir::currentPath().toStdWString()});
     auto devices = m_ipcBridge.listDevices();
     std::cout << "List of devices:" << std::endl;
     for (const auto &d : devices) {
         std::cout << "\t" << d << std::endl;
     }
     
-    if (!devices.empty()) {
+    bool isStarted{false};
+    if (devices.empty()) {
+        qDebug() << "No available devices. Need to create one..." << supportedFormats.size();
+        m_ipcBridge.deviceCreate(description, supportedFormats);
+        devices = m_ipcBridge.listDevices();
+        qDebug() << devices.size();
+        if (!devices.empty()) {
+            m_device = devices[0];
+            qDebug() << m_device.c_str();
+            for (int i = 1; i < 4; ++i) {
+                QThread::sleep(4 * i);
+                if ((isStarted = m_ipcBridge.deviceStart(m_device, format))) {
+                    break;
+                }
+            }
+            if (!isStarted) {
+                return false;
+            }
+        }
+        //m_device = m_ipcBridge.deviceCreate(description, supportedFormats);
+        //if (m_device.empty()) { // error during creating the device
+        //    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+        //    std::cout << "ipcBridge: " << converter.to_bytes(m_ipcBridge.errorMessage()) << std::endl;
+        //    return false;
+        //}
+    } else {
         qDebug() << "There are " << devices.size() << " devices. Choose 0...";
         m_device = devices[0];
-        m_ipcBridge.deviceEdit(m_device, L"Avatarify Camera", supportedFormats);
-    } else {
-        qDebug() << "No available devices. Need to create one..." << supportedFormats.size();
-        m_device = m_ipcBridge.deviceCreate(description, supportedFormats);
-        if (m_device.empty()) { // error during creating the device
-            std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-            std::cout << "ipcBridge: " << converter.to_bytes(m_ipcBridge.errorMessage()) << std::endl;
-            return false;
-        }
+        //m_ipcBridge.deviceEdit(m_device, L"Avatarify Camera", supportedFormats);
     }
-    bool isStarted = m_ipcBridge.deviceStart(m_device, format);
+    if (!isStarted) {
+        isStarted = m_ipcBridge.deviceStart(m_device, format);
+    }
     if (isStarted) {
         std::cout << "Success initializing " << m_device << std::endl;
         return true;
