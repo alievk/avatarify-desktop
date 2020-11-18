@@ -19,6 +19,38 @@ ApplicationWindow {
     height: minimumHeight
     title: "Avatarify Desktop"
 
+    Popup {
+        id: updatePopup
+        Component.onCompleted: {
+            versionChecker.updateAvailableChanged.connect(
+                function() {
+                    if (versionChecker.updateAvailable) {
+                        updatePopup.open();
+                    }
+                }
+            );
+            versionChecker.checkForUpdates();
+        }
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        width: 200
+        height: 50
+        modal: true
+        focus: true
+        //closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        Text {
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                verticalCenter: parent.verticalCenter
+            }
+            text: '<html><style type="text/css"></style><a href="%1">Update to version %2</a></html>'.arg(versionChecker.updateUrl).arg(versionChecker.updateVersion)
+            onLinkActivated: {
+                Qt.openUrlExternally(link);
+                Qt.quit();
+            }
+        }
+    }
+
     Settings {
         id: window_settings
         category: "Window"

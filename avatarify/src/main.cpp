@@ -8,6 +8,7 @@
 
 #include "utils/amplitudelogger.h"
 #include "utils/facefinder.h"
+#include "utils/versionchecker.h"
 
 #if defined(WIN32)
 
@@ -39,8 +40,11 @@ int main(int argc, char *argv[]) {
 //    qmlRegisterType<ImageCropperWidget>("com.avatarify.desktop", 1, 0, "ImageCropper");
 
     FaceFinder faceFinder;
+    VersionChecker versionChecker;
+    //versionChecker.checkForUpdates();
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("faceFinder", &faceFinder);
+    engine.rootContext()->setContextProperty("versionChecker", &versionChecker);
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)

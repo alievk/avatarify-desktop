@@ -54,9 +54,9 @@ QImage KalmanCrop::apply(const QImage &image) {
 
     centerX = (left + right) / 2;
     centerY = (top + bottom) / 2;
-    scale = (bottom - top) / 1.8;
+    scale = (bottom - top) / 1.5;
     left = centerX - 8 * scale;
-    top = centerY - 5.5 * scale;
+    top = centerY - 4.5 * scale;
 
     QRect rect(long(left), long(top), long(16 * scale), long(9 * scale));
     return image.copy(rect).scaled(1280, 720);

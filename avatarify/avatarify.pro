@@ -1,6 +1,19 @@
 TORCHDIR = c:/SDKs/libtorch-win-shared-with-deps-1.6.0
 TORCHDIR_DEBUG = c:/SDKs/libtorch-win-shared-with-deps-debug-1.6.0
 
+#Application version
+VERSION_MAJOR = 0
+VERSION_MINOR = 9
+VERSION_BUILD = 0
+VERSION_REVISION = 0
+
+DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR"\
+       "VERSION_MINOR=$$VERSION_MINOR"\
+       "VERSION_BUILD=$$VERSION_BUILD"\
+       "VERSION_REVISION=$$VERSION_REVISION"\
+
+VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}.$${VERSION_REVISION}
+
 QT += quick \
     widgets \
     quickcontrols2 \
@@ -37,6 +50,7 @@ HEADERS += \
     src/utils/cipherreader.h \
     src/utils/facefinder.h \
     src/utils/utils.h \
+    src/utils/versionchecker.h \
     src/vcam/AbstractVCamInterface.h \
     src/vcam/AkVCamBridge.h \
     src/vcam/StubVCam.h \
@@ -62,6 +76,7 @@ SOURCES += \
     src/utils/cipherreader.cpp \
     src/utils/facefinder.cpp \
     src/utils/utils.cpp \
+    src/utils/versionchecker.cpp \
     src/vcam/AbstractVCamInterface.cpp \
     src/vcam/AkVCamBridge.cpp \
     src/vcam/StubVCam.cpp \

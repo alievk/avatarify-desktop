@@ -45,7 +45,7 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
 
 at::Tensor LibtorchPredictor::frameToImage(QImage &drivingFrame) {
     auto drivingImage = qimageToTensor(drivingFrame);
-    drivingImage = drivingImage.slice(3, 160, -160);
+    drivingImage = drivingImage.slice(3, 280, -280);
     return torch::upsample_bilinear2d(drivingImage, {256, 256}, false);
 }
 
