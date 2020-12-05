@@ -24,6 +24,8 @@ private:
     DlibShapePredictor m_dlibPredictor;
 
     KalmanFilter1d m_kalmanFilter;
+
+    QVector<qreal> m_points;
 };
 
 

@@ -1,5 +1,7 @@
 #include "KalmanCrop.h"
 
+#include "../../utils/facefinder.h"
+
 const QString KalmanCrop::shapePredictorWeightsPath =
         QDir::homePath() + "/.avatarify/models/shape_predictor_5_face_landmarks.dat";
 
@@ -12,20 +14,46 @@ void KalmanCrop::erase() {
 }
 
 QImage KalmanCrop::apply(const QImage &image) {
+    //auto points = FaceFinder::findFace(image);
+    //if (points.size() < 4) {
+    //    if (m_points.size() < 4) {
+    //        qDebug() << "KalmanCrop returns source image";
+    //        return image;
+    //    }
+    //} else {
+    //    m_points = points;
+    //}
+    //if (m_points.size() < 4) {
+    //    qDebug() << "IMPOSSIBLE";
+    //    return image;
+    //}
+    //auto left = image.width() * m_points[0];
+    //auto top = image.height() * m_points[1];
+    //auto right = image.width() * m_points[2];
+    //auto bottom = image.height() * m_points[3];
+    //auto avg = ((right - left) + (bottom - top)) / 2;
+    //auto centerX = (left + right) / 2;
+    //auto centerY = (top + bottom) / 2;
+    //return image.copy(QRect(centerX - avg / 2, centerY - avg / 2, avg, avg));
     static double left, right, top, bottom, centerX, centerY, scale;
 
-    std::vector<dlib::point> points = m_dlibPredictor.detect(image);
+    auto points = FaceFinder::findFace(image.scaled(320, 240, Qt::KeepAspectRatio));//m_dlibPredictor.detect(image);
     std::vector<double> smoothedCropParams;
-    if (!points.empty()) {
+    if (points.size() >= 4) {
         // find top, bottom, centerX, and then crop in 16x9
-        left = 1280, right = 0, top = 720, bottom = 0;
-        for (auto point : points) {
-            left = left > point.x() ? point.x() : left;
-            right = right < point.x() ? point.x() : right;
-            top = top > point.y() ? point.y() : top;
-            bottom = bottom < point.y() ? point.y() : bottom;
-        }
-//        qDebug() << "before: " << top << "x" << right << "x" << bottom << "x" << left;
+
+        //left = image.width(), right = 0, top = image.height(), bottom = 0;
+        left = points[0] * image.width();
+        top = points[1] * image.height();
+        right = points[2] * image.width();
+        bottom = points[3] * image.height();
+        //for (auto point : points) {
+        //    left = left > point.x() ? point.x() : left;
+        //    right = right < point.x() ? point.x() : right;
+        //    top = top > point.y() ? point.y() : top;
+        //    bottom = bottom < point.y() ? point.y() : bottom;
+        //}
+        //qDebug() << "before: " << top << "x" << right << "x" << bottom << "x" << left;
 
         std::vector<double> x = {left, right, top, bottom};
         if (!m_kalmanFilter.isInitialized()) {
@@ -35,7 +63,7 @@ QImage KalmanCrop::apply(const QImage &image) {
     } else {
         if (!m_kalmanFilter.isInitialized()) {
             qDebug() << "no face detected; not initialized; return source image";
-            return image;
+            return image.copy(0, 0, qMin(image.width(), image.height()), qMin(image.width(), image.height()));
         }
         qDebug() << "no face detected; use last state";
         smoothedCropParams = m_kalmanFilter.state();
@@ -48,18 +76,25 @@ QImage KalmanCrop::apply(const QImage &image) {
 
     if (left != left || right != right || top != top || bottom != bottom) {
         qDebug() << "init!";
-        std::vector<double> newX = {0, 1280, 0, 720};
+        std::vector<double> newX = {0, static_cast<double>(image.width()), 0, static_cast<double>(image.height())};
         m_kalmanFilter.initFilters(newX);
     }
 
-    centerX = (left + right) / 2;
-    centerY = (top + bottom) / 2;
-    scale = (bottom - top) / 1.5;
-    left = centerX - 8 * scale;
-    top = centerY - 4.5 * scale;
+    QRect rect;
+    if (image.width() >= image.height()) {
+        rect = QRect(long(left + right - image.height()) / 2, 0, image.height(), image.height());
+    } else {
+        rect = QRect(0, long(top + bottom - image.width()) / 2, image.width(), image.width());
+    }
 
-    QRect rect(long(left), long(top), long(16 * scale), long(9 * scale));
-    return image.copy(rect).scaled(1280, 720);
+    //double scaleK = 1.666;
+    //centerX = (left + right) / 2;
+    //centerY = (top + bottom) / 2;
+    //scale = ((bottom - top) + (right - left)) / 4.0 * scaleK;
+    //left = centerX - scale;
+    //top = centerY - scale;
+
+    return image.copy(rect);
 }
 
 

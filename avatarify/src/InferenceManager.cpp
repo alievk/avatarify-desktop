@@ -111,11 +111,17 @@ void InferenceManager::requestCalibration() {
 }
 
 void InferenceManager::presentFrame(const QImage &generatedFrame) {
+    QImage img(QSize(1280, 720), /*QImage::Format_ARGB32*/generatedFrame.format());
+    QPainter painter(&img);
+    auto frame = generatedFrame.scaled(720, 720);
+    if (m_mirror) {
+        frame = frame.mirrored(true, false);
+    }
+    painter.drawImage(QPointF((1280 - 720) / 2, 0), frame);///*generatedFrame.convertToFormat(QImage::Format_ARGB32).scaled(480, 480)*/);
     // vcam
-    m_virtualCamera->present(generatedFrame);
+    m_virtualCamera->present(img);
 
     // preview
-    QImage generatedFrameRGBA = generatedFrame.convertToFormat(QImage::Format_ARGB32);
-    QVideoFrame previewFrame(m_mirror ? generatedFrameRGBA.mirrored(true, false) : generatedFrameRGBA);
+    QVideoFrame previewFrame(img.convertToFormat(QImage::Format_ARGB32));
     m_videoSurface->present(previewFrame);
 }

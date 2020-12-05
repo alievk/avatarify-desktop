@@ -137,7 +137,7 @@ ApplicationWindow {
                         Switch {
                             id: cameraMirrorCheckbox
                             Layout.fillWidth: true
-                            text: "Flip video preview"
+                            text: "Flip video"
                         }
 
                         Switch {
@@ -229,27 +229,22 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     title: "Preview"
 
-                    ColumnLayout {
-                        spacing: 0
+                    VideoOutput {
+                        id: videoOutput
+                        source: manager
                         anchors.fill: parent
-
-                        VideoOutput {
-                            id: videoOutput
-                            source: manager
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Image {
-                                id: overlayImage
-                                anchors {
-                                    left: parent.left
-                                    right: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                }
-                                height: videoOutput.contentRect.height
-                                fillMode: Image.PreserveAspectFit//.PreserveAspectCrop
-                                opacity: overlaySlider.value
-                                visible: overlayCheckbox.checked && (manager.avatarPath === "none")
+                        fillMode: videoOutput.PreserveAspectFit
+                        Image {
+                            id: overlayImage
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                verticalCenter: parent.verticalCenter
                             }
+                            height: videoOutput.contentRect.height
+                            fillMode: Image.PreserveAspectFit//.PreserveAspectCrop
+                            opacity: overlaySlider.value
+                            visible: overlayCheckbox.checked && (manager.avatarPath === "none")
                         }
                     }
                 }

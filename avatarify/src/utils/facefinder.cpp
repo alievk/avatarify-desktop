@@ -3,18 +3,21 @@
 #include <QDebug>
 #include <QImage>
 #include <QUrl>
-#include <dlib/image_processing/frontal_face_detector.h>
 
 FaceFinder::FaceFinder(QObject *parent) : QObject(parent) { }
 
+dlib::frontal_face_detector FaceFinder::detector = dlib::get_frontal_face_detector();
+
 QVector<qreal> FaceFinder::findFace(QString fileUrl) {
-    static dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
     QImage image(QUrl(fileUrl).toLocalFile());
     image = image.scaled(800, 800, Qt::KeepAspectRatio);
     if (image.format() != QImage::Format_RGB888) {
         image = image.convertToFormat(QImage::Format_RGB888);
     }
+    return findFace(image);
+}
 
+QVector<qreal> FaceFinder::findFace(const QImage &image) {
     dlib::matrix<dlib::rgb_pixel> img;
     img.set_size(image.height(), image.width());
     auto dstIt = img.begin();

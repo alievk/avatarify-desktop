@@ -14,8 +14,8 @@ void LibtorchPredictor::setSourceImage(QString &avatarPath) {
     isSourceImageReady = false;
 
     torch::Tensor newSourceImage = qimageToTensor(avatar);
-    newSourceImage = torch::upsample_bilinear2d(newSourceImage, {480, 480}, true);
-    newSourceImage = torch::nn::functional::pad(newSourceImage, torch::nn::functional::PadFuncOptions({80, 80}));
+    //newSourceImage = torch::upsample_bilinear2d(newSourceImage, {480, 480}, true);
+    //newSourceImage = torch::nn::functional::pad(newSourceImage, torch::nn::functional::PadFuncOptions({80, 80}));
     newSourceImage = torch::upsample_bilinear2d(newSourceImage, {256, 256}, true);
 
     setSourceImageInternal(newSourceImage);
@@ -38,14 +38,15 @@ QImage LibtorchPredictor::predict(QImage &drivingFrame) {
 
     auto drivingImage = frameToImage(drivingFrame);
     torch::Tensor generatedImage = predictInternal(drivingImage);
-    generatedImage = torch::upsample_bilinear2d(generatedImage, {720, 960}, false);
-    generatedImage = torch::nn::functional::pad(generatedImage, torch::nn::functional::PadFuncOptions({160, 160}));
+    generatedImage = torch::upsample_bilinear2d(generatedImage, {640, 640}, false);
+    //generatedImage = torch::upsample_bilinear2d(generatedImage, {720, 960}, false);
+    //generatedImage = torch::nn::functional::pad(generatedImage, torch::nn::functional::PadFuncOptions({160, 160}));
     return tensorToQImage(generatedImage);
 }
 
 at::Tensor LibtorchPredictor::frameToImage(QImage &drivingFrame) {
     auto drivingImage = qimageToTensor(drivingFrame);
-    drivingImage = drivingImage.slice(3, 280, -280);
+    //drivingImage = drivingImage.slice(3, 280, -280);
     return torch::upsample_bilinear2d(drivingImage, {256, 256}, false);
 }
 

@@ -68,7 +68,7 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
 
 //            qDebug() << "AsyncCameraCapture::processFrame " << pixelFormat << " " << imageFormat;
 
-            QImage image;
+            static QImage image;
             if (imageFormat != QImage::Format_Invalid) {
                 image = QImage(cloneFrame.bits(), cloneFrame.width(), cloneFrame.height(), imageFormat).mirrored().copy();
             } else if (pixelFormat == QVideoFrame::Format_NV12 ||
@@ -87,16 +87,22 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
             if (imageFormat != QImage::Format_RGB888) {
                 image = image.convertToFormat(QImage::Format_RGB888);
             }
-            if (image.width() == 640 || image.height() == 480) {
-                image = paddedImage(image, 107, QColor(Qt::black));
-            }
-            if (image.width() != 1280 || image.height() != 720) {
-                image = image.scaled(1280, 720);
-            }
+            //if (image.width() == 640 || image.height() == 480) {
+            //    image = paddedImage(image, 107, QColor(Qt::black));
+            //}
+            //if (image.width() != 1280 || image.height() != 720) {
+            //    image = image.scaled(1280, 720);
+            //}
 
+            auto wh = qMin(image.width(), image.height());
+            auto xx = (image.width() - wh) / 2;
+            auto yy = (image.height() - wh) / 2;
             if (m_smartCropFlag) {
-                image = m_smartCrop.apply(image);
+                image = m_smartCrop.apply(image).scaled(wh, wh);
+            } else {
+                image = image.copy(xx, yy, wh, wh);
             }
+            //qDebug() << "format " << image.format();
 
             Q_EMIT present(image);
         }

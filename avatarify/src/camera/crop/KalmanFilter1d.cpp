@@ -36,7 +36,7 @@ void KalmanFilter1d::initFilters(std::vector<double> &x0) {
         F.setIdentity(m, m);
         H.setIdentity(m, n);
         R(0, 0) = 5;
-        Q(0, 0) = 0.01;
+        Q(0, 0) = 0.0005;
 
         VectorXd x0v(2);
         x0v << x0[i], 0;
