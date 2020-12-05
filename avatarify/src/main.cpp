@@ -2,6 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QIcon>
 #include <QQmlContext>
+#include <QTimer>
+#include <QNetworkReply>
 #include "camera/AsyncCameraCapture.h"
 #include "imagecropper/ImageCropperWidget.h"
 #include "InferenceManager.h"
@@ -52,6 +54,19 @@ int main(int argc, char *argv[]) {
     }, Qt::QueuedConnection);
     engine.load(url);
     qDebug() << "Is CUDA available????? " << torch::cuda::is_available();
+    AmplitudeLogger::log(torch::cuda::is_available() ? "cuda_is_available" : "cuda_is_unavailable");
 
-    return app.exec();
+    auto retVal = app.exec();
+    auto nam = AmplitudeLogger::log(QString("exit_%1").arg(retVal));
+    QTimer timer;
+    timer.setSingleShot(true);
+    QEventLoop loop;
+    QObject::connect(nam, &QNetworkAccessManager::finished, [&loop](QNetworkReply* /*reply_*/) {
+        //reply_->deleteLater();
+        loop.quit();
+    });
+    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timer.start(2000);
+    loop.exec();
+    return retVal;
 }

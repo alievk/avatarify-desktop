@@ -2,11 +2,12 @@
 #define AMPLITUDELOGGER_H
 
 #include <QString>
+#include <QNetworkAccessManager>
 
 class AmplitudeLogger {
 public:
     AmplitudeLogger() = delete;
-    static void log(const QString& eventType_);
+    static QNetworkAccessManager* log(const QString& eventType_);
     static void setApiKey(const QString& apiKey_);
     static void setApiUrl(const QString& apiUrl_);
     static void setUserId(const QString& userId_);

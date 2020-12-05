@@ -1,5 +1,7 @@
 #include "AsyncCameraCapture.h"
 
+#include "../utils/amplitudelogger.h"
+
 template <typename T>
 QImage paddedImage(const QImage & source, int padWidth, T padValue) {
     QImage padded{source.width() + 2*padWidth, source.height(), source.format()};
@@ -114,6 +116,7 @@ bool AsyncCameraCapture::smartCrop() const {
 }
 
 void AsyncCameraCapture::setSmartCrop(const bool smartCrop) {
+    AmplitudeLogger::log(smartCrop ? "smart_crop_on" : "smart_crop_off");
     qDebug() << "AsyncCameraCapture::setSmartCrop " << QString::number(smartCrop);
     m_smartCrop.erase();
     m_smartCropFlag = smartCrop;

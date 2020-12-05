@@ -3,12 +3,11 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QHostAddress>
 #include <QNetworkInterface>
 
-void AmplitudeLogger::log(const QString& eventType_) {
+QNetworkAccessManager* AmplitudeLogger::log(const QString& eventType_) {
     auto request = QNetworkRequest(QUrl(apiUrl));
     QJsonObject json;
     json.insert("api_key", apiKey);
@@ -31,6 +30,7 @@ void AmplitudeLogger::log(const QString& eventType_) {
         qDebug() << "post request finished";
     });
     networkManager->post(request, jsonData);
+    return networkManager;
 }
 
 void AmplitudeLogger::setApiKey(const QString &apiKey_) {

@@ -3,6 +3,8 @@
 #include <QDir>
 #include <QThread>
 
+#include "../utils/amplitudelogger.h"
+
 const std::wstring AkVCamBridge::description(L"Avatarify Camera");
 const std::vector<AkVCam::PixelFormat> AkVCamBridge::pixelFormats({AkVCam::PixelFormat::PixelFormatRGB32,
                                                                    AkVCam::PixelFormat::PixelFormatRGB24,
@@ -59,9 +61,11 @@ bool AkVCamBridge::allocateDevice() {
         isStarted = m_ipcBridge.deviceStart(m_device, format);
     }
     if (isStarted) {
+        AmplitudeLogger::log("vcam_ok");
         std::cout << "Success initializing " << m_device << std::endl;
         return true;
     } else {
+        AmplitudeLogger::log("vcam_fail");
         std::cout << "Error initializing " << m_device << std::endl;
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
         std::cout << "ipcBridge: " << converter.to_bytes(m_ipcBridge.errorMessage()) << std::endl;
