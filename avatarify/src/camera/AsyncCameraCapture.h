@@ -18,6 +18,7 @@ class AsyncCameraCapture : public QObject {
 Q_OBJECT
     Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId)
     Q_PROPERTY(bool smartCrop READ smartCrop WRITE setSmartCrop)
+    Q_PROPERTY(bool mirror MEMBER m_mirror)
 
 public:
     explicit AsyncCameraCapture(QObject *parent = nullptr);
@@ -53,6 +54,7 @@ private:
 
     bool m_smartCropFlag = false;
     KalmanCrop m_smartCrop;
+    bool m_mirror{false};
 };
 
 #endif // BACKEND_H

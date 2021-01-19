@@ -80,14 +80,18 @@ void AsyncCameraCapture::processFrame(const QVideoFrame &frame) {
                 image = QImage(cloneFrame.width(), cloneFrame.height(), QImage::Format_BGR888);
                 convertToRGB(cloneFrame.bits(), image.bits(), pixelFormat, cloneFrame.width(), cloneFrame.height());
             } else {
-                qDebug() << "Not supported format: " << cloneFrame.pixelFormat();
-                cloneFrame.unmap();
-                return;
+                image = frame.image();
+                //qDebug() << "Not supported format: " << cloneFrame.pixelFormat();
+                //cloneFrame.unmap();
+                //return;
             }
             cloneFrame.unmap();
 
             if (imageFormat != QImage::Format_RGB888) {
                 image = image.convertToFormat(QImage::Format_RGB888);
+            }
+            if (m_mirror) {
+                image = image.mirrored(true, false);
             }
             //if (image.width() == 640 || image.height() == 480) {
             //    image = paddedImage(image, 107, QColor(Qt::black));

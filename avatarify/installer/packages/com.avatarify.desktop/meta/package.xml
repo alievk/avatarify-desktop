@@ -8,6 +8,9 @@
         <License name="Public License Agreement" file="license.txt" />
     </Licenses>
     <Script>installscript.qs</Script>
+    <UserInterfaces>
+        <UserInterface>targetwidget.ui</UserInterface>
+    </UserInterfaces>
     <Default>true</Default>
     <ForcedInstallation>true</ForcedInstallation>
     <Essential>true</Essential>

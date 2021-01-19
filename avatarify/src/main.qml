@@ -73,6 +73,7 @@ ApplicationWindow {
         id: cam
         deviceId: input_settings.cam_id
         smartCrop: input_settings.smartCrop
+        mirror: input_settings.mirror
     }
 
     VCam {
@@ -84,7 +85,7 @@ ApplicationWindow {
         id: manager
         camera: cam
         virtualCamera: vcam
-        mirror: input_settings.mirror
+        //mirror: input_settings.mirror
     }
 
     ColumnLayout {
@@ -192,11 +193,17 @@ ApplicationWindow {
                         RowLayout {
                             Layout.fillWidth: true
                             Button {
-                                text: "Calibrate"
-                                onClicked: {
+                                action: aCalibrate
+                            }
+                            Action {
+                                id: aCalibrate
+                                text: "&Calibrate"
+                                shortcut: "C"
+                                onTriggered: {
                                     manager.requestCalibration();
                                 }
                             }
+
                             Switch {
                                 id: overlayCheckbox
                                 Layout.fillWidth: true
@@ -286,6 +293,28 @@ ApplicationWindow {
                         folder: "file:///" + manager.rootFolder + "/.avatarify/avatars"
                         nameFilters: ['*.jpg', '*.jpeg', '*.png']
                     }
+                    ScrollBar.horizontal: ScrollBar { }
+                    function setAvatar(index) {
+                        if (index < 0 || index >= avatarModel.count) {
+                            return;
+                        }
+                        avatarSelector.currentIndex = index;
+                        manager.avatarPath = avatarModel.get(index, "fileName");
+                    }
+                    Action {
+                        id: aPrevious
+                        shortcut: "Left"
+                        onTriggered: {
+                            avatarSelector.setAvatar(avatarSelector.currentIndex - 1);
+                        }
+                    }
+                    Action {
+                        id: aNext
+                        shortcut: "Right"
+                        onTriggered: {
+                            avatarSelector.setAvatar(avatarSelector.currentIndex + 1);
+                        }
+                    }
                     delegate: Component {
                         Item {
                             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -318,8 +347,9 @@ ApplicationWindow {
                                 onClicked: {
                                     if (mouse.button == Qt.LeftButton) {
                                         if (avatarSelector.currentIndex != index) {
-                                            avatarSelector.currentIndex = index;
-                                            manager.avatarPath = model.fileName;
+                                            avatarSelector.setAvatar(index);
+                                            //avatarSelector.currentIndex = index;
+                                            //manager.avatarPath = model.fileName;
                                         } else {
                                             avatarSelector.currentIndex = -1;
                                             manager.avatarPath = "none";
