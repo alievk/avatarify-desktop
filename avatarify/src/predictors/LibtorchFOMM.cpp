@@ -4,7 +4,7 @@
 
 #include "LibtorchFOMM.h"
 //#include "../utils/cipherbuf.h"
-#include "../utils/cipherreader.h"
+//#include "../utils/cipherreader.h"
 
 LibtorchFOMM::LibtorchFOMM() {
     if (!QFileInfo::exists(FOMMEncoderPath)) {
@@ -26,9 +26,12 @@ LibtorchFOMM::LibtorchFOMM() {
     //CipherBuf::apply(std::filesystem::u8path(KPDetectorPath.toStdString()), std::filesystem::u8path(KPDetectorPath.toStdString() + "_"));
     //CipherBuf::apply(std::filesystem::u8path(FOMMNoEncoderNoKPDetectorPath.toStdString()), std::filesystem::u8path(FOMMNoEncoderNoKPDetectorPath.toStdString() + "_"));
 
-    FOMMEncoderModule = torch::jit::load(std::make_unique<CipherReader>(FOMMEncoderPath.toStdString() + "_"), device);
-    KPDetectorModule = torch::jit::load(std::make_unique<CipherReader>(KPDetectorPath.toStdString() + "_"), device);
-    FOMMNoEncoderNoKPDetectorModule = torch::jit::load(std::make_unique<CipherReader>(FOMMNoEncoderNoKPDetectorPath.toStdString() + "_"), device);
+    //FOMMEncoderModule = torch::jit::load(std::make_unique<CipherReader>(FOMMEncoderPath.toStdString() + "_"), device);
+    //KPDetectorModule = torch::jit::load(std::make_unique<CipherReader>(KPDetectorPath.toStdString() + "_"), device);
+    //FOMMNoEncoderNoKPDetectorModule = torch::jit::load(std::make_unique<CipherReader>(FOMMNoEncoderNoKPDetectorPath.toStdString() + "_"), device);
+    FOMMEncoderModule = torch::jit::load(FOMMEncoderPath.toStdString(), device);
+    KPDetectorModule = torch::jit::load(KPDetectorPath.toStdString(), device);
+    FOMMNoEncoderNoKPDetectorModule = torch::jit::load(FOMMNoEncoderNoKPDetectorPath.toStdString(), device);
 }
 
 void LibtorchFOMM::calibrate(QImage &drivingFrame) {
