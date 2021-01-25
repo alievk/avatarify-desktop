@@ -54,7 +54,7 @@ cd avatarify-desktop
 git submodule update --init --recursive
 ```
 * Build the project with Qt Creator. Choose MSVC 2019 64-bit kit and Release configuration.
-* Download additional files from [here](https://avatarify-desktop.s3.amazonaws.com/.avatarify.zip) and unpack to ~/.avatarify. This folder has the following structure:
+* Download additional files from [here](https://avatarify-desktop.s3.amazonaws.com/.avatarify.zip) and unpack to C:\\Users\\[user]\\.avatarify. This folder has the following structure:
   * .avatarify\avatars: avatar pictures
   * .avatarify\models: FOMM and landmark detector model weights
 * Download AkVirtualCamera.plugin from [here](https://avatarify-desktop.s3.amazonaws.com/AkVirtualCamera.plugin.zip) and unpack to [build]/avatarify. Avatarify will register еру plugin on the first run.
@@ -64,6 +64,6 @@ git submodule update --init --recursive
 
 * Build release solution
 * Call `make install` in cmake-build-release folder. Clean installation files will be located in C:\\Program Files\\Avatarify
-* Compress folder with 7z and put it in ./installer/packages/com.avatarify.desktop/data folder
-* You need to make similar archives for models and avatars from ~/.avatarify and put them to com.avatarify.desktop.models and com.avatarify.desktop.avatars folders
-* Run ./installer/package_for_windows.bat
+* Compress folder with 7z and put it in avatarify-desktop\\installer\\packages\\com.avatarify.desktop\\data folder
+* You need to make similar archives for models and avatars from C:\\Users\\[user]\\.avatarify and put them to com.avatarify.desktop.models and com.avatarify.desktop.avatars folders
+* Run avatarify-desktop\\installer\\package_for_windows.bat
