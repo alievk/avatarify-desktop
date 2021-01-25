@@ -2,21 +2,29 @@
 
 Successor of [Open Avatarify](https://github.com/alievk/avatarify), written in C++.
 
-Tasks in Notion: https://www.notion.so/54100a62141b4a0182df043a24b12d34?v=630854456ebb4f39bbf1faa43942742f.
-
 
 ## Getting started
+<!--
 ### Notes
 * **VS compiler**. Precompiled libtorch libraries are built with VS compiler. Libtorch sources compile without errors with VS compiler, but mingw causes errors. It seems reasonable to buy a license for VS compiler than make libtorch support for mingw.
 
 * **AKVitrualCamera**. We use my fork of [AKVitrualCamera](https://github.com/vlivashkin/akvirtualcamera) to support vcam. It has GNUv3 license, can we use it? In the fork, I've added CMake support for Windows (you'll need to add MacOS support). You also need to rename all stuff there (e.g. service name) to avoid collision with Webcamoid.
-
+-->
 
 ### Dependencies
-* **libtorch**. Library for NN inference. Download library here: https://pytorch.org/ (Stable; Windows; C++/Java; 10.2/None). Direct links: if you have Nvidia GPU [release](https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-1.6.0.zip), [debug](https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-debug-1.6.0.zip), otherwise [release](https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.6.0%2Bcpu.zip), [debug](https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-debug-1.6.0%2Bcpu.zip). 
+* **Qt**
+1. Download [online installer](https://www.qt.io/download-open-source?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5)
+1. Run the installer and on the Select Components page select these components:
+    * Qt -> Qt 5.15.2. Desellect all components except MSVC 2019 64bit to save disk space
+    * Qt -> Developer and Designer Tools -> OpenSSL 1.1.1d Toolkit
+1. 
 
-  Extract files to C:\\SDKs\\.
-  
+* **libtorch**. Library for NN inference. Download library here: https://pytorch.org/ (Stable; Windows; C++/Java; 10.2/None). Direct links: [release](https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-1.6.0.zip), [debug](https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-debug-1.6.0.zip). Extract files to
+    * Release: C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0
+    * Debug: C:\\SDKs\\libtorch-win-shared-with-deps-debug-1.6.0  
+ Make sure path C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0\lib (for release) is correct. Remove extra sub-directories if necessary.  
+
+<!--
 * **libyuv**. Library for fast frame format conversion, e.g. YUYV -> RGB. [Official manual](https://chromium.googlesource.com/libyuv/libyuv/+/HEAD/docs/getting_started.md).
   
 * **dlib**. Library for fast face tracking (needed by kalman crop). [Link](https://github.com/davisking/dlib/releases/tag/v19.21).
@@ -37,7 +45,7 @@ Tasks in Notion: https://www.notion.so/54100a62141b4a0182df043a24b12d34?v=630854
 	The reason came out to be that OpenSSL DLLs depend on another MSVC runtime version than the Qt app itself, and these errors go unreported.
 	Open these DLLs in Dependency Walker to find out what's missing. In my case it was MSVCR100.dll, so I had to install MSVC 2010 Redistributable x64 (x86 is here).
 	```
-
+-->
 
 ### Build project
 * Check that you have libtorch at C:\\SDKs\\
@@ -46,16 +54,11 @@ git clone https://github.com/vlivashkin/avatarify-desktop
 cd avatarify-desktop
 git submodule update --init --recursive
 ```
-* Build the project with Qt Creator
-* Check that you have all additional files in ~/.avatarify (you can download dump [here](https://www.dropbox.com/s/c98y8b1bfijt1lm/.avatarify.zip?dl=0)):
-  * ~/.avatarify/avatars:
-    * _add.png (crutch for adding custom avatars)
-    * some extra faces in 256x256
-  * ~/.avatarify/models:
-    * FOMMEncoder.pt_, KPDetector.pt_, FOMMNoEncoderNoKPDetector.pt_
-    * shape_predictor_5_face_landmarks.dat
-* Copy AkVirtualCamera.plugin folder to [build]/avatarify
-* Copy libssl-1_1-x64.dll and libcrypto-1_1-x64.dll to [build]/avatarify/release
+* Build the project with Qt Creator. Choose MSVC 2019 64-bit kit and Release configuration.
+* Download additional files from [here]() and unpack to ~/.avatarify. This folder has the following structure:
+  * .avatarify/avatars: avatar pictures
+  * .avatarify/models: FOMM and landmark detecor model weights
+* Download AkVirtualCamera.plugin from [here]() and unpack to [build]/avatarify. Avatarify will register plugin on the first run.
 
 ## How to build installer
 (not very clean solution, but at least it works)
