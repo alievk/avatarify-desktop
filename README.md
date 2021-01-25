@@ -17,7 +17,6 @@ Successor of [Open Avatarify](https://github.com/alievk/avatarify), written in C
 1. Run the installer and on the Select Components page select these components:
     * Qt -> Qt 5.15.2. Desellect all components except MSVC 2019 64bit to save disk space
     * Qt -> Developer and Designer Tools -> OpenSSL 1.1.1d Toolkit
-1. 
 
 * **libtorch**. Library for NN inference. Download library here: https://pytorch.org/ (Stable; Windows; C++/Java; 10.2/None). Direct links: [release](https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-1.6.0.zip), [debug](https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-debug-1.6.0.zip). Extract files to
     * Release: C:\\SDKs\\libtorch-win-shared-with-deps-1.6.0
@@ -55,10 +54,10 @@ cd avatarify-desktop
 git submodule update --init --recursive
 ```
 * Build the project with Qt Creator. Choose MSVC 2019 64-bit kit and Release configuration.
-* Download additional files from [here]() and unpack to ~/.avatarify. This folder has the following structure:
+* Download additional files from [here](https://avatarify-desktop.s3.amazonaws.com/.avatarify.zip) and unpack to ~/.avatarify. This folder has the following structure:
   * .avatarify/avatars: avatar pictures
   * .avatarify/models: FOMM and landmark detecor model weights
-* Download AkVirtualCamera.plugin from [here]() and unpack to [build]/avatarify. Avatarify will register plugin on the first run.
+* Download AkVirtualCamera.plugin from [here](https://avatarify-desktop.s3.amazonaws.com/AkVirtualCamera.plugin.zip) and unpack to [build]/avatarify. Avatarify will register plugin on the first run.
 
 ## How to build installer
 (not very clean solution, but at least it works)
