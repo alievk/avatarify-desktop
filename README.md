@@ -71,7 +71,7 @@ F | Fullscreen mode
 
 
 
-## Getting started
+## Build from source
 <!--
 ### Notes
 * **VS compiler**. Precompiled libtorch libraries are built with VS compiler. Libtorch sources compile without errors with VS compiler, but mingw causes errors. It seems reasonable to buy a license for VS compiler than make libtorch support for mingw.
@@ -127,7 +127,7 @@ git submodule update --init --recursive
   * .avatarify\models: FOMM and landmark detector model weights
 * Download AkVirtualCamera.plugin from [here](https://avatarify-desktop.s3.amazonaws.com/AkVirtualCamera.plugin.zip) and unpack to [build]/avatarify. Avatarify will register еру plugin on the first run.
 
-## How to build installer
+## Build installer
 (not very clean solution, but at least it works)
 
 * Build release solution
