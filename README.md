@@ -1,6 +1,74 @@
+<img src=https://openavatarify.s3.amazonaws.com/media/einstein_flexin.gif width=600>
+
 # Avatarify Desktop
 
-Successor of [Open Avatarify](https://github.com/alievk/avatarify), written in C++.
+Avatarify for desktop with a user friendly interface.
+
+## System requirements
+* Windows 10
+* Nvidia GPU: GeForce 1070 or higher is recommended
+* Web camera
+
+## Installation
+
+1. Download [Avatarify Desktop](https://avatarify-desktop.s3.amazonaws.com/installer/Avatarify+Desktop+v0.10.exe) (897 Mb).
+1. Double click on the installer. Windows Defender warning screen may pop up telling that the app comes from an unknown source. Click "More info", then "Run anyway".
+1. Follow the instructions of the setup Wizard. You may opt to the default settings.
+
+## Running
+
+1. The app starts automatically after the installation. If that didn't happen, press Windows button and start typing "Avatarify" and select "Avatarify Desktop". Windows Defender warning screen may pop up telling that the app comes from an unknown source. Click "More info", then "Run anyway".
+1. In the **Settings** section of the main window, choose your web camera in the drop-down menu.
+1. Position your head in the center of the frame and press C to calibrate.
+1. Left-click on any avatar and start driving.
+
+**Tip**: whenever your avatar screws, press C (or click **Calibrate** button) to reset the initial pose. 
+
+To break into video conferencing with an avatar, set up the **Virtual camera**.
+
+### Virtual camera
+
+This example is for Zoom, but the procedure is similar in the other video-conf apps.
+
+1. In Zoom, go to **Setting**s -> **Video**.
+1. In the **Camera** drop-down menu, choose *Avatarify Camera*.
+1. You should see your avatar immediately. If you see image from your web camera, go back to Avatarify and left-click on an avatar.
+
+### Add new avatar
+
+1. Click on **Open image file** in the main window.
+1. Browse to your image with an avatar and open it. **Requirements to images**: one face, neutral emotion, frontal look.
+1. Crop your image. Using the slider under the window, zoom image so that shoulder are slightly captured. Drag the image using left mouse button and center the head of the avatar. Leave some space between top of the head and image border.
+1. Click on **Save** button. The new avatar will appear on the left of the avatar reel.
+
+<img src=https://user-images.githubusercontent.com/4682236/101614195-b16b6480-3a1d-11eb-967d-465f3028b94d.PNG width=250>
+
+### Use overlay
+
+Avatar driving works better when your calibration pose matches the avatar's pose.
+
+1. If an avatar is selected, left-click on it to switch to the web camera mode.
+1. Right-click on the avatar to make it appear as an overlay on your web camera image.
+1. Use **Overlay** slider in the **Settings** section to change opacity of the overlay.
+1. Match your pose and expression with the avatar and press C to calibrate.
+1. Left-click on the avatar to drive it.
+
+<img src=https://user-images.githubusercontent.com/4682236/101615548-4fabfa00-3a1f-11eb-8258-c6d4dca85034.png width=400>
+
+### Smart crop
+
+The app has a function to automatically track the position of your head. It's useful when your web camera is mounted sidewise and you not appear in the center of the frame.
+
+In the **Settings** section, switch **Smart crop** slider. The app will start tracking your head and move it to the center of the frame. When it's done, press C to calibrate.
+
+## Controls
+
+Key | Action
+--- | ---
+C | Calibrate. 
+⬅️ ➡️| Switch to previous / next avatar.
+F | Fullscreen mode
+
 
 
 ## Getting started
