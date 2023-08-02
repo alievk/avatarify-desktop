@@ -1,4 +1,4 @@
-<img src=https://openavatarify.s3.amazonaws.com/media/einstein_flexin.gif width=600>
+<img src=https://openavatarify.s3-avatarify.com/media/einstein_flexin.gif width=600>
 
 # Avatarify Desktop
 
@@ -11,7 +11,7 @@ Avatarify for desktop with a user friendly interface.
 
 ## Installation
 
-1. Download [Avatarify Desktop](https://avatarify-desktop.s3.amazonaws.com/installer/Avatarify+Desktop+v0.10.exe) (897 Mb).
+1. Download [Avatarify Desktop](https://avatarify-desktop.s3-avatarify.com/installer/Avatarify%20Desktop%20v0.10.exe) (897 Mb).
 1. Double click on the installer. Windows Defender warning screen may pop up telling that the app comes from an unknown source. Click "More info", then "Run anyway".
 1. Follow the instructions of the setup Wizard. You may opt to the default settings.
 
@@ -122,10 +122,10 @@ cd avatarify-desktop
 git submodule update --init --recursive
 ```
 * Build the project with Qt Creator. Choose MSVC 2019 64-bit kit and Release configuration.
-* Download additional files from [here](https://avatarify-desktop.s3.amazonaws.com/.avatarify.zip) and unpack to C:\\Users\\[user]\\.avatarify. This folder has the following structure:
+* Download additional files from [here](https://avatarify-desktop.s3-avatarify.com/.avatarify.zip) and unpack to C:\\Users\\[user]\\.avatarify. This folder has the following structure:
   * .avatarify\avatars: avatar pictures
   * .avatarify\models: FOMM and landmark detector model weights
-* Download AkVirtualCamera.plugin from [here](https://avatarify-desktop.s3.amazonaws.com/AkVirtualCamera.plugin.zip) and unpack to [build]/avatarify. Avatarify will register еру plugin on the first run.
+* Download AkVirtualCamera.plugin from [here](https://avatarify-desktop.s3-avatarify.com/AkVirtualCamera.plugin.zip) and unpack to [build]/avatarify. Avatarify will register еру plugin on the first run.
 
 ## Build installer
 (not very clean solution, but at least it works)
